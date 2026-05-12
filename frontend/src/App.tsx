@@ -1,122 +1,55 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import AdminLayout from './components/layout/AdminLayout';
+
+// Mock Pages (Sẽ triển khai chi tiết sau)
+const Dashboard = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    {[
+      { label: 'Tổng doanh thu', value: '150,000,000đ', color: 'text-success' },
+      { label: 'Đơn hàng mới', value: '25', color: 'text-primary' },
+      { label: 'Tài khoản đang bán', value: '1,240', color: 'text-warning' },
+      { label: 'Người dùng mới', value: '12', color: 'text-text-main' },
+    ].map((stat, i) => (
+      <div key={i} className="card p-6">
+        <p className="text-sm text-text-secondary mb-1">{stat.label}</p>
+        <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+      </div>
+    ))}
+  </div>
+);
+
+const GameManagement = () => (
+  <div className="card">
+    <div className="p-6 border-b border-border-color flex justify-between items-center">
+      <h2 className="text-xl font-bold">Danh sách Game</h2>
+      <button className="btn-primary">Thêm Game mới</button>
+    </div>
+    <div className="p-6">
+      <p className="text-text-secondary text-center py-10">Đang tải danh sách game...</p>
+    </div>
+  </div>
+);
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <Router>
+      <Routes>
+        {/* Admin Routes */}
+        <path path="/admin" element={<AdminLayout children={<Dashboard />} />}>
+          <Route index element={<Navigate to="/admin/dashboard" replace />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="games" element={<GameManagement />} />
+          <Route path="accounts" element={<div>Quản lý Tài khoản (Coming soon)</div>} />
+          <Route path="orders" element={<div>Quản lý Đơn hàng (Coming soon)</div>} />
+          <Route path="users" element={<div>Quản lý Người dùng (Coming soon)</div>} />
+          <Route path="deposits" element={<div>Quản lý Nạp tiền (Coming soon)</div>} />
+        </path>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        {/* Home Redirect */}
+        <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;

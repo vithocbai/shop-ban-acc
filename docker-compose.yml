@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=shop_game
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+
+  redis:
+    image: redis:7-alpine
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+      - redis
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    volumes:
+      - ./frontend:/app
+
+volumes:
+  postgres_data:

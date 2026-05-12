@@ -8,6 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.site_header := "Game Market Admin"),
     # API Endpoints
     path('api/', include('apps.games.urls')),
+    path('api/', include('apps.accounts.urls')),
     
     # API Documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

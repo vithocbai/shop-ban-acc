@@ -6,6 +6,8 @@ from django.utils import timezone
 from .models import Transaction, Deposit
 from .serializers import TransactionSerializer, DepositSerializer
 from .services.balance import update_user_balance
+from apps.notifications.services.notifier import notify_user
+from apps.notifications.models import Notification
 
 class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -56,6 +58,14 @@ class DepositViewSet(viewsets.ModelViewSet):
                 transaction_type=Transaction.Type.DEPOSIT,
                 note=f"Nạp tiền từ yêu cầu #{deposit.id} ({deposit.method})",
                 metadata={"deposit_id": deposit.id}
+            )
+            
+            # Gửi thông báo
+            notify_user(
+                user=deposit.user,
+                title="Nạp tiền thành công",
+                content=f"Yêu cầu nạp {deposit.amount:,.0f}đ của bạn đã được duyệt. Số dư đã được cập nhật.",
+                n_type=Notification.Type.PAYMENT
             )
             
         return Response({"message": "Đã duyệt nạp tiền thành công!"})

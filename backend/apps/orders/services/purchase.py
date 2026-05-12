@@ -6,6 +6,8 @@ from apps.accounts.models import Account
 from apps.payments.models import Transaction
 from apps.payments.services.balance import update_user_balance
 from apps.orders.models import Order, OrderItem
+from apps.notifications.services.notifier import notify_user
+from apps.notifications.models import Notification
 
 @transaction.atomic
 def purchase_account(user, account_id: int, note: str = ""):
@@ -65,6 +67,14 @@ def purchase_account(user, account_id: int, note: str = ""):
             "login_type": account.login_type,
             "message": "Vui lòng liên hệ Admin để nhận thông tin đăng nhập chi tiết."
         }
+    )
+
+    # 7. Gửi thông báo cho người mua
+    notify_user(
+        user=user,
+        title="Mua tài khoản thành công",
+        content=f"Chúc mừng! Bạn đã sở hữu tài khoản {account.account_code}. Kiểm tra lịch sử đơn hàng để xem thông tin.",
+        n_type=Notification.Type.ORDER
     )
 
     return order

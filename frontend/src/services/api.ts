@@ -1,0 +1,67 @@
+import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+
+// Tạo instance axios
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Request Interceptor: Đính kèm token vào header
+api.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response Interceptor: Xử lý lỗi tập trung và Refresh Token
+api.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError) => {
+    const originalRequest = error.config as any;
+
+    // Nếu lỗi 401 (Unauthorized) và chưa từng thử refresh
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      const refreshToken = localStorage.getItem('refresh_token');
+
+      if (refreshToken) {
+        try {
+          // Gọi API refresh token
+          const response = await axios.post(`${API_URL}/auth/refresh/`, {
+            refresh: refreshToken,
+          });
+
+          const { access } = response.data;
+          
+          // Lưu token mới
+          localStorage.setItem('access_token', access);
+          
+          // Cập nhật header và thực hiện lại request cũ
+          originalRequest.headers.Authorization = `Bearer ${access}`;
+          return api(originalRequest);
+        } catch (refreshError) {
+          // Nếu refresh cũng lỗi thì xóa hết token và đẩy về login
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+          window.location.href = '/admin/login';
+          return Promise.reject(refreshError);
+        }
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export default api;

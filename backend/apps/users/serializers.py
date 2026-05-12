@@ -40,3 +40,35 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+
+class ChangePasswordSerializer(serializers.Serializer):
+    """
+    Serializer cho việc đổi mật khẩu khi đã đăng nhập.
+    """
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+    confirm_password = serializers.CharField(required=True)
+
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['confirm_password']:
+            raise serializers.ValidationError({"confirm_password": "Mật khẩu mới không khớp."})
+        return attrs
+
+class PasswordResetSerializer(serializers.Serializer):
+    """
+    Serializer yêu cầu đặt lại mật khẩu (Gửi email).
+    """
+    email = serializers.EmailField(required=True)
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    """
+    Serializer xác nhận đặt lại mật khẩu bằng token.
+    """
+    token = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+    confirm_password = serializers.CharField(required=True)
+
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['confirm_password']:
+            raise serializers.ValidationError({"confirm_password": "Mật khẩu mới không khớp."})
+        return attrs

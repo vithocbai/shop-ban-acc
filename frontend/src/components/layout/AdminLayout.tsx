@@ -19,6 +19,7 @@ import {
   Image as ImageIcon,
   Bell
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 interface MenuItem {
   label: string;
@@ -32,7 +33,6 @@ const NavItem: React.FC<{ item: MenuItem; isActive: boolean; isOpen: boolean; on
 }) => {
   const location = useLocation();
   const hasChildren = !!item.children;
-
   if (!hasChildren) {
     return (
       <Link 
@@ -88,6 +88,7 @@ const NavItem: React.FC<{ item: MenuItem; isActive: boolean; isOpen: boolean; on
 
 const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
+  const { logout } = useAuth();
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
     'Tài khoản': true,
     'Đơn hàng': false,
@@ -182,7 +183,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <div className="px-4 mt-10">
           <button className="w-full flex items-center px-4 py-3 text-error hover:bg-red-50 rounded-md transition-colors text-sm font-medium">
             <span className="mr-3 font-bold">🚪</span>
-            <span>Đăng xuất</span>
+            <span onClick={() => logout()}>Đăng xuất</span>
           </button>
         </div>
       </aside>

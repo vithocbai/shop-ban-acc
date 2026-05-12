@@ -36,13 +36,21 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    'apps.common',
-    'apps.users',
-    'apps.games',
-    'apps.accounts',
-    'apps.payments',
-    'apps.orders',
-    'apps.notifications',
+    'common',
+    'apps.core',
+    'apps.user',
+    'apps.game',
+    'apps.account',
+    'apps.order',
+    'apps.payment',
+    'apps.transaction',
+    'apps.cart',
+    'apps.banner',
+    'apps.news',
+    'apps.notification',
+    'apps.analytics',
+    'apps.upload',
+    'apps.system_config',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -106,7 +114,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom User Model
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'user.User'
 
 # Django REST Framework Settings
 REST_FRAMEWORK = {

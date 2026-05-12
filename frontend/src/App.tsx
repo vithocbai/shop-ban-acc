@@ -1,7 +1,22 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from './components/layout/AdminLayout';
+import AdminLogin from './pages/admin/Login';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
-// Mock Pages (Sẽ triển khai chi tiết sau)
+// Protected Route Component
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) return <div className="flex items-center justify-center min-h-screen">Đang tải...</div>;
+  
+  if (!user || (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN')) {
+    return <Navigate to="/admin/login" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+// Mock Pages
 const Dashboard = () => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
     {[
@@ -32,23 +47,32 @@ const GameManagement = () => (
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* Admin Routes */}
-        <path path="/admin" element={<AdminLayout children={<Dashboard />} />}>
-          <Route index element={<Navigate to="/admin/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="games" element={<GameManagement />} />
-          <Route path="accounts" element={<div>Quản lý Tài khoản (Coming soon)</div>} />
-          <Route path="orders" element={<div>Quản lý Đơn hàng (Coming soon)</div>} />
-          <Route path="users" element={<div>Quản lý Người dùng (Coming soon)</div>} />
-          <Route path="deposits" element={<div>Quản lý Nạp tiền (Coming soon)</div>} />
-        </path>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          {/* Public Auth Routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
 
-        {/* Home Redirect */}
-        <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
-      </Routes>
-    </Router>
+          {/* Admin Routes (Protected) */}
+          <Route path="/admin" element={
+            <ProtectedRoute>
+              <AdminLayout children={<Dashboard />} />
+            </ProtectedRoute>
+          }>
+            <Route index element={<Navigate to="/admin/dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="games" element={<GameManagement />} />
+            <Route path="accounts" element={<div>Quản lý Tài khoản (Coming soon)</div>} />
+            <Route path="orders" element={<div>Quản lý Đơn hàng (Coming soon)</div>} />
+            <Route path="users" element={<div>Quản lý Người dùng (Coming soon)</div>} />
+            <Route path="deposits" element={<div>Quản lý Nạp tiền (Coming soon)</div>} />
+          </Route>
+
+          {/* Home Redirect */}
+          <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

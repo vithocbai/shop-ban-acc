@@ -14,7 +14,7 @@ Tài liệu này bám sát cấu trúc Admin Dashboard quy định trong `ARCHIT
 - [x] Khởi tạo dự án Vite + React + TypeScript + TailwindCSS.
 - [x] Cấu hình hệ màu và Font Roboto chuẩn.
 - [x] Xây dựng `AdminLayout` với Sidebar phân cấp theo đúng sơ đồ cây.
-- [ ] Thiết lập **Axios Instance** (JWT Interceptors).
+- [x] Thiết lập **Axios Instance** (JWT Interceptors).
 
 ## 2. Quản lý Tài khoản (Account Management)
 - [ ] **Tài khoản game**: Danh sách, đăng bán (Dynamic JSON fields), chỉnh sửa.

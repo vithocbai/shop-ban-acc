@@ -6,7 +6,8 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 
 urlpatterns = [
     path('admin/', admin.site.site_header := "Game Market Admin"),
-    path('admin/', admin.site.urls),
+    # API Endpoints
+    path('api/', include('apps.games.urls')),
     
     # API Documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

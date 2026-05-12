@@ -1,21 +1,47 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@theme {
+  --color-primary: #008BFF;
+  --color-primary-hover: #0077DB;
+  --color-bg-main: #FFFFFF;
+  --color-bg-secondary: #F9F7FA;
+  --color-border-color: #E5E7E9;
+  --color-text-main: #1E293B;
+  --color-text-secondary: #647488;
+  --color-success: #10B981;
+  --color-error: #EF4444;
+  --color-warning: #F59E0B;
+
+  --font-roboto: "Roboto", sans-serif;
+}
 
 @layer base {
   body {
-    @apply font-roboto bg-bg-secondary text-text-main antialiased;
+    @apply bg-bg-main text-text-main font-roboto;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary text-white px-5 py-2.5 rounded-md font-medium transition-all hover:bg-primary-hover active:scale-95;
+    @apply bg-primary hover:bg-primary-hover text-white font-bold py-2 px-4 rounded transition-all duration-200 shadow-sm;
   }
-  
+
   .card {
-    @apply bg-white border border-border-color rounded-md shadow-sm;
+    @apply bg-white border border-border-color rounded-xl shadow-sm overflow-hidden;
   }
+
+  .input-field {
+    @apply w-full px-4 py-2 border border-border-color rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all;
+  }
+}
+
+/* Animations */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.animate-shake {
+  animation: shake 0.2s ease-in-out 0s 2;
 }

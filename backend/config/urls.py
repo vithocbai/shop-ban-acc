@@ -4,8 +4,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
+admin.site.site_header = "Game Market Admin"
+
 urlpatterns = [
-    path('admin/', admin.site.site_header := "Game Market Admin"),
+    path('admin/', admin.site.urls),
     # API Endpoints
     path('api/auth/', include('apps.user.urls')),
     path('api/', include('apps.game.urls')),

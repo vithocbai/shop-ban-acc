@@ -57,16 +57,16 @@ users
 ```sql id="5szqtr"
 users
 - id BIGSERIAL PRIMARY KEY
-- username VARCHAR(50)
 - email VARCHAR(255) UNIQUE
+- username VARCHAR(150)
 - password VARCHAR(255)
 - avatar TEXT
 - phone VARCHAR(20)
-- balance DECIMAL(18,2)
-- role VARCHAR(30)
-- status VARCHAR(20)
-- email_verified BOOLEAN
-- last_login TIMESTAMP
+- balance DECIMAL(18,2) DEFAULT 0
+- role VARCHAR(30) -- USER, ADMIN, SUPER_ADMIN, MODERATOR
+- status VARCHAR(20) -- ACTIVE, BANNED, PENDING
+- email_verified BOOLEAN DEFAULT FALSE
+- date_joined TIMESTAMP
 - created_at TIMESTAMP
 - updated_at TIMESTAMP
 ```
@@ -134,32 +134,84 @@ MAINTENANCE
 ```sql id="7hjf6n"
 accounts
 - id BIGSERIAL PRIMARY KEY
-- game_id BIGINT
+- game_id BIGINT FK(games.id)
 - title VARCHAR(255)
-- slug VARCHAR(255)
-- account_code VARCHAR(50)
+- slug VARCHAR(255) UNIQUE
+- account_code VARCHAR(50) UNIQUE
 - thumbnail TEXT
 - price DECIMAL(18,2)
 - original_price DECIMAL(18,2)
-- discount_percent INTEGER
-- status VARCHAR(20)
+- discount_percent INTEGER DEFAULT 0
+- status VARCHAR(20) -- AVAILABLE, RESERVED, SOLD, LOCKED, HIDDEN
 - login_type VARCHAR(50)
 - account_type VARCHAR(50)
 - short_description TEXT
 - description TEXT
-- account_data JSONB
+- account_data JSONB -- Rank, Skin, Server...
 - sold_at TIMESTAMP
 - is_featured BOOLEAN
 - is_hot BOOLEAN
-- views INTEGER
-- created_by BIGINT
+- views INTEGER DEFAULT 0
+- created_by BIGINT FK(users.id)
 - created_at TIMESTAMP
 - updated_at TIMESTAMP
 ```
 
 ---
 
-# 5. Dynamic Game Data
+## account_images
+
+```sql id="k2p3q1"
+account_images
+- id BIGSERIAL PRIMARY KEY
+- account_id BIGINT FK(accounts.id)
+- image_url TEXT
+- sort_order INTEGER DEFAULT 0
+- created_at TIMESTAMP
+```
+
+---
+
+## transactions
+
+```sql id="u7p8q1"
+transactions
+- id BIGSERIAL PRIMARY KEY
+- user_id BIGINT FK(users.id)
+- transaction_code VARCHAR(50) UNIQUE
+- type VARCHAR(50) -- DEPOSIT, PURCHASE, REFUND, WITHDRAW
+- amount DECIMAL(18,2)
+- balance_before DECIMAL(18,2)
+- balance_after DECIMAL(18,2)
+- payment_method VARCHAR(50)
+- status VARCHAR(20) -- PENDING, SUCCESS, FAILED
+- metadata JSONB
+- note TEXT
+- created_at TIMESTAMP
+- updated_at TIMESTAMP
+```
+
+## deposits
+
+```sql id="j9k2l1"
+deposits
+- id BIGSERIAL PRIMARY KEY
+- user_id BIGINT FK(users.id)
+- amount DECIMAL(18,2)
+- method VARCHAR(50) -- BANK, MOMO, CARD
+- transaction_image TEXT -- Bill nạp tiền
+- note TEXT
+- admin_note TEXT
+- status VARCHAR(20) -- PENDING, APPROVED, REJECTED
+- approved_by BIGINT FK(users.id)
+- approved_at TIMESTAMP
+- created_at TIMESTAMP
+- updated_at TIMESTAMP
+```
+
+---
+
+# 7. Dynamic Game Data
 
 ## account_data JSONB
 

@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import AdminLayout from "./components/layout/AdminLayout";
 import AuthPage from "./pages/admin/auth";
+import GameManagementPage from "./pages/admin/GameManagement";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
 // Protected Route Component
@@ -33,17 +34,7 @@ const Dashboard = () => (
     </div>
 );
 
-const GameManagement = () => (
-    <div className="card">
-        <div className="p-6 border-b border-border-color flex justify-between items-center">
-            <h2 className="text-xl font-bold">Danh sách Game</h2>
-            <button className="btn-primary">Thêm Game mới</button>
-        </div>
-        <div className="p-6">
-            <p className="text-text-secondary text-center py-10">Đang tải danh sách game...</p>
-        </div>
-    </div>
-);
+
 
 function App() {
     return (
@@ -63,13 +54,13 @@ function App() {
                         path="/admin"
                         element={
                             <ProtectedRoute>
-                                <AdminLayout children={<Dashboard />} />
+                                <AdminLayout />
                             </ProtectedRoute>
                         }
                     >
                         <Route index element={<Navigate to="/admin/dashboard" replace />} />
                         <Route path="dashboard" element={<Dashboard />} />
-                        <Route path="games" element={<GameManagement />} />
+                        <Route path="games" element={<GameManagementPage />} />
                         <Route path="accounts" element={<div>Quản lý Tài khoản (Coming soon)</div>} />
                         <Route path="orders" element={<div>Quản lý Đơn hàng (Coming soon)</div>} />
                         <Route path="users" element={<div>Quản lý Người dùng (Coming soon)</div>} />

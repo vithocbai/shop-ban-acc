@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, Outlet } from 'react-router-dom';
 import { 
   Gamepad2, 
   ClipboardList, 
@@ -86,7 +86,7 @@ const NavItem: React.FC<{ item: MenuItem; isActive: boolean; isOpen: boolean; on
   );
 };
 
-const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const AdminLayout: React.FC = () => {
   const location = useLocation();
   const { logout } = useAuth();
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
@@ -210,7 +210,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </header>
 
         <div className="p-8">
-          {children}
+          <Outlet />
         </div>
       </main>
     </div>

@@ -13,6 +13,14 @@ export const authService = {
   },
 
   /**
+   * Đăng ký
+   */
+  register: async (username: string, email: string, password: string, confirmPassword: string) => {
+    const response = await api.post('/auth/register/', { username, email, password, confirm_password: confirmPassword });
+    return response.data;
+  },
+  
+  /**
    * Đăng xuất xóa token
    */
   logout: () => {

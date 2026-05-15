@@ -1,21 +1,29 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { LogIn, Mail, Lock, AlertCircle, Loader2, User } from "lucide-react";
+import { LogIn, Mail, Lock, AlertCircle, Loader2, User, View, EyeOff, Eye } from "lucide-react";
 
 const AdminLogin: React.FC = () => {
+    const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
     // Thêm state để lưu lỗi validation cho từng trường
     const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
+    // Thêm state ẩn hiện mật khẩu
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    // Thêm state loading
     const [isLoading, setIsLoading] = useState(false);
-    const [isActive, setIsActive] = useState<boolean>(false);
+    
     const { login } = useAuth();
     const navigate = useNavigate();
 
     // Mode
     const [mode, setMode] = useState<"login" | "register">("login");
+    // Thêm state active Mode
+    const [isActive, setIsActive] = useState<boolean>(true);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -25,6 +33,13 @@ const AdminLogin: React.FC = () => {
         let isValid = true;
 
         const errorMessages: { [key: string]: string } = {};
+
+        // Validate Username
+        if (!username) {
+            errorMessages.username = "Tên đăng nhập không được để trống.";
+            setIsLoading(false);
+            isValid = false;
+        }
 
         // Validate Email
         if (!email) {
@@ -40,6 +55,17 @@ const AdminLogin: React.FC = () => {
         // Validate Password
         if (!password) {
             errorMessages.password = "Mật khẩu không được để trống.";
+            setIsLoading(false);
+            isValid = false;
+        }
+
+        // Validate confirm Password
+        if (!confirmPassword) {
+            errorMessages.confirmPassword = "Xác nhận mật khẩu không được để trống.";
+            setIsLoading(false);
+            isValid = false;
+        } else if (confirmPassword !== password) {
+            errorMessages.confirmPassword = "Mật khẩu không khớp.";
             setIsLoading(false);
             isValid = false;
         }
@@ -61,8 +87,6 @@ const AdminLogin: React.FC = () => {
     return (
         <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-center py-6 px-4 sm:px-6 lg:px-8 font-roboto">
             <div className="sm:mx-auto sm:w-full sm:max-w-[540px]">
-                {/* <h2 className="text-[28px] font-bold text-primary mb-6">Đăng nhập / Đăng ký</h2> */}
-
                 <div className="bg-white shadow-md border border-[#E2E8F0] rounded-2xl overflow-hidden">
                     {/* Tabs */}
                     <div className="flex border-b border-[#E2E8F0]">
@@ -89,10 +113,10 @@ const AdminLogin: React.FC = () => {
                         </button>
                     </div>
 
-                    <div className="p-6 sm:p-10">
-                        <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+                    <div className="p-6 sm:p-8 min-h-[500px] flex flex-col">
+                        <form className="space-y-1.5" onSubmit={handleSubmit} noValidate>
                             {error && (
-                                <div className="bg-red-50 border border-red-200 text-error px-4 py-3 rounded-xl flex items-center gap-3 animate-shake">
+                                <div className="bg-red-50 border border-red-200 text-error px-4 py-3 rounded-xl flex items-center gap-3 animate-shake mb-4">
                                     <AlertCircle size={18} />
                                     <span className="text-sm font-medium">{error}</span>
                                 </div>
@@ -102,42 +126,41 @@ const AdminLogin: React.FC = () => {
                                 <div>
                                     <label
                                         htmlFor="username"
-                                        className="block text-[15px] font-medium text-[#1E293B] mb-2"
+                                        className="block text-[14px] font-medium text-[#1E293B] mb-1.5"
                                     >
                                         Tên đăng nhập
                                     </label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#94A3B8]">
-                                            <User size={20} />
+                                            <User size={18} />
                                         </div>
                                         <input
-                                            id="email"
-                                            name="email"
-                                            type="email"
-                                            value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
-                                            className={`block w-full pl-12 pr-4 py-3.5 bg-white border rounded-xl transition-all focus:outline-none focus:ring-2 
-                                                    ${
-                                                        fieldErrors.email
-                                                            ? "border-red-500 focus:ring-red-200 focus:border-red-500"
-                                                            : "border-[#E2E8F0] focus:ring-primary/20 focus:border-primary"
-                                                    }`}
-                                            placeholder="Nhập địa chỉ Email"
+                                            id="username"
+                                            name="username"
+                                            type="text"
+                                            value={username}
+                                            onChange={(e) => setUsername(e.target.value)}
+                                            className={`block w-full pl-11 pr-4 py-3 bg-white border rounded-xl transition-all focus:outline-none focus:ring-2 ${fieldErrors.username ? "border-red-500 focus:ring-red-200 focus:border-red-500" : "border-[#E2E8F0] focus:ring-primary/20 focus:border-primary"}`}
+                                            placeholder="Nhập tên đăng nhập"
                                         />
                                     </div>
-                                    {fieldErrors.email && (
-                                        <p className="text-[12px] text-red-500 mt-1 italic">{fieldErrors.email}</p>
-                                    )}
+                                    <div className="min-h-[20px]">
+                                        {fieldErrors.username && (
+                                            <p className="text-[12px] text-red-500 mt-0.5 italic">
+                                                {fieldErrors.username}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
                             )}
-                            {/* Email Field */}
+
                             <div>
-                                <label htmlFor="email" className="block text-[15px] font-medium text-[#1E293B] mb-2">
+                                <label htmlFor="email" className="block text-[14px] font-medium text-[#1E293B] mb-1.5">
                                     Tài khoản của bạn (Email)
                                 </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#94A3B8]">
-                                        <User size={20} />
+                                        <Mail size={18} />
                                     </div>
                                     <input
                                         id="email"
@@ -145,78 +168,98 @@ const AdminLogin: React.FC = () => {
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className={`block w-full pl-12 pr-4 py-3.5 bg-white border rounded-xl transition-all focus:outline-none focus:ring-2 
-                                                    ${
-                                                        fieldErrors.email
-                                                            ? "border-red-500 focus:ring-red-200 focus:border-red-500"
-                                                            : "border-[#E2E8F0] focus:ring-primary/20 focus:border-primary"
-                                                    }`}
+                                        className={`block w-full pl-11 pr-4 py-3 bg-white border rounded-xl transition-all focus:outline-none focus:ring-2 ${fieldErrors.email ? "border-red-500 focus:ring-red-200 focus:border-red-500" : "border-[#E2E8F0] focus:ring-primary/20 focus:border-primary"}`}
                                         placeholder="Nhập địa chỉ Email"
                                     />
                                 </div>
-                                {fieldErrors.email && (
-                                    <p className="text-[12px] text-red-500 mt-1 italic">{fieldErrors.email}</p>
-                                )}
+                                <div className="min-h-[20px]">
+                                    {fieldErrors.email && (
+                                        <p className="text-[12px] text-red-500 mt-0.5 italic">{fieldErrors.email}</p>
+                                    )}
+                                </div>
                             </div>
 
-                            {/* Password Field */}
                             <div>
-                                <label htmlFor="password" className="block text-[15px] font-medium text-[#1E293B] mb-2">
+                                <label
+                                    htmlFor="password"
+                                    className="block text-[14px] font-medium text-[#1E293B] mb-1.5"
+                                >
                                     Mật khẩu
                                 </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#94A3B8]">
-                                        <Lock size={20} />
+                                        <Lock size={18} />
                                     </div>
                                     <input
                                         id="password"
                                         name="password"
-                                        type="password"
+                                        type={showPassword ? `text` : `password`}
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className={`block w-full pl-12 pr-4 py-3.5 bg-white border rounded-xl transition-all focus:outline-none focus:ring-2 
-                                                    ${
-                                                        fieldErrors.email
-                                                            ? "border-red-500 focus:ring-red-200 focus:border-red-500"
-                                                            : "border-[#E2E8F0] focus:ring-primary/20 focus:border-primary"
-                                                    }`}
+                                        className={`block w-full pl-11 pr-11 py-3 bg-white border rounded-xl transition-all focus:outline-none focus:ring-2 ${fieldErrors.password ? "border-red-500 focus:ring-red-200 focus:border-red-500" : "border-[#E2E8F0] focus:ring-primary/20 focus:border-primary"}`}
                                         placeholder="Nhập mật khẩu"
                                     />
                                     <button
                                         type="button"
                                         className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#94A3B8] hover:text-primary transition-colors"
+                                        onClick={() => setShowPassword(!showPassword)}
                                     >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="20"
-                                            height="20"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        >
-                                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-10-7-10-7a22.79 22.79 0 0 1 2.1-3.18"></path>
-                                            <path d="M6.83 6.83A10.11 10.11 0 0 1 12 4c7 0 10 7 10 7a22.79 22.79 0 0 1-1.1 1.74"></path>
-                                            <line x1="1" y1="1" x2="23" y2="23"></line>
-                                            <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
-                                        </svg>
+                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                     </button>
                                 </div>
-                                {fieldErrors.password && (
-                                    <p className="text-[12px] text-red-500 mt-2 italic">{fieldErrors.password}</p>
-                                )}
+                                <div className="min-h-[20px]">
+                                    {fieldErrors.password && (
+                                        <p className="text-[12px] text-red-500 mt-0.5 italic">{fieldErrors.password}</p>
+                                    )}
+                                </div>
                             </div>
 
-                            {/* Remember & Forgot */}
+                            {mode === "register" && (
+                                <div>
+                                    <label
+                                        htmlFor="confirmPassword"
+                                        className="block text-[14px] font-medium text-[#1E293B] mb-1.5"
+                                    >
+                                        Nhập lại mật khẩu
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#94A3B8]">
+                                            <Lock size={18} />
+                                        </div>
+                                        <input
+                                            id="confirmPassword"
+                                            name="confirmPassword"
+                                            type={showConfirmPassword ? `text` : `password`}
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            className={`block w-full pl-11 pr-11 py-3 bg-white border rounded-xl transition-all focus:outline-none focus:ring-2 ${fieldErrors.confirmPassword ? "border-red-500 focus:ring-red-200 focus:border-red-500" : "border-[#E2E8F0] focus:ring-primary/20 focus:border-primary"}`}
+                                            placeholder="Nhập lại mật khẩu"
+                                        />
+                                        <button
+                                            type="button"
+                                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#94A3B8] hover:text-primary transition-colors"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        >
+                                            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                        </button>
+                                    </div>
+                                    <div className="min-h-[20px]">
+                                        {fieldErrors.confirmPassword && (
+                                            <p className="text-[12px] text-red-500 mt-0.5 italic">
+                                                {fieldErrors.confirmPassword}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="flex items-center justify-between pt-1">
                                 <div className="flex items-center">
                                     <input
                                         id="remember-me"
                                         name="remember-me"
                                         type="checkbox"
-                                        className="h-5 w-5 text-primary focus:ring-primary/20 border-[#E2E8F0] rounded-md cursor-pointer"
+                                        className="h-4 w-4 text-primary focus:ring-primary/20 border-[#E2E8F0] rounded cursor-pointer"
                                     />
                                     <label
                                         htmlFor="remember-me"
@@ -225,23 +268,29 @@ const AdminLogin: React.FC = () => {
                                         Ghi nhớ đăng nhập
                                     </label>
                                 </div>
-                                <a href="#" className="text-sm font-medium text-primary hover:underline">
-                                    Quên mật khẩu?
-                                </a>
+                                {mode === "login" && (
+                                    <a href="#" className="text-sm font-medium text-primary hover:underline">
+                                        Quên mật khẩu?
+                                    </a>
+                                )}
                             </div>
 
-                            {/* Submit Button */}
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-base font-bold text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+                                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-base font-bold text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-4"
                             >
-                                {isLoading ? <Loader2 className="animate-spin" size={24} /> : "Đăng nhập"}
+                                {isLoading ? (
+                                    <Loader2 className="animate-spin" size={24} />
+                                ) : mode === "login" ? (
+                                    "Đăng nhập"
+                                ) : (
+                                    "Đăng ký ngay"
+                                )}
                             </button>
                         </form>
 
-                        {/* Social Login */}
-                        <div className="mt-8">
+                        <div className="mt-auto pt-8">
                             <div className="relative mb-6">
                                 <div className="absolute inset-0 flex items-center">
                                     <div className="w-full border-t border-[#E2E8F0]"></div>
@@ -292,15 +341,6 @@ const AdminLogin: React.FC = () => {
                                         />
                                     </svg>
                                 </button>
-                            </div>
-
-                            <div className="mt-8 text-center">
-                                <p className="text-sm text-[#64748B]">
-                                    Chưa có tài khoản?{" "}
-                                    <button type="button" className="text-primary font-bold hover:underline">
-                                        Đăng ký ngay
-                                    </button>
-                                </p>
                             </div>
                         </div>
                     </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { LogIn, Mail, Lock, AlertCircle, Loader2, User, View, EyeOff, Eye } from "lucide-react";
@@ -21,10 +21,28 @@ const AdminLogin: React.FC = () => {
     const { login } = useAuth();
     const navigate = useNavigate();
 
-    // Mode
-    const [mode, setMode] = useState<"login" | "register">("login");
     // Thêm state active Mode
     const [isActive, setIsActive] = useState<boolean>(true);
+    // Mode
+    const [mode, setMode] = useState<"login" | "register">(() => {
+        const saveMode = localStorage.getItem("modeStyle");
+        
+        try {
+            return saveMode !== null ? JSON.parse(saveMode) : "login";
+        } catch (error) {
+            console.error("Lỗi khi phân tích mode từ localStorage:", error);
+            return "login";
+        }
+    });
+    
+    useEffect(() => {
+        localStorage.setItem("modeStyle", JSON.stringify(mode));
+         if (mode === "login") {
+            setIsActive(true);
+        } else {
+            setIsActive(false);
+        }
+    }, [mode]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

@@ -50,9 +50,13 @@ function App() {
         <AuthProvider>
             <Router>
                 <Routes>
-                    {/* Public Auth Routes */}
-                    <Route path="/admin/login" element={<AuthPage mode="login" />} />
-                    <Route path="/admin/register" element={<AuthPage mode="register" />} />
+                    {/* Public Auth Routes (For Users) */}
+                    <Route path="/login" element={<AuthPage mode="login" />} />
+                    <Route path="/register" element={<AuthPage mode="register" />} />
+
+                    {/* Admin Auth Routes (For Admins) */}
+                    <Route path="/admin/login" element={<AuthPage mode="login" isAdminPage={true} />} />
+                    <Route path="/admin/register" element={<AuthPage mode="register" isAdminPage={true} />} />
 
                     {/* Admin Routes (Protected) */}
                     <Route
@@ -72,8 +76,8 @@ function App() {
                         <Route path="deposits" element={<div>Quản lý Nạp tiền (Coming soon)</div>} />
                     </Route>
 
-                    {/* Home Redirect */}
-                    <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+                    {/* Home Redirect / Landing Page */}
+                    <Route path="/" element={<div className="p-10 text-center"><h1>Chào mừng đến với Shop Acc Game</h1><p>Giao diện người dùng đang phát triển...</p><a href="/login" className="text-primary underline">Đăng nhập ngay</a></div>} />
                 </Routes>
             </Router>
         </AuthProvider>

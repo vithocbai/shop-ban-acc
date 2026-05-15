@@ -1,27 +1,73 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { LogIn, UserPlus } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 
 interface AuthPageProps {
     mode: "login" | "register";
+    isAdminPage?: boolean;
 }
 
-const AuthPage: React.FC<AuthPageProps> = ({ mode }) => {
+const AuthPage: React.FC<AuthPageProps> = ({ mode, isAdminPage = false }) => {
     const navigate = useNavigate();
+    const { user, loading, logout } = useAuth();
+    const [authError, setAuthError] = useState<string | null>(null);
     const isActive = mode === "login";
+
+    useEffect(() => {
+        // Nếu là trang Admin mà user login vào là user thường
+        if (user && isAdminPage && user.role !== "ADMIN" && user.role !== "SUPER_ADMIN") {
+            setAuthError("Bạn không có quyền truy cập trang quản trị. Vui lòng đăng nhập tài khoản Admin.");
+            // Logout để họ có thể login lại bằng acc admin
+            logout();
+        }
+    }, [user, isAdminPage, logout]);
+
+    if (loading) return (
+        <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+    );
+
+    // Nếu đã đăng nhập thành công và đúng quyền hạn
+    if (user && !authError) {
+        if (isAdminPage) {
+            if (user.role === "ADMIN" || user.role === "SUPER_ADMIN") {
+                return <Navigate to="/admin/dashboard" replace />;
+            }
+        } else {
+            // Trang public thì về Home
+            return <Navigate to="/" replace />;
+        }
+    }
+
+    const handleNavigate = (newMode: "login" | "register") => {
+        const path = isAdminPage ? `/admin/${newMode}` : `/${newMode}`;
+        navigate(path);
+    };
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-center py-6 px-4 sm:px-6 lg:px-8 font-roboto">
             <div className="sm:mx-auto sm:w-full sm:max-w-[540px]">
                 <div className="bg-white shadow-md border border-[#E2E8F0] rounded-2xl overflow-hidden">
+                    {/* Header Admin vs Public */}
+                    <div className="bg-slate-50 px-6 py-4 border-b border-[#E2E8F0] text-center">
+                        <h2 className="text-xl font-bold text-[#1E293B]">
+                            {isAdminPage ? "HỆ THỐNG QUẢN TRỊ" : "HỆ THỐNG SHOP ACC"}
+                        </h2>
+                        <p className="text-sm text-[#64748B]">
+                            {isAdminPage ? "Vui lòng đăng nhập tài khoản quản lý" : "Chào mừng bạn đến với hệ thống của chúng tôi"}
+                        </p>
+                    </div>
+
                     {/* Tabs */}
                     <div className="flex border-b border-[#E2E8F0]">
                         <button
                             className={`flex-1 py-4 flex items-center justify-center gap-2 cursor-pointer transition-all
                               ${isActive ? "text-primary font-medium border-b-2 border-primary" : "text-[#64748B] font-medium hover:bg-slate-50"}`}
-                            onClick={() => navigate("/admin/login")}
+                            onClick={() => handleNavigate("login")}
                         >
                             <LogIn size={20} />
                             Đăng nhập
@@ -29,7 +75,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ mode }) => {
                         <button
                             className={`flex-1 py-4 flex items-center justify-center gap-2 cursor-pointer transition-all
                               ${!isActive ? "text-primary font-medium border-b-2 border-primary" : "text-[#64748B] font-medium hover:bg-slate-50"}`}
-                            onClick={() => navigate("/admin/register")}
+                            onClick={() => handleNavigate("register")}
                         >
                             <UserPlus size={20} />
                             Đăng ký
@@ -37,10 +83,16 @@ const AuthPage: React.FC<AuthPageProps> = ({ mode }) => {
                     </div>
 
                     <div className="p-6 sm:p-8 min-h-[500px] flex flex-col">
+                        {authError && (
+                            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm font-medium animate-shake">
+                                {authError}
+                            </div>
+                        )}
+
                         {mode === "login" ? (
-                            <LoginForm onSwitchToRegister={() => navigate("/admin/register")} />
+                            <LoginForm onSwitchToRegister={() => handleNavigate("register")} />
                         ) : (
-                            <RegisterForm onSwitchToLogin={() => navigate("/admin/login")} />
+                            <RegisterForm onSwitchToLogin={() => handleNavigate("login")} />
                         )}
 
                         {/* Social Login Shared Section */}
@@ -50,7 +102,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ mode }) => {
                                     <div className="w-full border-t border-[#E2E8F0]"></div>
                                 </div>
                                 <div className="relative flex justify-center text-sm">
-                                    <span className="px-4 bg-white text-[#94A3B8] font-medium">Hoặc {mode === "login" ? "đăng nhập" : "đăng ký"} với</span>
+                                    <span className="px-4 bg-white text-[#94A3B8] font-medium">Hoặc đăng nhập với</span>
                                 </div>
                             </div>
 

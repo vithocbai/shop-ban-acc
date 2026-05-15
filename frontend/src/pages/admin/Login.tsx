@@ -11,12 +11,13 @@ const AdminLogin: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     // Thêm state để lưu lỗi validation cho từng trường
     const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
+
     // Thêm state ẩn hiện mật khẩu
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     // Thêm state loading
     const [isLoading, setIsLoading] = useState(false);
-    
+
     const { login } = useAuth();
     const navigate = useNavigate();
 
@@ -84,6 +85,18 @@ const AdminLogin: React.FC = () => {
         }
     };
 
+    const handleInputChange = (field: string, value: string, setter: (val: string) => void) => {
+        setter(value); // Cập nhật state (email, password, username...)
+
+        // Nếu trường này đang có lỗi thì xóa nó đi
+        if (fieldErrors[field]) {
+            setFieldErrors((prev) => {
+                console.log("Dữ liệu prev hiện tại nè:", prev);
+                return { ...prev, [field]: "" };
+            });
+        }
+    };
+
     return (
         <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-center py-6 px-4 sm:px-6 lg:px-8 font-roboto">
             <div className="sm:mx-auto sm:w-full sm:max-w-[540px]">
@@ -139,7 +152,7 @@ const AdminLogin: React.FC = () => {
                                             name="username"
                                             type="text"
                                             value={username}
-                                            onChange={(e) => setUsername(e.target.value)}
+                                            onChange={(e) => handleInputChange("username", e.target.value, setUsername)}
                                             className={`block w-full pl-11 pr-4 py-3 bg-white border rounded-xl transition-all focus:outline-none focus:ring-2 ${fieldErrors.username ? "border-red-500 focus:ring-red-200 focus:border-red-500" : "border-[#E2E8F0] focus:ring-primary/20 focus:border-primary"}`}
                                             placeholder="Nhập tên đăng nhập"
                                         />
@@ -167,7 +180,9 @@ const AdminLogin: React.FC = () => {
                                         name="email"
                                         type="email"
                                         value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        onChange={(e) => {
+                                            handleInputChange("email", e.target.value, setEmail);
+                                        }}
                                         className={`block w-full pl-11 pr-4 py-3 bg-white border rounded-xl transition-all focus:outline-none focus:ring-2 ${fieldErrors.email ? "border-red-500 focus:ring-red-200 focus:border-red-500" : "border-[#E2E8F0] focus:ring-primary/20 focus:border-primary"}`}
                                         placeholder="Nhập địa chỉ Email"
                                     />
@@ -195,7 +210,7 @@ const AdminLogin: React.FC = () => {
                                         name="password"
                                         type={showPassword ? `text` : `password`}
                                         value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
+                                        onChange={(e) => handleInputChange("password", e.target.value, setPassword)}
                                         className={`block w-full pl-11 pr-11 py-3 bg-white border rounded-xl transition-all focus:outline-none focus:ring-2 ${fieldErrors.password ? "border-red-500 focus:ring-red-200 focus:border-red-500" : "border-[#E2E8F0] focus:ring-primary/20 focus:border-primary"}`}
                                         placeholder="Nhập mật khẩu"
                                     />
@@ -231,7 +246,9 @@ const AdminLogin: React.FC = () => {
                                             name="confirmPassword"
                                             type={showConfirmPassword ? `text` : `password`}
                                             value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            onChange={(e) =>
+                                                handleInputChange("confirmPassword", e.target.value, setConfirmPassword)
+                                            }
                                             className={`block w-full pl-11 pr-11 py-3 bg-white border rounded-xl transition-all focus:outline-none focus:ring-2 ${fieldErrors.confirmPassword ? "border-red-500 focus:ring-red-200 focus:border-red-500" : "border-[#E2E8F0] focus:ring-primary/20 focus:border-primary"}`}
                                             placeholder="Nhập lại mật khẩu"
                                         />

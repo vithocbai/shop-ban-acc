@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { X, Save, Loader2, AlertCircle } from "lucide-react";
-import type { Game, GameCreateInput, GameStatus } from "../types";
+import type { Game, GameCreateInput } from "../types";
 import { gameService } from "../services/game.service";
 
 interface GameModalProps {

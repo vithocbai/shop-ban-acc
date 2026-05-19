@@ -12,7 +12,7 @@ export default {
           hover: '#0076D9',
         },
         'bg-main': '#FFFFFF',
-        'bg-secondary': '#F9F7FA',
+        'bg-secondary': '#FFFFFF',
         'border-color': '#E5E7E9',
         'text-main': '#1E293B',
         'text-secondary': '#647488',

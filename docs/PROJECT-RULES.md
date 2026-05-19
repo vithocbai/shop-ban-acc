@@ -74,7 +74,8 @@ Không viết business logic trong UI.
 
 * ReactJS
 * TypeScript
-* TailwindCSS
+* TailwindCSS v4 (base styling engine)
+* **shadcn/ui** (component library – `npx shadcn add <component>`)
 * Zustand
 * React Query
 * Axios
@@ -216,17 +217,21 @@ services/account.service.ts
 
 # 11. Styling Rules
 
-## Chỉ dùng:
+## Component Library: shadcn/ui
 
-* TailwindCSS
+* Dùng **shadcn/ui** làm component library chính (Button, Input, Dialog, Table, Card...).
+* Cài component bằng: `npx shadcn add <tên-component>`
+* **TailwindCSS** vẫn là nền tảng – dùng Tailwind class để custom/điều chỉnh thêm khi cần.
 
 ---
 
-## Không dùng:
+## ❌ Không dùng:
 
 * inline style
 * bootstrap
 * material ui
+* ant design
+* hành vi viết thủ công những component đã có trong shadcn/ui
 
 ---
 

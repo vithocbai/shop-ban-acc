@@ -72,7 +72,8 @@ AI phải:
 
 * ReactJS
 * TypeScript
-* TailwindCSS
+* TailwindCSS v4 (base styling engine)
+* **shadcn/ui** (dùng `npx shadcn add <component>`)
 * Zustand
 * React Query
 
@@ -90,10 +91,14 @@ AI phải:
 
 # 6. UI Rules
 
-## Theme
+## shadcn/ui – Component Library chính
 
-* Phải kế thừa Design System từ `setup-ui-foundation/skill.md`
-* Luôn ưu tiên Mobile-first và Responsive Layout
+* Khi cần Button, Input, Dialog, Table, Card, Sheet, Badge... phải dùng shadcn/ui.
+* Cài bằng: `npx shadcn add <component>` (ví dụ: `npx shadcn add dialog table`)
+* Sau khi cài, import từ `@/components/ui/<component>`.
+* Dùng Tailwind class để điều chỉnh style khi shadcn/ui chưa đáp ứng đủ.
+* Phải kế thừa Design System từ `docs/PROJECT-RULES.md` (màu `#008BFF`, font `Roboto`...)
+* Luôn ưu tiên Mobile-first và Responsive Layout.
 
 ---
 

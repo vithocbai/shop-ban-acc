@@ -96,7 +96,8 @@ Tách:
 
 * ReactJS
 * TypeScript
-* TailwindCSS
+* TailwindCSS v4 (base styling engine)
+* **shadcn/ui** (component library – `npx shadcn add <component>`)
 * Zustand
 * React Query
 
@@ -182,17 +183,21 @@ any
 
 # 8. Styling Rules
 
-## Chỉ dùng:
+## Component Library: shadcn/ui
 
-* TailwindCSS
+* Dùng **shadcn/ui** làm component library chính.
+* Cài component mới bằng lệnh: `npx shadcn add <tên-component>`
+* TailwindCSS là nền tảng – dùng Tailwind class để custom thêm khi cần.
+* Không tự viết lại component nếu shadcn/ui đã có sẵn.
 
 ---
 
-## Không dùng:
+## ❌ Không dùng:
 
 * inline CSS
 * bootstrap
 * material ui
+* ant design
 
 ---
 

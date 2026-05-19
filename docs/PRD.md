@@ -598,7 +598,8 @@ Roboto
 
 * ReactJS
 * TypeScript
-* TailwindCSS
+* TailwindCSS v4
+* **shadcn/ui**
 * Zustand
 * React Query
 

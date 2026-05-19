@@ -159,7 +159,8 @@ Mục tiêu:
 
 * ReactJS
 * TypeScript
-* TailwindCSS
+* TailwindCSS v4 (base styling engine)
+* **shadcn/ui** (component library – dùng `npx shadcn add`)
 * React Router
 * Zustand
 * React Query
@@ -848,21 +849,25 @@ Font weight:
 
 # UI Components
 
-Bao gồm:
+> ⚡ Dùng **shadcn/ui** làm component library chính. Cài component bằng lệnh: `npx shadcn add <component-name>`
 
-* Button
-* Input
-* Select
-* Modal
-* Card
-* Sidebar
-* Navbar
-* Table
-* Pagination
-* Badge
-* Drawer
-* Tabs
-* Toast
+| Component | shadcn/ui package |
+| --------- | ----------------- |
+| Button | `button` |
+| Input | `input` |
+| Select | `select` |
+| Dialog / Modal | `dialog` |
+| Card | `card` |
+| Table | `table` |
+| Pagination | `pagination` |
+| Badge | `badge` |
+| Sheet / Drawer | `sheet` |
+| Tabs | `tabs` |
+| Toast | `sonner` |
+| Dropdown Menu | `dropdown-menu` |
+| Skeleton | `skeleton` |
+| Alert | `alert` |
+| Form + Validation | `form` + `react-hook-form` + `zod` |
 
 ---
 

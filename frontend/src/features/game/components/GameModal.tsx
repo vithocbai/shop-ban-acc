@@ -110,7 +110,7 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
             <div className="bg-white rounded-md shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200 border border-border-color">
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-border-color flex items-center justify-between">

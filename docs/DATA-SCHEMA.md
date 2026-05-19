@@ -103,12 +103,12 @@ games
 - id BIGSERIAL PRIMARY KEY
 - name VARCHAR(100)
 - slug VARCHAR(100) UNIQUE
-- icon TEXT
-- banner TEXT
-- thumbnail TEXT
+- icon VARCHAR(500)
+- banner VARCHAR(500)
+- thumbnail VARCHAR(500)
 - description TEXT
 - theme_color VARCHAR(20)
-- sort_order INTEGER
+- sort_order INTEGER (Positive)
 - is_hot BOOLEAN
 - status VARCHAR(20)
 - created_at TIMESTAMP

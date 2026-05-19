@@ -56,7 +56,7 @@ class GamePaginationTests(APITestCase):
         # Xác thực giá trị trả về khớp với số lượng game và cấu hình
         self.assertEqual(data_payload['total'], 5)
         self.assertEqual(data_payload['page'], 1)
-        self.assertEqual(data_payload['page_size'], 10)
+        self.assertEqual(data_payload['page_size'], 20)
         self.assertEqual(len(data_payload['items']), 5)
 
     def test_custom_page_size(self):

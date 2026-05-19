@@ -71,9 +71,9 @@ Table game_game {
   deleted_at datetime
   name varchar(100)
   slug varchar(100)
-  icon text
-  banner text
-  thumbnail text
+  icon varchar(500)
+  banner varchar(500)
+  thumbnail varchar(500)
   description text
   theme_color varchar(20)
   sort_order integer

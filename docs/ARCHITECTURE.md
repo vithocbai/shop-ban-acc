@@ -469,6 +469,7 @@ games
 - slug
 - icon
 - banner
+- thumbnail
 - description
 - theme_color
 - sort_order

@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { X, Save, Loader2, AlertCircle } from "lucide-react";
+import { X, Save, Loader2 } from "lucide-react";
 import type { Game, GameCreateInput } from "../types";
 import { gameService } from "../services/game.service";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 interface GameModalProps {
     isOpen: boolean;
@@ -82,72 +86,74 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <div className="bg-white rounded-md shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200 border border-border-color">
                 {/* Header */}
-                <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-slate-800">
+                <div className="px-6 py-4 border-b border-border-color flex items-center justify-between">
+                    <h3 className="text-lg font-bold text-text-main">
                         {game ? "Chỉnh sửa Game" : "Thêm Game mới"}
                     </h3>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-lg transition-all text-slate-400 hover:text-slate-600">
+                    <Button
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={onClose} 
+                        className="h-9 w-9 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer"
+                    >
                         <X size={20} />
-                    </button>
+                    </Button>
                 </div>
 
                 {/* Form Body */}
                 <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-5">
                     {error && (
-                        <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl flex items-center gap-3">
-                            <AlertCircle size={20} />
-                            <p className="text-sm font-medium">{error}</p>
-                        </div>
+                        <Alert variant="destructive">
+                            <AlertDescription>{error}</AlertDescription>
+                        </Alert>
                     )}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-1.5">
-                            <label className="text-sm font-bold text-slate-700">Tên Game <span className="text-error">*</span></label>
-                            <input
+                            <Label className="font-bold text-text-main">Tên Game <span className="text-error">*</span></Label>
+                            <Input
                                 required
                                 name="name"
                                 value={formData.name}
                                 onChange={handleInputChange}
-                                className="block w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                                 placeholder="Ví dụ: Liên Quân Mobile"
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-sm font-bold text-slate-700">Slug (Đường dẫn) <span className="text-error">*</span></label>
-                            <input
+                            <Label className="font-bold text-text-main">Slug (Đường dẫn) <span className="text-error">*</span></Label>
+                            <Input
                                 required
                                 name="slug"
                                 value={formData.slug}
                                 onChange={handleInputChange}
-                                className="block w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                                 placeholder="Ví dụ: lien-quan-mobile"
                             />
                         </div>
                     </div>
 
                     <div className="space-y-1.5">
-                        <label className="text-sm font-bold text-slate-700">Mô tả</label>
+                        <Label className="font-bold text-text-main">Mô tả</Label>
                         <textarea
                             name="description"
                             value={formData.description}
                             onChange={handleInputChange}
                             rows={3}
-                            className="block w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
+                            className="block w-full px-4 py-2.5 bg-bg-secondary border border-border-color rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none text-text-main placeholder:text-text-secondary"
                             placeholder="Mô tả ngắn về game..."
                         />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                         <div className="space-y-1.5">
-                            <label className="text-sm font-bold text-slate-700">Trạng thái</label>
+                            <Label className="font-bold text-text-main">Trạng thái</Label>
                             <select
                                 name="status"
                                 value={formData.status}
                                 onChange={handleInputChange}
-                                className="block w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                className="block w-full px-4 py-2.5 bg-bg-secondary border border-border-color rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-text-main"
                             >
                                 <option value="ACTIVE">Hoạt động</option>
                                 <option value="HIDDEN">Ẩn</option>
@@ -155,31 +161,30 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                             </select>
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-sm font-bold text-slate-700">Thứ tự hiển thị</label>
-                            <input
+                            <Label className="font-bold text-text-main">Thứ tự hiển thị</Label>
+                            <Input
                                 type="number"
                                 name="sort_order"
                                 value={formData.sort_order}
                                 onChange={handleInputChange}
-                                className="block w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-sm font-bold text-slate-700">Màu chủ đạo</label>
+                            <Label className="font-bold text-text-main">Màu chủ đạo</Label>
                             <div className="flex gap-2">
                                 <input
                                     type="color"
                                     name="theme_color"
                                     value={formData.theme_color}
                                     onChange={handleInputChange}
-                                    className="h-10 w-12 p-1 bg-white border border-slate-200 rounded-lg cursor-pointer"
+                                    className="h-10 w-12 p-1 bg-white border border-border-color rounded-md cursor-pointer animate-none"
                                 />
-                                <input
+                                <Input
                                     type="text"
                                     name="theme_color"
                                     value={formData.theme_color}
                                     onChange={handleInputChange}
-                                    className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                    className="flex-1"
                                 />
                             </div>
                         </div>
@@ -192,30 +197,28 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                                 name="is_hot"
                                 checked={formData.is_hot}
                                 onChange={handleInputChange}
-                                className="w-4 h-4 text-primary rounded border-slate-300 focus:ring-primary/20"
+                                className="w-4 h-4 text-primary rounded border-border-color focus:ring-primary/20 cursor-pointer"
                             />
-                            <span className="text-sm font-bold text-slate-700">Đánh dấu là Game HOT</span>
+                            <span className="text-sm font-bold text-text-main select-none">Đánh dấu là Game HOT</span>
                         </label>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-1.5">
-                            <label className="text-sm font-bold text-slate-700">Icon URL</label>
-                            <input
+                            <Label className="font-bold text-text-main">Icon URL</Label>
+                            <Input
                                 name="icon"
                                 value={formData.icon}
                                 onChange={handleInputChange}
-                                className="block w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                                 placeholder="https://example.com/icon.png"
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-sm font-bold text-slate-700">Thumbnail URL</label>
-                            <input
+                            <Label className="font-bold text-text-main">Thumbnail URL</Label>
+                            <Input
                                 name="thumbnail"
                                 value={formData.thumbnail}
                                 onChange={handleInputChange}
-                                className="block w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                                 placeholder="https://example.com/thumb.png"
                             />
                         </div>
@@ -223,18 +226,19 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                 </form>
 
                 {/* Footer Buttons */}
-                <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-end gap-3 bg-slate-50/50">
-                    <button
+                <div className="px-6 py-4 border-t border-border-color flex items-center justify-end gap-3 bg-bg-secondary/50">
+                    <Button
                         type="button"
+                        variant="outline"
                         onClick={onClose}
-                        className="px-5 py-2.5 rounded-xl font-bold text-sm text-slate-600 hover:bg-slate-200 transition-all"
+                        className="font-bold px-5"
                     >
                         Hủy bỏ
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={handleSubmit}
                         disabled={isLoading}
-                        className="flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white px-8 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm shadow-primary/20 disabled:opacity-50"
+                        className="font-bold px-8"
                     >
                         {isLoading ? (
                             <Loader2 className="animate-spin" size={18} />
@@ -244,7 +248,7 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                                 {game ? "Lưu thay đổi" : "Tạo Game"}
                             </>
                         )}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

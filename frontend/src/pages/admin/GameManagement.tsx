@@ -6,8 +6,10 @@ const GameManagementPage: React.FC = () => {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800">Quản lý Danh mục Game</h1>
-                    <p className="text-slate-500 text-sm mt-1">Quản lý các loại game đang kinh doanh trên hệ thống</p>
+                    <h1 className="text-2xl font-bold text-text-main">Quản lý Danh mục Game</h1>
+                    <p className="text-text-secondary text-sm mt-1">
+                        Quản lý các loại game đang kinh doanh trên hệ thống
+                    </p>
                 </div>
             </div>
 

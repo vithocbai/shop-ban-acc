@@ -17,7 +17,8 @@ import {
   ShieldCheck,
   FileText,
   Image as ImageIcon,
-  Bell
+  Bell,
+  LogOut
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -39,7 +40,7 @@ const NavItem: React.FC<{ item: MenuItem; isActive: boolean; isOpen: boolean; on
         to={item.to!} 
         className={`flex items-center px-4 py-3 mb-1 rounded-md transition-all duration-200 ${
           isActive 
-            ? 'bg-blue-50 text-primary font-medium' 
+            ? 'bg-primary text-white font-medium shadow-sm' 
             : 'text-text-secondary hover:bg-bg-secondary hover:text-primary'
         }`}
       >
@@ -54,7 +55,7 @@ const NavItem: React.FC<{ item: MenuItem; isActive: boolean; isOpen: boolean; on
       <button 
         onClick={onToggle}
         className={`w-full flex items-center justify-between px-4 py-3 rounded-md transition-all duration-200 ${
-          isActive ? 'text-primary font-medium' : 'text-text-secondary hover:bg-bg-secondary hover:text-primary'
+          isActive ? 'text-primary font-bold' : 'text-text-secondary hover:bg-bg-secondary hover:text-primary'
         }`}
       >
         <div className="flex items-center">
@@ -72,7 +73,7 @@ const NavItem: React.FC<{ item: MenuItem; isActive: boolean; isOpen: boolean; on
               to={child.to}
               className={`flex items-center px-4 py-2 text-xs rounded-md transition-all ${
                 location.pathname === child.to 
-                  ? 'text-primary font-bold bg-blue-50' 
+                  ? 'text-white bg-primary font-medium shadow-sm' 
                   : 'text-text-secondary hover:text-primary hover:bg-bg-secondary'
               }`}
             >
@@ -165,7 +166,7 @@ const AdminLayout: React.FC = () => {
       <aside className="w-64 bg-white border-r border-border-color sticky top-0 h-screen flex flex-col overflow-y-auto py-6 scrollbar-hide">
         <div className="px-6 mb-8">
           <h2 className="text-2xl font-bold text-primary tracking-tight">SHOP GAME</h2>
-          <p className="text-[10px] text-text-secondary font-bold uppercase tracking-widest mt-1">Hệ thống quản trị</p>
+          <p className="text-[14px] text-text-secondary mt-1">Hệ thống quản trị</p>
         </div>
         
         <nav className="flex-1 px-3">
@@ -181,9 +182,12 @@ const AdminLayout: React.FC = () => {
         </nav>
         
         <div className="px-4 mt-10">
-          <button className="w-full flex items-center px-4 py-3 text-error hover:bg-red-50 rounded-md transition-colors text-sm font-medium">
-            <span className="mr-3 font-bold">🚪</span>
-            <span onClick={() => logout()}>Đăng xuất</span>
+          <button 
+            onClick={() => logout()}
+            className="w-full flex items-center px-4 py-3 text-error hover:bg-error/10 cursor-pointer rounded-md transition-colors text-sm font-medium"
+          >
+            <span className="mr-3 font-bold"><LogOut size={18} /></span>
+            <span>Đăng xuất</span>
           </button>
         </div>
       </aside>
@@ -194,7 +198,7 @@ const AdminLayout: React.FC = () => {
           <div className="flex items-center">
             <h1 className="text-lg font-bold text-text-main">
               {/* Tên trang hiện tại */}
-              Admin Panel
+              Admin Panel 
             </h1>
           </div>
           
@@ -203,7 +207,7 @@ const AdminLayout: React.FC = () => {
               <p className="text-sm font-bold text-text-main">Quản trị viên</p>
               <p className="text-[11px] text-text-secondary">admin@gamemarket.com</p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-primary border border-blue-100">
+            <div className="w-10 h-10 rounded-full bg-bg-secondary flex items-center justify-center text-text-main border border-border-color">
               <UserCircle size={24} />
             </div>
           </div>

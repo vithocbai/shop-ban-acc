@@ -41,7 +41,7 @@ const NavItem: React.FC<{ item: MenuItem; isActive: boolean; isOpen: boolean; on
         className={`flex items-center px-4 py-3 mb-1 rounded-md transition-all duration-200 ${
           isActive 
             ? 'bg-primary text-white font-medium shadow-sm' 
-            : 'text-text-secondary hover:bg-bg-secondary hover:text-primary'
+            : 'text-text-secondary font-medium hover:bg-bg-secondary hover:text-primary'
         }`}
       >
         <span className="mr-3">{item.icon}</span>
@@ -55,7 +55,7 @@ const NavItem: React.FC<{ item: MenuItem; isActive: boolean; isOpen: boolean; on
       <button 
         onClick={onToggle}
         className={`w-full flex items-center justify-between px-4 py-3 rounded-md transition-all duration-200 ${
-          isActive ? 'text-primary font-bold' : 'text-text-secondary hover:bg-bg-secondary hover:text-primary'
+          isActive ? 'text-primary font-bold' : 'text-text-secondary font-medium hover:bg-bg-secondary hover:text-primary'
         }`}
       >
         <div className="flex items-center">
@@ -71,10 +71,10 @@ const NavItem: React.FC<{ item: MenuItem; isActive: boolean; isOpen: boolean; on
             <Link
               key={child.to}
               to={child.to}
-              className={`flex items-center px-4 py-2 text-xs rounded-md transition-all ${
+              className={`flex items-center px-4 py-2 text-sm rounded-md transition-all ${
                 location.pathname === child.to 
                   ? 'text-white bg-primary font-medium shadow-sm' 
-                  : 'text-text-secondary hover:text-primary hover:bg-bg-secondary'
+                  : 'text-text-secondary font-medium hover:text-primary hover:bg-bg-secondary'
               }`}
             >
               <span className="mr-2 opacity-70">{child.icon}</span>
@@ -166,7 +166,7 @@ const AdminLayout: React.FC = () => {
       <aside className="w-64 bg-white border-r border-border-color sticky top-0 h-screen flex flex-col overflow-y-auto py-6 scrollbar-hide">
         <div className="px-6 mb-8">
           <h2 className="text-2xl font-bold text-primary tracking-tight">SHOP GAME</h2>
-          <p className="text-[14px] text-text-secondary mt-1">Hệ thống quản trị</p>
+          <p className="text-[14px] text-text-secondary mt-1 font-medium">Hệ thống quản trị</p>
         </div>
         
         <nav className="flex-1 px-3">

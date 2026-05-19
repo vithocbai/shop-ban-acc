@@ -110,9 +110,9 @@ const GameList: React.FC = () => {
     }
 
     return (
-        <Card className="overflow-hidden">
+        <div className="flex-1 flex flex-col min-h-0 space-y-4">
             {/* Header / Toolbar */}
-            <div className="p-5 border-b border-border-color flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white">
+            <div className="py-2 px-1 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
                 <div className="relative flex-1 max-w-md">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-secondary z-10">
                         <Search size={18} />
@@ -135,7 +135,7 @@ const GameList: React.FC = () => {
             </div>
 
             {error && (
-                <div className="m-5">
+                <div className="shrink-0">
                     <Alert variant="destructive">
                         <AlertDescription>{error}</AlertDescription>
                     </Alert>
@@ -143,131 +143,133 @@ const GameList: React.FC = () => {
             )}
 
             {/* Table */}
-            <Table className="bg-white">
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Game</TableHead>
-                        <TableHead className="text-center">Trạng thái</TableHead>
-                        <TableHead className="text-center">Thứ tự</TableHead>
-                        <TableHead className="text-center">Nổi bật</TableHead>
-                        <TableHead className="text-right">Thao tác</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {games.length > 0 ? (
-                        games.map((game) => (
-                            <TableRow key={game.id}>
-                                <TableCell>
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-md bg-bg-secondary flex items-center justify-center overflow-hidden border border-border-color">
-                                            {game.icon ? (
-                                                <img src={game.icon} alt={game.name} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className="text-text-secondary font-bold text-xl">
-                                                    {game.name.charAt(0)}
-                                                </div>
-                                            )}
+            <Card className="overflow-hidden flex-1 flex flex-col min-h-0">
+                <Table className="bg-white" containerClassName="flex-1 overflow-auto min-h-0">
+                    <TableHeader className="sticky top-0 z-10 bg-bg-secondary">
+                        <TableRow>
+                            <TableHead>Game</TableHead>
+                            <TableHead className="text-center">Trạng thái</TableHead>
+                            <TableHead className="text-center">Thứ tự</TableHead>
+                            <TableHead className="text-center">Nổi bật</TableHead>
+                            <TableHead className="text-right">Thao tác</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {games.length > 0 ? (
+                            games.map((game) => (
+                                <TableRow key={game.id}>
+                                    <TableCell>
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-md bg-bg-secondary flex items-center justify-center overflow-hidden border border-border-color">
+                                                {game.icon ? (
+                                                    <img src={game.icon} alt={game.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <div className="text-text-secondary font-bold text-xl">
+                                                        {game.name.charAt(0)}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-text-main">{game.name}</p>
+                                                <p className="text-xs text-text-secondary">{game.slug}</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="font-bold text-text-main">{game.name}</p>
-                                            <p className="text-xs text-text-secondary">{game.slug}</p>
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        {game.status === "ACTIVE" ? (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-success/10 text-success text-xs font-bold border border-success/20">
+                                                <Eye size={14} />
+                                                Hoạt động
+                                            </span>
+                                        ) : game.status === "HIDDEN" ? (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-bg-secondary text-text-secondary text-xs font-bold border border-border-color">
+                                                <EyeOff size={14} />
+                                                Đang ẩn
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-warning/10 text-warning text-xs font-bold border border-warning/20">
+                                                Bảo trì
+                                            </span>
+                                        )}
+                                    </TableCell>
+                                    <TableCell className="text-center font-medium text-text-secondary">
+                                        {game.sort_order}
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        {game.is_hot ? (
+                                            <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-warning/10 text-warning border border-warning/20">
+                                                <Star size={16} fill="currentColor" />
+                                            </div>
+                                        ) : (
+                                            <div className="text-border-color">
+                                                <Star size={16} />
+                                            </div>
+                                        )}
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <div className="flex items-center justify-end gap-1">
+                                            <Button 
+                                                variant="ghost" 
+                                                size="icon" 
+                                                onClick={() => handleEdit(game)}
+                                                title="Chỉnh sửa"
+                                                className="h-8 w-8 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer"
+                                            >
+                                                <Edit2 size={16} />
+                                            </Button>
+                                            <Button 
+                                                variant="ghost" 
+                                                size="icon" 
+                                                onClick={() => handleDelete(game.id)}
+                                                disabled={isDeleting === game.id}
+                                                title="Xóa"
+                                                className="h-8 w-8 text-text-secondary hover:text-error hover:bg-error/10 cursor-pointer disabled:opacity-50"
+                                            >
+                                                {isDeleting === game.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                                            </Button>
+                                            <Button 
+                                                variant="ghost" 
+                                                size="icon" 
+                                                className="h-8 w-8 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer"
+                                            >
+                                                <MoreVertical size={16} />
+                                            </Button>
                                         </div>
-                                    </div>
-                                </TableCell>
-                                <TableCell className="text-center">
-                                    {game.status === "ACTIVE" ? (
-                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-success/10 text-success text-xs font-bold border border-success/20">
-                                            <Eye size={14} />
-                                            Hoạt động
-                                        </span>
-                                    ) : game.status === "HIDDEN" ? (
-                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-bg-secondary text-text-secondary text-xs font-bold border border-border-color">
-                                            <EyeOff size={14} />
-                                            Đang ẩn
-                                        </span>
-                                    ) : (
-                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-warning/10 text-warning text-xs font-bold border border-warning/20">
-                                            Bảo trì
-                                        </span>
-                                    )}
-                                </TableCell>
-                                <TableCell className="text-center font-medium text-text-secondary">
-                                    {game.sort_order}
-                                </TableCell>
-                                <TableCell className="text-center">
-                                    {game.is_hot ? (
-                                        <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-warning/10 text-warning border border-warning/20">
-                                            <Star size={16} fill="currentColor" />
-                                        </div>
-                                    ) : (
-                                        <div className="text-border-color">
-                                            <Star size={16} />
-                                        </div>
-                                    )}
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <div className="flex items-center justify-end gap-1">
-                                        <Button 
-                                            variant="ghost" 
-                                            size="icon" 
-                                            onClick={() => handleEdit(game)}
-                                            title="Chỉnh sửa"
-                                            className="h-8 w-8 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer"
-                                        >
-                                            <Edit2 size={16} />
-                                        </Button>
-                                        <Button 
-                                            variant="ghost" 
-                                            size="icon" 
-                                            onClick={() => handleDelete(game.id)}
-                                            disabled={isDeleting === game.id}
-                                            title="Xóa"
-                                            className="h-8 w-8 text-text-secondary hover:text-error hover:bg-error/10 cursor-pointer disabled:opacity-50"
-                                        >
-                                            {isDeleting === game.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
-                                        </Button>
-                                        <Button 
-                                            variant="ghost" 
-                                            size="icon" 
-                                            className="h-8 w-8 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer"
-                                        >
-                                            <MoreVertical size={16} />
-                                        </Button>
-                                    </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={5} className="py-20 text-center text-text-secondary font-medium">
+                                    Không tìm thấy game nào khớp với tìm kiếm.
                                 </TableCell>
                             </TableRow>
-                        ))
-                    ) : (
-                        <TableRow>
-                            <TableCell colSpan={5} className="py-20 text-center text-text-secondary font-medium">
-                                Không tìm thấy game nào khớp với tìm kiếm.
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
+                        )}
+                    </TableBody>
+                </Table>
 
-            {/* Thanh Footer Phân Trang Sử Dụng Component Dùng Chung */}
-            <PaginationControls
-                page={page}
-                pageSize={pageSize}
-                total={total}
-                itemsLength={games.length}
-                onPageChange={(newPage) => setPage(newPage)}
-                onPageSizeChange={(newPageSize) => {
-                    setPageSize(newPageSize);
-                    setPage(1); // Reset về trang 1 khi đổi page size
-                }}
-                pageSizeOptions={[10, 20, 50]}
-            />
+                {/* Thanh Footer Phân Trang Sử Dụng Component Dùng Chung */}
+                <PaginationControls
+                    page={page}
+                    pageSize={pageSize}
+                    total={total}
+                    itemsLength={games.length}
+                    onPageChange={(newPage) => setPage(newPage)}
+                    onPageSizeChange={(newPageSize) => {
+                        setPageSize(newPageSize);
+                        setPage(1); // Reset về trang 1 khi đổi page size
+                    }}
+                    pageSizeOptions={[10, 20, 50]}
+                />
 
-            <GameModal 
-                isOpen={isModalOpen}
-                onClose={handleModalClose}
-                onSuccess={fetchGames}
-                game={selectedGame}
-            />
-        </Card>
+                <GameModal 
+                    isOpen={isModalOpen}
+                    onClose={handleModalClose}
+                    onSuccess={fetchGames}
+                    game={selectedGame}
+                />
+            </Card>
+        </div>
     );
 };
 

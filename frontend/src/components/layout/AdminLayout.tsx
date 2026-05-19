@@ -161,7 +161,7 @@ const AdminLayout: React.FC = () => {
   ];
 
   return (
-    <div className="flex min-h-screen bg-bg-secondary font-roboto">
+    <div className="flex h-screen bg-bg-secondary font-roboto overflow-hidden">
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-border-color sticky top-0 h-screen flex flex-col overflow-y-auto py-6 scrollbar-hide">
         <div className="px-6 mb-8">
@@ -193,8 +193,8 @@ const AdminLayout: React.FC = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 bg-white border-b border-border-color flex items-center justify-between px-8 sticky top-0 z-20">
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <header className="h-16 bg-white border-b border-border-color flex items-center justify-between px-8 sticky top-0 z-20 flex-shrink-0">
           <div className="flex items-center">
             <h1 className="text-lg font-bold text-text-main">
               {/* Tên trang hiện tại */}
@@ -213,7 +213,7 @@ const AdminLayout: React.FC = () => {
           </div>
         </header>
 
-        <div className="p-8">
+        <div className="p-4 flex-1 overflow-hidden flex flex-col">
           <Outlet />
         </div>
       </main>

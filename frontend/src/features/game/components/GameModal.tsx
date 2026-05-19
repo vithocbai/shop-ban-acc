@@ -165,7 +165,7 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                             value={formData.description}
                             onChange={handleInputChange}
                             rows={3}
-                            className="block w-full px-4 py-2.5 bg-bg-secondary border border-border-color rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none text-text-main placeholder:text-text-secondary"
+                            className="block w-full px-4 py-2.5 bg-bg-secondary border border-border-color rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary transition-all resize-none text-text-main placeholder:text-text-secondary"
                             placeholder="Mô tả ngắn về game..."
                         />
                     </div>
@@ -177,7 +177,7 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                                 name="status"
                                 value={formData.status}
                                 onChange={handleInputChange}
-                                className="block w-full px-4 py-2.5 bg-bg-secondary border border-border-color rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-text-main"
+                                className="block w-full px-4 py-2.5 bg-bg-secondary border border-border-color rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary transition-all text-text-main"
                             >
                                 <option value="ACTIVE">Hoạt động</option>
                                 <option value="HIDDEN">Ẩn</option>

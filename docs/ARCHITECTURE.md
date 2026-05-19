@@ -1,124 +1,123 @@
 web-builder/
 │
-├── frontend/                         # 🎨 React App (UI + Builder editor)
-│   │
-│   ├── public/                       # Static assets (favicon, images, icon)
-│   │
-│   ├── src/                          # 💻 Source chính
-│   │   │
-│   │   ├── app/                      # ⚙️ Config toàn app (KHÔNG chứa business logic)
-│   │   │   ├── router.tsx            # Định nghĩa route (projects, editor...)
-│   │   │   ├── providers.tsx         # Wrap context (theme, auth, query client...)
-│   │   │   └── store.ts              # Setup global store (Zustand/Redux root)
-│   │   │
-│   │   ├── features/                 # 🧠 Business modules (quan trọng nhất FE)
-│   │   │   │
-│   │   │   ├── project/              # 🎯 Quản lý project (CRUD)
-│   │   │   │   ├── components/       # UI riêng của project (card, modal...)
-│   │   │   │   ├── hooks/            # useProject(), useCreateProject()
-│   │   │   │   ├── services/         # call API project
-│   │   │   │   ├── store/            # state riêng project
-│   │   │   │   └── types.ts          # type TS của project
-│   │   │   │
-│   │   │   ├── page/                 # 📄 quản lý page trong project
-│   │   │   │
-│   │   │   ├── builder/              # 🔥 CORE: drag-drop editor
-│   │   │   │   ├── components/       # canvas, toolbar, sidebar
-│   │   │   │   ├── engine/           # logic builder (tree, node, layout)
-│   │   │   │   ├── hooks/            # useBuilder(), useDragDrop()
-│   │   │   │   ├── store/            # state editor + undo/redo
-│   │   │   │   └── types.ts          # schema JSON component
-│   │   │   │
-│   │   │   └── auth/                 # 🔐 login/register (nếu có)
-│   │   │
-│   │   ├── components/               # 🧩 UI dùng chung (reusable)
-│   │   │   ├── ui/                   # button, input, modal
-│   │   │   └── layout/               # navbar, sidebar layout
-│   │   │
-│   │   ├── hooks/                   # global hooks (useDebounce, useLocalStorage)
-│   │   ├── services/                # axios config + base API
-│   │   ├── utils/                   # helper functions
-│   │   ├── types/                   # global types
-│   │   └── constants/               # config constants
-│   │
-│   ├── manifest.config.ts           # config extension (nếu build chrome extension)
-│   ├── package.json
-│   └── .env                         # biến môi trường FE
+├── frontend/ # 🎨 React App (UI + Builder editor)
+│ │
+│ ├── public/ # Static assets (favicon, images, icon)
+│ │
+│ ├── src/ # 💻 Source chính
+│ │ │
+│ │ ├── app/ # ⚙️ Config toàn app (KHÔNG chứa business logic)
+│ │ │ ├── router.tsx # Định nghĩa route (projects, editor...)
+│ │ │ ├── providers.tsx # Wrap context (theme, auth, query client...)
+│ │ │ └── store.ts # Setup global store (Zustand/Redux root)
+│ │ │
+│ │ ├── features/ # 🧠 Business modules (quan trọng nhất FE)
+│ │ │ │
+│ │ │ ├── project/ # 🎯 Quản lý project (CRUD)
+│ │ │ │ ├── components/ # UI riêng của project (card, modal...)
+│ │ │ │ ├── hooks/ # useProject(), useCreateProject()
+│ │ │ │ ├── services/ # call API project
+│ │ │ │ ├── store/ # state riêng project
+│ │ │ │ └── types.ts # type TS của project
+│ │ │ │
+│ │ │ ├── page/ # 📄 quản lý page trong project
+│ │ │ │
+│ │ │ ├── builder/ # 🔥 CORE: drag-drop editor
+│ │ │ │ ├── components/ # canvas, toolbar, sidebar
+│ │ │ │ ├── engine/ # logic builder (tree, node, layout)
+│ │ │ │ ├── hooks/ # useBuilder(), useDragDrop()
+│ │ │ │ ├── store/ # state editor + undo/redo
+│ │ │ │ └── types.ts # schema JSON component
+│ │ │ │
+│ │ │ └── auth/ # 🔐 login/register (nếu có)
+│ │ │
+│ │ ├── components/ # 🧩 UI dùng chung (reusable)
+│ │ │ ├── ui/ # button, input, modal
+│ │ │ └── layout/ # navbar, sidebar layout
+│ │ │
+│ │ ├── hooks/ # global hooks (useDebounce, useLocalStorage)
+│ │ ├── services/ # axios config + base API
+│ │ ├── utils/ # helper functions
+│ │ ├── types/ # global types
+│ │ └── constants/ # config constants
+│ │
+│ ├── manifest.config.ts # config extension (nếu build chrome extension)
+│ ├── package.json
+│ └── .env # biến môi trường FE
 │
-├── backend/                         # ⚙️ Django REST API
-│   │
-│   ├── config/                      # ⚙️ cấu hình Django
-│   │   ├── settings/
-│   │   │   ├── base.py              # config chung
-│   │   │   ├── dev.py               # config dev
-│   │   │   └── prod.py              # config production
-│   │   ├── urls.py                  # root API route
-│   │   └── wsgi.py
-│   │
-│   ├── apps/                        # 🧩 business modules (DDD-lite)
-│   │   │
-│   │   ├── core/                    # 🔥 dùng chung toàn hệ thống
-│   │   │   ├── models.py            # BaseModel (created_at, updated_at)
-│   │   │   ├── permissions.py       # custom permission
-│   │   │   ├── pagination.py        # config pagination
-│   │   │   └── utils.py             # helper backend
-│   │   │
-│   │   ├── project/                 # 🎯 domain project
-│   │   │   ├── models.py            # model Project
-│   │   │   ├── serializers.py       # convert model <-> JSON
-│   │   │   ├── views.py             # API endpoint
-│   │   │   ├── urls.py              # route /projects/
-│   │   │   ├── services/            # 🔥 business logic (create, clone...)
-│   │   │   │   └── project_service.py
-│   │   │   ├── selectors/           # 🔥 query DB (lọc, search)
-│   │   │   │   └── project_selector.py
-│   │   │   └── tests/               # test API
-│   │   │
-│   │   ├── page/                    # 📄 page trong project
-│   │   ├── component/               # 🧩 component config (button, text...)
-│   │   ├── builder/                 # 🔥 lưu layout JSON
-│   │   └── user/                    # 👤 user system
-│   │
-│   ├── common/                      # optional (mixins, reusable logic)
-│   │
-│   ├── manage.py
-│   ├── requirements/                # dependency tách theo môi trường
-│   │   ├── base.txt
-│   │   ├── dev.txt
-│   │   └── prod.txt
-│   │
-│   └── .env                         # biến môi trường backend
+├── backend/ # ⚙️ Django REST API
+│ │
+│ ├── config/ # ⚙️ cấu hình Django
+│ │ ├── settings/
+│ │ │ ├── base.py # config chung
+│ │ │ ├── dev.py # config dev
+│ │ │ └── prod.py # config production
+│ │ ├── urls.py # root API route
+│ │ └── wsgi.py
+│ │
+│ ├── apps/ # 🧩 business modules (DDD-lite)
+│ │ │
+│ │ ├── core/ # 🔥 dùng chung toàn hệ thống
+│ │ │ ├── models.py # BaseModel (created_at, updated_at)
+│ │ │ ├── permissions.py # custom permission
+│ │ │ ├── pagination.py # config pagination
+│ │ │ └── utils.py # helper backend
+│ │ │
+│ │ ├── project/ # 🎯 domain project
+│ │ │ ├── models.py # model Project
+│ │ │ ├── serializers.py # convert model <-> JSON
+│ │ │ ├── views.py # API endpoint
+│ │ │ ├── urls.py # route /projects/
+│ │ │ ├── services/ # 🔥 business logic (create, clone...)
+│ │ │ │ └── project_service.py
+│ │ │ ├── selectors/ # 🔥 query DB (lọc, search)
+│ │ │ │ └── project_selector.py
+│ │ │ └── tests/ # test API
+│ │ │
+│ │ ├── page/ # 📄 page trong project
+│ │ ├── component/ # 🧩 component config (button, text...)
+│ │ ├── builder/ # 🔥 lưu layout JSON
+│ │ └── user/ # 👤 user system
+│ │
+│ ├── common/ # optional (mixins, reusable logic)
+│ │
+│ ├── manage.py
+│ ├── requirements/ # dependency tách theo môi trường
+│ │ ├── base.txt
+│ │ ├── dev.txt
+│ │ └── prod.txt
+│ │
+│ └── .env # biến môi trường backend
 │
-├── docs/                            # 📚 tài liệu toàn hệ thống (QUAN TRỌNG)
-│   ├── ARCHITECTURE.md              # mô tả tổng thể hệ thống
-│   ├── API-CONTRACT.md              # định nghĩa API (FE ↔ BE)
-│   ├── DATA-SCHEMA.md               # schema DB + JSON builder
-│   ├── PRD.md                       # yêu cầu sản phẩm
-│   ├── PROJECT-RULES.md             # rule code team
-│   │
-│   └── flows/                       # 🔥 flow nghiệp vụ
-│       ├── builder-flow.md          # kéo thả component
-│       ├── undo-redo.md             # logic undo/redo
-│       └── save-publish.md          # lưu & publish
+├── docs/ # 📚 tài liệu toàn hệ thống (QUAN TRỌNG)
+│ ├── ARCHITECTURE.md # mô tả tổng thể hệ thống
+│ ├── API-CONTRACT.md # định nghĩa API (FE ↔ BE)
+│ ├── DATA-SCHEMA.md # schema DB + JSON builder
+│ ├── PRD.md # yêu cầu sản phẩm
+│ ├── PROJECT-RULES.md # rule code team
+│ │
+│ └── flows/ # 🔥 flow nghiệp vụ
+│ ├── builder-flow.md # kéo thả component
+│ ├── undo-redo.md # logic undo/redo
+│ └── save-publish.md # lưu & publish
 │
-├── .agents/                         # 🧠 AI agent system
-│   ├── rules/                       # rule cho AI
-│   ├── skills/                      # kỹ năng AI (generate UI, code...)
-│   └── workflows/                   # flow automation
+├── .agents/ # 🧠 AI agent system
+│ ├── rules/ # rule cho AI
+│ ├── skills/ # kỹ năng AI (generate UI, code...)
+│ └── workflows/ # flow automation
 │
-├── docker/                          # 🐳 deploy production
-│   ├── nginx/                       # reverse proxy
-│   ├── backend/                     # docker backend
-│   └── frontend/                    # docker frontend
+├── docker/ # 🐳 deploy production
+│ ├── nginx/ # reverse proxy
+│ ├── backend/ # docker backend
+│ └── frontend/ # docker frontend
 │
-├── docker-compose.yml               # chạy full stack local
-├── .env                             # env global
-└── README.md                        # hướng dẫn project
+├── docker-compose.yml # chạy full stack local
+├── .env # env global
+└── README.md # hướng dẫn project
 
 ---
 
 # ARCHITECTURE.md
-
 
 # 🏗 SYSTEM ARCHITECTURE
 
@@ -142,14 +141,14 @@ PostgreSQL + Redis + Storage
 
 Mục tiêu:
 
-* Quản lý nhiều game
-* Dễ scale thêm game mới
-* UI hiện đại
-* Responsive mobile-first
-* Auto delivery account
-* Hệ thống admin mạnh
-* Tách module rõ ràng
-* Dễ maintain & phát triển team
+- Quản lý nhiều game
+- Dễ scale thêm game mới
+- UI hiện đại
+- Responsive mobile-first
+- Auto delivery account
+- Hệ thống admin mạnh
+- Tách module rõ ràng
+- Dễ maintain & phát triển team
 
 ---
 
@@ -157,51 +156,51 @@ Mục tiêu:
 
 ## Frontend
 
-* ReactJS
-* TypeScript
-* TailwindCSS v4 (base styling engine)
-* **shadcn/ui** (component library – dùng `npx shadcn add`)
-* React Router
-* Zustand
-* React Query
-* Axios
-* Framer Motion
+- ReactJS
+- TypeScript
+- TailwindCSS v4 (base styling engine)
+- **shadcn/ui** (component library – dùng `npx shadcn add`)
+- React Router
+- Zustand
+- React Query
+- Axios
+- Framer Motion
 
 ---
 
 ## Backend
 
-* Python 3
-* Django
-* Django REST Framework
-* JWT Authentication
+- Python 3
+- Django
+- Django REST Framework
+- JWT Authentication
 
 ---
 
 ## Database
 
-* PostgreSQL
+- PostgreSQL
 
 ---
 
 ## Cache / Queue
 
-* Redis
+- Redis
 
 ---
 
 ## Upload / Storage
 
-* Cloudflare R2 / AWS S3
+- Cloudflare R2 / AWS S3
 
 ---
 
 ## Deployment
 
-* Docker
-* Docker Compose
-* Nginx
-* Gunicorn
+- Docker
+- Docker Compose
+- Nginx
+- Gunicorn
 
 ---
 
@@ -277,21 +276,21 @@ Website
 
 Bao gồm:
 
-* banner slider
-* game categories
-* acc nổi bật
-* flash sale
-* tin tức
-* feedback
-* footer
+- banner slider
+- game categories
+- acc nổi bật
+- flash sale
+- tin tức
+- feedback
+- footer
 
 ---
 
 ## Danh Mục Game
 
-* Liên Quân
-* Ngọc Rồng
-* hỗ trợ mở rộng game mới
+- Liên Quân
+- Ngọc Rồng
+- hỗ trợ mở rộng game mới
 
 ---
 
@@ -299,10 +298,10 @@ Bao gồm:
 
 Chức năng:
 
-* filter
-* search realtime
-* sort
-* pagination
+- filter
+- search realtime
+- sort
+- pagination
 
 ---
 
@@ -310,20 +309,20 @@ Chức năng:
 
 Bao gồm:
 
-* gallery ảnh
-* thông tin acc
-* bảo hành
-* nút mua nhanh
-* acc liên quan
+- gallery ảnh
+- thông tin acc
+- bảo hành
+- nút mua nhanh
+- acc liên quan
 
 ---
 
 ## Giỏ Hàng
 
-* thêm acc
-* cập nhật
-* xóa acc
-* tính tổng tiền
+- thêm acc
+- cập nhật
+- xóa acc
+- tính tổng tiền
 
 ---
 
@@ -331,20 +330,20 @@ Bao gồm:
 
 Hỗ trợ:
 
-* QR Bank
-* Momo
-* Thẻ cào
-* số dư tài khoản
+- QR Bank
+- Momo
+- Thẻ cào
+- số dư tài khoản
 
 ---
 
 ## Tài Khoản Người Dùng
 
-* profile
-* đổi mật khẩu
-* lịch sử mua
-* lịch sử nạp
-* wishlist
+- profile
+- đổi mật khẩu
+- lịch sử mua
+- lịch sử nạp
+- wishlist
 
 ---
 
@@ -512,10 +511,10 @@ accounts
 
 ```json id="4zmy89"
 {
-  "rank": "Cao Thủ",
-  "skins": 120,
-  "heroes": 95,
-  "ngoc": "Full cấp 3"
+    "rank": "Cao Thủ",
+    "skins": 120,
+    "heroes": 95,
+    "ngoc": "Full cấp 3"
 }
 ```
 
@@ -525,10 +524,10 @@ accounts
 
 ```json id="ml4lm2"
 {
-  "server": "Vũ Trụ 7",
-  "hanh_tinh": "Namek",
-  "suc_manh": "15 tỷ",
-  "de_tu": true
+    "server": "Vũ Trụ 7",
+    "hanh_tinh": "Namek",
+    "suc_manh": "15 tỷ",
+    "de_tu": true
 }
 ```
 
@@ -641,9 +640,9 @@ Protected APIs
 
 Role:
 
-* user
-* admin
-* super_admin
+- user
+- admin
+- super_admin
 
 ---
 
@@ -697,12 +696,12 @@ HIDDEN
 
 Hỗ trợ:
 
-* filter theo game
-* giá
-* rank
-* skin
-* server
-* login type
+- filter theo game
+- giá
+- rank
+- skin
+- server
+- login type
 
 Ví dụ API:
 
@@ -716,10 +715,10 @@ Ví dụ API:
 
 Upload:
 
-* avatar
-* thumbnail
-* banner
-* gallery ảnh
+- avatar
+- thumbnail
+- banner
+- gallery ảnh
 
 Flow:
 
@@ -739,11 +738,11 @@ Save URL
 
 Redis dùng cho:
 
-* homepage cache
-* hot accounts
-* flash sale
-* session cache
-* statistics
+- homepage cache
+- hot accounts
+- flash sale
+- session cache
+- statistics
 
 ---
 
@@ -751,21 +750,21 @@ Redis dùng cho:
 
 ## Password
 
-* bcrypt hash
+- bcrypt hash
 
 ## APIs
 
-* rate limit
-* validation
-* permission
+- rate limit
+- validation
+- permission
 
 ## Sensitive Data
 
-* encrypt account info
+- encrypt account info
 
 ## Admin
 
-* RBAC permission system
+- RBAC permission system
 
 ---
 
@@ -789,11 +788,11 @@ PostgreSQL + Redis
 
 ## Thiết Kế Tổng Quan
 
-* Nền trắng chủ đạo, hiện đại, tối giản, gaming nhẹ
-* Font Roboto, Button màu primary, Mobile First, Responsive toàn bộ
-* Component Library: **shadcn/ui** (Radix UI + Tailwind)
-* Icon Library: **lucide-react**
-* Không hardcode hex vào class — dùng **CSS variables** của shadcn
+- Nền trắng chủ đạo, hiện đại, tối giản, gaming nhẹ
+- Font Roboto, Button màu primary, Mobile First, Responsive toàn bộ
+- Component Library: **shadcn/ui** (Radix UI + Tailwind)
+- Icon Library: **lucide-react**
+- Không hardcode hex vào class — dùng **CSS variables** của shadcn
 
 ---
 
@@ -804,7 +803,7 @@ PostgreSQL + Redis
 | 🎮 Danh mục game    | Quản lý nhiều game    |
 | 🔍 Tìm kiếm & lọc   | Rank, giá, skin       |
 | 📋 Chi tiết acc     | Gallery + thông tin   |
-| ⚡ Thanh toán nhanh  | QR Bank, Momo         |
+| ⚡ Thanh toán nhanh | QR Bank, Momo         |
 | 🤖 Nhận acc tự động | Auto delivery         |
 | 🛡 Bảo hành         | Hỗ trợ khách hàng     |
 | 👤 Tài khoản        | Lịch sử mua           |
@@ -812,28 +811,30 @@ PostgreSQL + Redis
 
 ---
 
-# Hệ Màu (CSS Variables — shadcn/ui)
+# Hệ Màu (CSS Variables trong index.css)
 
-Cấu hình trong `globals.css`. Dùng qua Tailwind class — **không hardcode hex**:
+Cấu hình màu giao diện trắng đen làm chủ đạo qua các biến CSS trong `@theme` — **không hardcode hex vào class**:
 
-| CSS Variable | Giá trị | Tailwind class |
-| ------------------- | ------- | -------------- |
-| `--primary` | `#008BFF` | `bg-primary` / `text-primary` |
-| `--background` | `#FFFFFF` | `bg-background` |
-| `--card` | `#FFFFFF` | `bg-card` |
-| `--muted` | `#FFFFFF` | `bg-muted` |
-| `--border` | `#E5E7E9` | `border-border` |
-| `--foreground` | `#1E293B` | `text-foreground` |
-| `--muted-foreground`| `#647488` | `text-muted-foreground` |
-| `--destructive` | `#EF4444` | `text-destructive` |
+| Biến CSS                 | Giá trị   | Tailwind class           | Dùng cho                        |
+| ------------------------ | --------- | ------------------------ | ------------------------------- |
+| `--color-primary`        | `#000000` | `bg-primary`             | Nút bấm chính, tông chủ đạo đen |
+| `--color-primary-hover`  | `#1a1a1a` | `hover:bg-primary-hover` | Di chuột nút bấm chính          |
+| `--color-bg-main`        | `#FFFFFF` | `bg-bg-main`             | Nền chính trắng tinh khiết      |
+| `--color-bg-secondary`   | `#FAFAFA` | `bg-bg-secondary`        | Nền phụ xám tinh khiết cực nhạt |
+| `--color-border-color`   | `#E5E7E9` | `border-border-color`    | Màu đường viền khung            |
+| `--color-text-main`      | `#1E293B` | `text-text-main`         | Chữ chính                       |
+| `--color-text-secondary` | `#647488` | `text-text-secondary`    | Chữ chú thích, chữ phụ          |
+| `--color-success`        | `#10B981` | `text-success`           | Trạng thái thành công           |
+| `--color-error`          | `#EF4444` | `text-error`             | Trạng thái lỗi                  |
+| `--color-warning`        | `#F59E0B` | `text-warning`           | Trạng thái cảnh báo             |
 
 ---
 
 # Font Chữ
 
-* Font chính: **Roboto** (Google Fonts)
-* Khai báo trong `globals.css` hoặc `layout.tsx`
-* Font weight: 300 / 400 / 500 / 600 / 700
+- Font chính: **Roboto** (Google Fonts)
+- Khai báo trong `globals.css` hoặc `layout.tsx`
+- Font weight: 300 / 400 / 500 / 600 / 700
 
 ---
 
@@ -841,22 +842,22 @@ Cấu hình trong `globals.css`. Dùng qua Tailwind class — **không hardcode 
 
 > ⚡ Dùng **shadcn/ui** làm component library chính. Cài component bằng lệnh: `npx shadcn add <component-name>`
 
-| Component | shadcn/ui package |
-| --------- | ----------------- |
-| Button | `button` |
-| Input | `input` |
-| Select | `select` |
-| Dialog / Modal | `dialog` |
-| Card | `card` |
-| Table | `table` |
-| Pagination | `pagination` |
-| Badge | `badge` |
-| Sheet / Drawer | `sheet` |
-| Tabs | `tabs` |
-| Toast | `sonner` |
-| Dropdown Menu | `dropdown-menu` |
-| Skeleton | `skeleton` |
-| Alert | `alert` |
+| Component         | shadcn/ui package                  |
+| ----------------- | ---------------------------------- |
+| Button            | `button`                           |
+| Input             | `input`                            |
+| Select            | `select`                           |
+| Dialog / Modal    | `dialog`                           |
+| Card              | `card`                             |
+| Table             | `table`                            |
+| Pagination        | `pagination`                       |
+| Badge             | `badge`                            |
+| Sheet / Drawer    | `sheet`                            |
+| Tabs              | `tabs`                             |
+| Toast             | `sonner`                           |
+| Dropdown Menu     | `dropdown-menu`                    |
+| Skeleton          | `skeleton`                         |
+| Alert             | `alert`                            |
 | Form + Validation | `form` + `react-hook-form` + `zod` |
 
 ---
@@ -865,14 +866,14 @@ Cấu hình trong `globals.css`. Dùng qua Tailwind class — **không hardcode 
 
 ## Desktop
 
-* sidebar
-* multi grid
+- sidebar
+- multi grid
 
 ## Mobile
 
-* bottom navigation
-* filter drawer
-* sticky CTA
+- bottom navigation
+- filter drawer
+- sticky CTA
 
 ---
 
@@ -880,23 +881,23 @@ Cấu hình trong `globals.css`. Dùng qua Tailwind class — **không hardcode 
 
 Hỗ trợ mở rộng:
 
-* thêm game mới
-* vòng quay
-* random box
-* affiliate
-* livestream
-* app mobile
-* AI recommendation
+- thêm game mới
+- vòng quay
+- random box
+- affiliate
+- livestream
+- app mobile
+- AI recommendation
 
 ---
 
 # 19. Coding Standards
 
-* strict TypeScript
-* modular architecture
-* reusable components
-* clean code
-* atomic design
+- strict TypeScript
+- modular architecture
+- reusable components
+- clean code
+- atomic design
 
 ---
 
@@ -916,8 +917,8 @@ Response format:
 
 ```json id="e6v51s"
 {
-  "success": true,
-  "message": "Success",
-  "data": {}
+    "success": true,
+    "message": "Success",
+    "data": {}
 }
 ```

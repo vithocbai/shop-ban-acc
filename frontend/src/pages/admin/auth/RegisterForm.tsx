@@ -1,7 +1,11 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import { Mail, Lock, AlertCircle, Loader2, User, EyeOff, Eye } from "lucide-react";
+import { Input } from "../../../components/ui/input";
+import { Label } from "../../../components/ui/label";
+import { Button } from "../../../components/ui/button";
+import { Alert, AlertDescription } from "../../../components/ui/alert";
+import { cn } from "../../../lib/utils";
 
 interface RegisterFormProps {
     onSwitchToLogin: () => void;
@@ -19,7 +23,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const { register } = useAuth();
-    const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -84,82 +87,82 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
     return (
         <form className="space-y-1.5" onSubmit={handleSubmit} noValidate>
             {error && (
-                <div className="bg-red-50 border border-red-200 text-error px-4 py-3 rounded-xl flex items-center gap-3 animate-shake mb-4">
-                    <AlertCircle size={18} />
-                    <span className="text-sm font-medium">{error}</span>
-                </div>
+                <Alert variant="destructive" className="mb-4 animate-shake">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription className="font-medium ml-2">{error}</AlertDescription>
+                </Alert>
             )}
 
             <div>
-                <label htmlFor="username" className="block text-[14px] font-medium text-[#1E293B] mb-1.5">
+                <Label htmlFor="username" className="mb-1.5 block">
                     Tên đăng nhập
-                </label>
+                </Label>
                 <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#94A3B8]">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-text-secondary">
                         <User size={18} />
                     </div>
-                    <input
+                    <Input
                         id="username"
                         name="username"
                         type="text"
                         value={username}
                         onChange={(e) => handleInputChange("username", e.target.value, setUsername)}
-                        className={`block w-full pl-11 pr-4 py-3 bg-white border rounded-xl transition-all focus:outline-none focus:ring-2 ${fieldErrors.username ? "border-red-500 focus:ring-red-200 focus:border-red-500" : "border-[#E2E8F0] focus:ring-primary/20 focus:border-primary"}`}
+                        className={cn("pl-11 pr-4 py-3 rounded-md", fieldErrors.username && "border-error focus-visible:ring-error")}
                         placeholder="Nhập tên đăng nhập"
                     />
                 </div>
                 <div className="min-h-[20px]">
                     {fieldErrors.username && (
-                        <p className="text-[12px] text-red-500 mt-0.5 italic">{fieldErrors.username}</p>
+                        <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.username}</p>
                     )}
                 </div>
             </div>
 
             <div>
-                <label htmlFor="email" className="block text-[14px] font-medium text-[#1E293B] mb-1.5">
+                <Label htmlFor="email" className="mb-1.5 block">
                     Tài khoản của bạn (Email)
-                </label>
+                </Label>
                 <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#94A3B8]">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-text-secondary">
                         <Mail size={18} />
                     </div>
-                    <input
+                    <Input
                         id="email"
                         name="email"
                         type="email"
                         value={email}
                         onChange={(e) => handleInputChange("email", e.target.value, setEmail)}
-                        className={`block w-full pl-11 pr-4 py-3 bg-white border rounded-xl transition-all focus:outline-none focus:ring-2 ${fieldErrors.email ? "border-red-500 focus:ring-red-200 focus:border-red-500" : "border-[#E2E8F0] focus:ring-primary/20 focus:border-primary"}`}
+                        className={cn("pl-11 pr-4 py-3 rounded-md", fieldErrors.email && "border-error focus-visible:ring-error")}
                         placeholder="Nhập địa chỉ Email"
                     />
                 </div>
                 <div className="min-h-[20px]">
                     {fieldErrors.email && (
-                        <p className="text-[12px] text-red-500 mt-0.5 italic">{fieldErrors.email}</p>
+                        <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.email}</p>
                     )}
                 </div>
             </div>
 
             <div>
-                <label htmlFor="password" className="block text-[14px] font-medium text-[#1E293B] mb-1.5">
+                <Label htmlFor="password" className="mb-1.5 block">
                     Mật khẩu
-                </label>
+                </Label>
                 <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#94A3B8]">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-text-secondary">
                         <Lock size={18} />
                     </div>
-                    <input
+                    <Input
                         id="password"
                         name="password"
                         type={showPassword ? "text" : "password"}
                         value={password}
                         onChange={(e) => handleInputChange("password", e.target.value, setPassword)}
-                        className={`block w-full pl-11 pr-11 py-3 bg-white border rounded-xl transition-all focus:outline-none focus:ring-2 ${fieldErrors.password ? "border-red-500 focus:ring-red-200 focus:border-red-500" : "border-[#E2E8F0] focus:ring-primary/20 focus:border-primary"}`}
+                        className={cn("pl-11 pr-11 py-3 rounded-md", fieldErrors.password && "border-error focus-visible:ring-error")}
                         placeholder="Nhập mật khẩu"
                     />
                     <button
                         type="button"
-                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#94A3B8] hover:text-primary transition-colors"
+                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-text-secondary hover:text-primary transition-colors"
                         onClick={() => setShowPassword(!showPassword)}
                     >
                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -167,31 +170,31 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
                 </div>
                 <div className="min-h-[20px]">
                     {fieldErrors.password && (
-                        <p className="text-[12px] text-red-500 mt-0.5 italic">{fieldErrors.password}</p>
+                        <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.password}</p>
                     )}
                 </div>
             </div>
 
             <div>
-                <label htmlFor="confirmPassword" className="block text-[14px] font-medium text-[#1E293B] mb-1.5">
+                <Label htmlFor="confirmPassword" className="mb-1.5 block">
                     Nhập lại mật khẩu
-                </label>
+                </Label>
                 <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#94A3B8]">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-text-secondary">
                         <Lock size={18} />
                     </div>
-                    <input
+                    <Input
                         id="confirmPassword"
                         name="confirmPassword"
                         type={showConfirmPassword ? "text" : "password"}
                         value={confirmPassword}
                         onChange={(e) => handleInputChange("confirmPassword", e.target.value, setConfirmPassword)}
-                        className={`block w-full pl-11 pr-11 py-3 bg-white border rounded-xl transition-all focus:outline-none focus:ring-2 ${fieldErrors.confirmPassword ? "border-red-500 focus:ring-red-200 focus:border-red-500" : "border-[#E2E8F0] focus:ring-primary/20 focus:border-primary"}`}
+                        className={cn("pl-11 pr-11 py-3 rounded-md", fieldErrors.confirmPassword && "border-error focus-visible:ring-error")}
                         placeholder="Nhập lại mật khẩu"
                     />
                     <button
                         type="button"
-                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#94A3B8] hover:text-primary transition-colors"
+                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-text-secondary hover:text-primary transition-colors"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
                         {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -199,21 +202,22 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
                 </div>
                 <div className="min-h-[20px]">
                     {fieldErrors.confirmPassword && (
-                        <p className="text-[12px] text-red-500 mt-0.5 italic">{fieldErrors.confirmPassword}</p>
+                        <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.confirmPassword}</p>
                     )}
                 </div>
             </div>
 
-            <button
+            <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-base font-bold text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+                className="w-full mt-4 h-12 text-base font-bold rounded-md"
             >
-                {isLoading ? <Loader2 className="animate-spin" size={24} /> : "Đăng ký ngay"}
-            </button>
+                {isLoading && <Loader2 className="animate-spin mr-2" size={20} />}
+                {isLoading ? "Đang xử lý..." : "Đăng ký ngay"}
+            </Button>
 
             <div className="mt-4 text-center">
-                <p className="text-sm text-[#64748B]">
+                <p className="text-sm text-text-secondary">
                     Đã có tài khoản?{" "}
                     <button 
                         type="button" 

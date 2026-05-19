@@ -10,21 +10,21 @@ Shop bán acc game – Development Standards & Team Conventions
 
 Tài liệu này định nghĩa:
 
-* coding standards
-* kiến trúc project
-* quy tắc teamwork
-* convention frontend/backend
-* quy tắc Git
-* quy tắc UI/UX
-* performance & security rules
+- coding standards
+- kiến trúc project
+- quy tắc teamwork
+- convention frontend/backend
+- quy tắc Git
+- quy tắc UI/UX
+- performance & security rules
 
 Mục tiêu:
 
-* code clean
-* dễ maintain
-* dễ scale
-* onboarding nhanh
-* AI agent friendly
+- code clean
+- dễ maintain
+- dễ scale
+- onboarding nhanh
+- AI agent friendly
 
 ---
 
@@ -72,13 +72,13 @@ Không viết business logic trong UI.
 
 # Frontend Stack
 
-* ReactJS
-* TypeScript
-* TailwindCSS v4 (base styling engine)
-* **shadcn/ui** (component library – `npx shadcn add <component>`)
-* Zustand
-* React Query
-* Axios
+- ReactJS
+- TypeScript
+- TailwindCSS v4 (base styling engine)
+- **shadcn/ui** (component library – `npx shadcn add <component>`)
+- Zustand
+- React Query
+- Axios
 
 ---
 
@@ -139,8 +139,8 @@ features/
 ### ✅ Đúng
 
 ```tsx id="9apvij"
-AccountCard.tsx
-AccountFilter.tsx
+AccountCard.tsx;
+AccountFilter.tsx;
 ```
 
 ---
@@ -148,8 +148,8 @@ AccountFilter.tsx
 ### ❌ Sai
 
 ```tsx id="jk6zzn"
-card.tsx
-filter.tsx
+card.tsx;
+filter.tsx;
 ```
 
 ---
@@ -161,7 +161,7 @@ filter.tsx
 ### ❌ Không dùng
 
 ```ts id="rv6r2v"
-any
+any;
 ```
 
 ---
@@ -180,18 +180,18 @@ enum
 
 ## Zustand dùng cho:
 
-* auth state
-* cart state
-* UI state
+- auth state
+- cart state
+- UI state
 
 ---
 
 ## React Query dùng cho:
 
-* API cache
-* async data
-* pagination
-* mutation
+- API cache
+- async data
+- pagination
+- mutation
 
 ---
 
@@ -210,7 +210,7 @@ axios.get(...)
 ### ✅ Đúng
 
 ```tsx id="wmr0t8"
-services/account.service.ts
+services / account.service.ts;
 ```
 
 ---
@@ -219,9 +219,9 @@ services/account.service.ts
 
 ## Component Library: shadcn/ui
 
-* Dùng **shadcn/ui** làm component library chính.
-* Cài component bằng: `npx shadcn add <tên-component>`
-* **TailwindCSS** vẫn là nền tảng – dùng Tailwind class để custom thêm khi cần.
+- Dùng **shadcn/ui** làm component library chính.
+- Cài component bằng: `npx shadcn add <tên-component>`
+- **TailwindCSS** vẫn là nền tảng – dùng Tailwind class để custom thêm khi cần.
 
 ---
 
@@ -231,13 +231,13 @@ services/account.service.ts
 
 ```tsx
 // ✅ Luôn import từ @/components/ui/<tên> (alias) hoặc đường dẫn tương đối
-import { Button }   from "@/components/ui/button";
-import { Input }    from "@/components/ui/input";
-import { Label }    from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge }    from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -256,20 +256,18 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 ```tsx
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn }    from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 <div className="space-y-1.5">
-  <Label htmlFor="email">Email</Label>
-  <Input
-    id="email"
-    type="email"
-    placeholder="Nhập email..."
-    className={cn(hasError && "border-destructive focus-visible:ring-destructive")}
-  />
-  {hasError && (
-    <p className="text-sm text-destructive">{errorMessage}</p>
-  )}
-</div>
+    <Label htmlFor="email">Email</Label>
+    <Input
+        id="email"
+        type="email"
+        placeholder="Nhập email..."
+        className={cn(hasError && "border-destructive focus-visible:ring-destructive")}
+    />
+    {hasError && <p className="text-sm text-destructive">{errorMessage}</p>}
+</div>;
 ```
 
 ### Button với trạng thái loading
@@ -279,9 +277,9 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 
 <Button type="submit" disabled={isLoading} className="w-full">
-  {isLoading && <Loader2 className="animate-spin" data-icon="inline-start" />}
-  {isLoading ? "Đang xử lý..." : "Đăng nhập"}
-</Button>
+    {isLoading && <Loader2 className="animate-spin" data-icon="inline-start" />}
+    {isLoading ? "Đang xử lý..." : "Đăng nhập"}
+</Button>;
 ```
 
 ### Card
@@ -290,13 +288,11 @@ import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 <Card>
-  <CardHeader>
-    <CardTitle>Tiêu đề</CardTitle>
-  </CardHeader>
-  <CardContent>
-    {/* Nội dung */}
-  </CardContent>
-</Card>
+    <CardHeader>
+        <CardTitle>Tiêu đề</CardTitle>
+    </CardHeader>
+    <CardContent>{/* Nội dung */}</CardContent>
+</Card>;
 ```
 
 ### Dialog (Modal)
@@ -305,13 +301,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 <Dialog open={isOpen} onOpenChange={setIsOpen}>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>Tiêu đề Modal</DialogTitle>
-    </DialogHeader>
-    {/* Nội dung modal */}
-  </DialogContent>
-</Dialog>
+    <DialogContent>
+        <DialogHeader>
+            <DialogTitle>Tiêu đề Modal</DialogTitle>
+        </DialogHeader>
+        {/* Nội dung modal */}
+    </DialogContent>
+</Dialog>;
 ```
 
 ### Table
@@ -320,32 +316,34 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 <Table>
-  <TableHeader>
-    <TableRow>
-      <TableHead>Tên</TableHead>
-      <TableHead>Trạng thái</TableHead>
-    </TableRow>
-  </TableHeader>
-  <TableBody>
-    {data.map((row) => (
-      <TableRow key={row.id}>
-        <TableCell>{row.name}</TableCell>
-        <TableCell><Badge>{row.status}</Badge></TableCell>
-      </TableRow>
-    ))}
-  </TableBody>
-</Table>
+    <TableHeader>
+        <TableRow>
+            <TableHead>Tên</TableHead>
+            <TableHead>Trạng thái</TableHead>
+        </TableRow>
+    </TableHeader>
+    <TableBody>
+        {data.map((row) => (
+            <TableRow key={row.id}>
+                <TableCell>{row.name}</TableCell>
+                <TableCell>
+                    <Badge>{row.status}</Badge>
+                </TableCell>
+            </TableRow>
+        ))}
+    </TableBody>
+</Table>;
 ```
 
 ---
 
 ## ❌ Không dùng:
 
-* Thẻ HTML thuần (`<input>`, `<button>`, `<label>`) khi đã có component shadcn/ui tương đương
-* inline style / style prop
-* Bootstrap, Material UI, Ant Design
-* Hardcode hex color vào className (dùng CSS variables: `text-destructive`, `bg-primary`...)
-* Tự viết lại component đã có trong shadcn/ui
+- Thẻ HTML thuần (`<input>`, `<button>`, `<label>`) khi đã có component shadcn/ui tương đương
+- inline style / style prop
+- Bootstrap, Material UI, Ant Design
+- Hardcode hex color vào className (dùng CSS variables: `text-destructive`, `bg-primary`...)
+- Tự viết lại component đã có trong shadcn/ui
 
 ---
 
@@ -353,9 +351,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 ## Quy tắc kết hợp shadcn/ui + Tailwind
 
-* Tailwind chỉ dùng để **custom thêm** lên các component shadcn/ui, không viết UI từ đầu.
-* ❌ Không viết className quá dài và lặp lại — tách vào `cn()` hoặc variant.
-* ✅ Dùng hàm `cn()` (từ `@/lib/utils`) để merge class có điều kiện.
+- Tailwind chỉ dùng để **custom thêm** lên các component shadcn/ui, không viết UI từ đầu.
+- ❌ Không viết className quá dài và lặp lại — tách vào `cn()` hoặc variant.
+- ✅ Dùng hàm `cn()` (từ `@/lib/utils`) để merge class có điều kiện.
 
 ```tsx
 // ✅ Đúng
@@ -368,50 +366,52 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 ## Thiết Kế Tổng Quan
 
-* Nền trắng chủ đạo, hiện đại, tối giản, gaming nhẹ
-* Component Library: **shadcn/ui** (Radix UI primitives + Tailwind)
-* Icon Library: **lucide-react** (mặc định của shadcn)
+- Nền trắng chủ đạo, hiện đại, tối giản, gaming nhẹ
+- Component Library: **shadcn/ui** (Radix UI primitives + Tailwind)
+- Icon Library: **lucide-react** (mặc định của shadcn)
 
 ---
 
 ## Font
 
-* Font chính: **Roboto** (Google Fonts)
-* Khai báo trong `globals.css` hoặc `layout.tsx`, không hardcode inline.
+- Font chính: **Roboto** (Google Fonts)
+- Khai báo trong `globals.css` hoặc `layout.tsx`, không hardcode inline.
 
 ---
 
-## Color System (CSS Variables của shadcn/ui)
+## Color System (CSS Variables trong index.css)
 
-Cấu hình màu qua CSS variables trong `globals.css` — **không hardcode hex vào Tailwind class**:
+Cấu hình màu giao diện trắng đen làm chủ đạo qua các biến CSS trong `@theme` — **không hardcode hex vào class**:
 
-| CSS Variable | Giá trị mặc định | Dùng cho |
-| ------------ | ---------------- | -------- |
-| `--primary` | `#008BFF` | Nút chính, link, focus |
-| `--background` | `#FFFFFF` | Nền trang |
-| `--card` | `#FFFFFF` | Nền card |
-| `--muted` | `#FFFFFF` | Nền phụ, header bảng |
-| `--border` | `#E5E7E9` | Viền |
-| `--foreground` | `#1E293B` | Text chính |
-| `--muted-foreground`| `#647488` | Text phụ |
-| `--destructive` | `#EF4444` | Lỗi, xóa |
+| Biến CSS                 | Giá trị   | Dùng cho                          |
+| ------------------------ | --------- | --------------------------------- |
+| `--color-primary`        | `#000000` | Nút bấm chính, tông chủ đạo đen   |
+| `--color-primary-hover`  | `#1a1a1a` | Trạng thái di chuột nút bấm chính |
+| `--color-bg-main`        | `#FFFFFF` | Nền chính trắng tinh khiết        |
+| `--color-bg-secondary`   | `#FAFAFA` | Nền phụ xám tinh khiết cực nhạt   |
+| `--color-border-color`   | `#E5E7E9` | Màu đường viền khung              |
+| `--color-text-main`      | `#1E293B` | Chữ chính                         |
+| `--color-text-secondary` | `#647488` | Chữ chú thích, chữ phụ            |
+| `--color-success`        | `#10B981` | Thông báo thành công              |
+| `--color-error`          | `#EF4444` | Trạng thái lỗi                    |
+| `--color-warning`        | `#F59E0B` | Trạng thái cảnh báo               |
 
-Dùng trong Tailwind bằng: `bg-primary`, `text-foreground`, `border-border`...
+Dùng trong Tailwind bằng: `bg-primary`, `bg-bg-secondary`, `text-text-main`, `border-border-color`...
 
 ---
 
 ## Border Radius
 
-* Cấu hình qua `--radius` trong `globals.css` (shadcn/ui chuẩn).
-* Dùng class: `rounded-md` (button nhỏ), `rounded-lg` (card/dialog), `rounded-xl` (panel lớn).
-* ❌ Không dùng `rounded-2xl` tùy tiện — phải nhất quán với `--radius`.
+- Cấu hình qua `--radius` trong `index.css` (shadcn/ui chuẩn).
+- Nhất quán sử dụng class: `rounded-md` cho toàn bộ các thành phần (Button, Input, Card, Dialog, Panels).
+- ❌ Không dùng các bo góc quá lớn như `rounded-xl` hay `rounded-2xl` tùy tiện.
 
 ---
 
 ## Shadow
 
-* Dùng `shadow-sm` cho card thông thường, `shadow-md` cho modal/dropdown.
-* shadcn/ui component tự áp dụng shadow phù hợp — không override tùy tiện.
+- Dùng `shadow-sm` cho card thông thường, `shadow-md` cho modal/dropdown.
+- shadcn/ui component tự áp dụng shadow phù hợp — không override tùy tiện.
 
 ---
 
@@ -477,10 +477,10 @@ plural_table_name
 
 # Backend Stack
 
-* Django
-* Django REST Framework
-* PostgreSQL
-* Redis
+- Django
+- Django REST Framework
+- PostgreSQL
+- Redis
 
 ---
 
@@ -505,14 +505,14 @@ apps/
 
 ## ❌ Không viết business logic trong:
 
-* views.py
-* serializers.py
+- views.py
+- serializers.py
 
 ---
 
 ## ✅ Business logic phải nằm:
 
-* services/
+- services/
 
 ---
 
@@ -520,7 +520,7 @@ apps/
 
 ## Query DB phải nằm:
 
-* selectors/
+- selectors/
 
 ---
 
@@ -561,8 +561,8 @@ games
 
 ```json id="jgpm0w"
 {
-  "rank": "Cao Thủ",
-  "skins": 120
+    "rank": "Cao Thủ",
+    "skins": 120
 }
 ```
 
@@ -574,9 +574,9 @@ games
 
 ```json id="a3a8tt"
 {
-  "success": true,
-  "message": "Success",
-  "data": {}
+    "success": true,
+    "message": "Success",
+    "data": {}
 }
 ```
 
@@ -586,9 +586,9 @@ games
 
 ```json id="t2f7tb"
 {
-  "success": false,
-  "message": "Validation Error",
-  "errors": {}
+    "success": false,
+    "message": "Validation Error",
+    "errors": {}
 }
 ```
 
@@ -598,7 +598,7 @@ games
 
 ## Auth Method
 
-* JWT Authentication
+- JWT Authentication
 
 ---
 
@@ -617,9 +617,9 @@ MODERATOR
 
 ## Admin APIs phải check:
 
-* authentication
-* permission
-* role
+- authentication
+- permission
+- role
 
 ---
 
@@ -627,17 +627,17 @@ MODERATOR
 
 ## Không log:
 
-* password
-* token
-* account credentials
+- password
+- token
+- account credentials
 
 ---
 
 ## Encrypt:
 
-* account password
-* recovery email
-* sensitive data
+- account password
+- recovery email
+- sensitive data
 
 ---
 
@@ -693,10 +693,10 @@ refactor(order): optimize query
 
 ## PR phải:
 
-* clear description
-* screenshot UI
-* explain changes
-* no conflict
+- clear description
+- screenshot UI
+- explain changes
+- no conflict
 
 ---
 
@@ -704,12 +704,12 @@ refactor(order): optimize query
 
 ## Review Checklist
 
-* clean code
-* responsive
-* reusable
-* no duplicate
-* performance
-* security
+- clean code
+- responsive
+- reusable
+- no duplicate
+- performance
+- security
 
 ---
 
@@ -717,19 +717,19 @@ refactor(order): optimize query
 
 ## Frontend
 
-* lazy loading
-* code splitting
-* memoization
-* image optimization
+- lazy loading
+- code splitting
+- memoization
+- image optimization
 
 ---
 
 ## Backend
 
-* select_related
-* prefetch_related
-* caching
-* indexing
+- select_related
+- prefetch_related
+- caching
+- indexing
 
 ---
 
@@ -737,10 +737,10 @@ refactor(order): optimize query
 
 ## Redis dùng cho:
 
-* homepage
-* flash sale
-* statistics
-* hot accounts
+- homepage
+- flash sale
+- statistics
+- hot accounts
 
 ---
 
@@ -750,9 +750,9 @@ refactor(order): optimize query
 
 ### Images only:
 
-* jpg
-* png
-* webp
+- jpg
+- png
+- webp
 
 ---
 
@@ -768,10 +768,10 @@ refactor(order): optimize query
 
 ## Log:
 
-* payment
-* admin action
-* transaction
-* auth events
+- payment
+- admin action
+- transaction
+- auth events
 
 ---
 
@@ -779,16 +779,16 @@ refactor(order): optimize query
 
 # Frontend
 
-* component test
-* hook test
+- component test
+- hook test
 
 ---
 
 # Backend
 
-* API test
-* service test
-* permission test
+- API test
+- service test
+- permission test
 
 ---
 
@@ -796,10 +796,10 @@ refactor(order): optimize query
 
 ## SEO Friendly
 
-* slug
-* meta title
-* meta description
-* sitemap
+- slug
+- meta title
+- meta description
+- sitemap
 
 ---
 
@@ -807,9 +807,9 @@ refactor(order): optimize query
 
 ## Accessibility
 
-* semantic HTML
-* keyboard navigation
-* aria labels
+- semantic HTML
+- keyboard navigation
+- aria labels
 
 ---
 
@@ -819,11 +819,11 @@ refactor(order): optimize query
 
 Phải:
 
-* đúng structure
-* đúng naming
-* không hardcode
-* reusable
-* typed đầy đủ
+- đúng structure
+- đúng naming
+- không hardcode
+- reusable
+- typed đầy đủ
 
 ---
 
@@ -831,9 +831,9 @@ Phải:
 
 ## Mọi module phải có:
 
-* README
-* API docs
-* type docs
+- README
+- API docs
+- type docs
 
 ---
 
@@ -841,10 +841,10 @@ Phải:
 
 ## Production
 
-* Dockerized
-* environment separated
-* HTTPS only
-* Cloudflare protected
+- Dockerized
+- environment separated
+- HTTPS only
+- Cloudflare protected
 
 ---
 
@@ -852,14 +852,14 @@ Phải:
 
 # ❌ Cấm
 
-* hardcode API URL
-* dùng any
-* duplicate code
-* inline CSS
-* business logic trong component
-* query DB trực tiếp trong views lớn
-* commit secrets
-* upload file không validate
+- hardcode API URL
+- dùng any
+- duplicate code
+- inline CSS
+- business logic trong component
+- query DB trực tiếp trong views lớn
+- commit secrets
+- upload file không validate
 
 ---
 
@@ -867,10 +867,10 @@ Phải:
 
 ## Hệ thống phải:
 
-* scalable
-* maintainable
-* modular
-* secure
-* mobile-first
-* multi-game ready
-* AI-agent friendly
+- scalable
+- maintainable
+- modular
+- secure
+- mobile-first
+- multi-game ready
+- AI-agent friendly

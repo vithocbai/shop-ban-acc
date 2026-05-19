@@ -515,16 +515,17 @@ Roboto
 
 ## Color System
 
-| Thành phần     | Màu     |
-| -------------- | ------- |
-| Primary        | #008BFF |
-| Background     | #FFFFFF |
-| Secondary BG   | #FFFFFF |
-| Border         | #E5E7E9 |
-| Text Primary   | #1E293B |
-| Text Secondary | #647488 |
-| Success        | #10B981 |
-| Error          | #EF4444 |
+| Thành phần | Màu | Lớp CSS (Tailwind) | Dùng cho |
+| ----------------- | ------- | -------------------- | ------------------------------ |
+| Primary | #000000 | `bg-primary` | Nút bấm chính, tông chủ đạo đen|
+| Primary Hover | #1a1a1a | `hover:bg-primary-hover`| Di chuột nút bấm chính |
+| Background | #FFFFFF | `bg-bg-main` | Nền chính trắng tinh khiết |
+| Secondary BG | #FAFAFA | `bg-bg-secondary` | Nền phụ xám tinh khiết cực nhạt |
+| Border | #E5E7E9 | `border-border-color`| Màu đường viền khung |
+| Text Primary | #1E293B | `text-text-main` | Chữ chính |
+| Text Secondary | #647488 | `text-text-secondary`| Chữ chú thích, chữ phụ |
+| Success | #10B981 | `text-success` | Trạng thái thành công |
+| Error | #EF4444 | `text-error` | Trạng thái lỗi |
 
 ---
 

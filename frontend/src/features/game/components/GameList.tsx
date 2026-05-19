@@ -112,7 +112,7 @@ const GameList: React.FC = () => {
     return (
         <div className="flex-1 flex flex-col min-h-0 space-y-4">
             {/* Header / Toolbar */}
-            <div className="py-2 px-1 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+            <div className="py-2 px-[1px] flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 mb-0">
                 <div className="relative flex-1 max-w-md">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-secondary z-10">
                         <Search size={18} />
@@ -201,7 +201,7 @@ const GameList: React.FC = () => {
                                                 <Star size={16} fill="currentColor" />
                                             </div>
                                         ) : (
-                                            <div className="text-border-color">
+                                            <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-bg-secondary border-none text-text-secondary">
                                                 <Star size={16} />
                                             </div>
                                         )}

@@ -393,6 +393,34 @@ export function PaginationIconsOnly() {
 
 ---
 
+### Quy tắc Phân trang Frontend (React + API Integration)
+
+Để đảm bảo phân trang hoạt động chính xác, ổn định và đồng bộ dữ liệu hoàn hảo, bắt buộc tuân theo các quy tắc sau:
+
+1. **State Quản Lý Phân Trang**:
+   - `page` (number, bắt đầu từ `1`).
+   - `pageSize` (number, các giá trị tiêu chuẩn: `10`, `20`, `50`, `100`).
+
+2. **Đồng Bộ API Dependency Array**:
+   - Bắt buộc đưa `page` và `pageSize` vào dependency array của React Query (Query Key) hoặc `useEffect`. Nếu thiếu, dữ liệu sẽ không tự reload khi người dùng chuyển trang hoặc thay đổi số lượng bản ghi hiển thị.
+   
+   *Ví dụ chuẩn React Query:*
+   ```tsx
+   const { data, isLoading } = useQuery({
+     queryKey: ["accounts", { page, pageSize, search, filters }],
+     queryFn: () => getAccounts({ page, page_size: pageSize, search, ...filters }),
+     keepPreviousData: true, // Tránh giật UI khi chuyển trang
+   });
+   ```
+
+3. **Quy Tắc Reset Trang**:
+   - Khi có bất kỳ thay đổi nào từ phía người dùng về **Search Query (Tìm kiếm)** hoặc **Filter (Bộ lọc)**, **bắt buộc reset `page` về `1`**. Nếu không, khi đang ở trang lớn (ví dụ trang 5) mà lọc ra kết quả chỉ có 1 trang, UI sẽ bị trống hoặc lỗi.
+
+4. **Đồng bộ Rows Per Page & Pagination UI**:
+   - Sử dụng Select component cho "Rows per page" để thay đổi `pageSize`. Khi thay đổi `pageSize`, hãy reset `page` về `1`.
+
+---
+
 ## ❌ Không dùng:
 
 - Thẻ HTML thuần (`<input>`, `<button>`, `<label>`) khi đã có component shadcn/ui tương đương

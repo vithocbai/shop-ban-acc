@@ -724,3 +724,35 @@ Dễ mở rộng:
 * livestream
 * AI recommendations
 * mobile app
+
+---
+
+# 31. API Pagination Standards
+
+Để đảm bảo đồng nhất giữa Backend và Frontend, tất cả các API lấy danh sách (List APIs) có phân trang phải tuân thủ chuẩn sau:
+
+## Query Parameters
+* `page`: Trang hiện tại (1-indexed, mặc định là `1`).
+* `page_size`: Số bản ghi trên mỗi trang (mặc định là `10` hoặc `20`).
+
+Ví dụ: `GET /api/accounts/?page=2&page_size=20`
+
+## API Response Format (Standard Envelope)
+Tất cả kết quả phân trang trả về từ Backend phải được chuẩn hóa dưới dạng cấu trúc sau:
+
+```json
+{
+  "success": true,
+  "message": "Lấy danh sách thành công",
+  "data": {
+    "items": [
+      // Mảng chứa danh sách các thực thể (ví dụ: danh sách accounts)
+    ],
+    "total": 105,       // Tổng số bản ghi trên toàn hệ thống
+    "page": 2,          // Trang hiện tại
+    "page_size": 20     // Số bản ghi mỗi trang
+  }
+}
+```
+
+---

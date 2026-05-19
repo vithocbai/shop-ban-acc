@@ -258,6 +258,45 @@ mobile → tablet → desktop
 
 ---
 
+# 10b. API Pagination & React Integration Rules
+
+AI Agent phải tuân thủ nghiêm ngặt chuẩn phân trang sau khi viết code cả Backend và Frontend:
+
+## 1. Backend (Django REST Framework)
+* Tất cả API danh sách có phân trang bắt buộc hỗ trợ hai query params: `page` và `page_size`.
+* Response format trả về dạng Envelope chuẩn:
+  ```json
+  {
+    "success": true,
+    "message": "Lấy danh sách thành công",
+    "data": {
+      "items": [],
+      "total": 100,
+      "page": 1,
+      "page_size": 10
+    }
+  }
+  ```
+
+## 2. Frontend (ReactJS + React Query)
+* **Bắt buộc**: Đưa `page` và `pageSize` state vào Query Key của React Query (hoặc dependency array của `useEffect`) để tự động re-fetch khi chuyển trang hoặc đổi số lượng bản ghi hiển thị trên trang.
+* **Bắt buộc**: Bất cứ khi nào **Search Query (Tìm kiếm)** hoặc **Filter (Bộ lọc)** thay đổi, **phải reset `page` về `1`** để tránh lỗi giao diện trống.
+* Sử dụng component phân trang thống nhất `<PaginationFooter>` hoặc component của shadcn/ui. Khi người dùng đổi `pageSize` (Rows per page), reset `page` về `1`.
+
+*Ví dụ React Query chuẩn:*
+```tsx
+const [page, setPage] = useState(1);
+const [pageSize, setPageSize] = useState(20);
+
+const { data, isLoading } = useQuery({
+  queryKey: ["games", { page, pageSize, search, filter }],
+  queryFn: () => getGames({ page, page_size: pageSize, search, ...filter }),
+  keepPreviousData: true,
+});
+```
+
+---
+
 # 11. Backend Rules
 
 # Backend Stack

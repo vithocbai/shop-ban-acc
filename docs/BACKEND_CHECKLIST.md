@@ -66,7 +66,7 @@ Tài liệu này tổng hợp danh sách các công việc Backend, bám sát ki
 ## 9. DevOps & Testing
 - [ ] Dockerize ứng dụng.
 - [ ] Cấu hình CI/CD.
-- [ ] Viết Unit Test cho Core Logic.
+- [x] Viết Unit Test cho Core Logic.
 
 ---
 *Cập nhật lần cuối: 12/05/2026*

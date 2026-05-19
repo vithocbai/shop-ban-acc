@@ -126,6 +126,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PAGINATION_CLASS': 'common.pagination.StandardResultsSetPagination',
+    'PAGE_SIZE': 20,
 }
 
 # Simple JWT Settings

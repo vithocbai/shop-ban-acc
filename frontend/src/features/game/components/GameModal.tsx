@@ -14,6 +14,19 @@ interface GameModalProps {
     game?: Game | null; // If present, it's Edit mode
 }
 
+// Hàm chuyển đổi chuỗi tiếng Việt thành Slug chuẩn
+const convertToSlug = (text: string): string => {
+    return text
+        .toLowerCase()
+        .normalize("NFD") // Tách các dấu khỏi chữ cái gốc
+        .replace(/[\u0300-\u036f]/g, "") // Xóa toàn bộ dấu tiếng Việt
+        .replace(/đ/g, "d")
+        .replace(/([^0-9a-z-\s])/g, "") // Xóa ký tự đặc biệt
+        .replace(/(\s+)/g, "-") // Thay khoảng trắng bằng dấu gạch ngang
+        .replace(/-+/g, "-") // Thu gọn nhiều dấu gạch ngang liên tiếp thành 1
+        .replace(/^-+|-+$/g, ""); // Cắt bỏ dấu gạch ngang ở đầu hoặc cuối chuỗi
+};
+
 const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game }) => {
     const [formData, setFormData] = useState<GameCreateInput>({
         name: "",
@@ -57,10 +70,21 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target as any;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value
-        }));
+        const checked = (e.target as HTMLInputElement).checked;
+
+        setFormData(prev => {
+            const nextState = {
+                ...prev,
+                [name]: type === "checkbox" ? checked : value
+            };
+
+            // Nếu người dùng đang gõ trường "name", tự động cập nhật "slug" tương ứng
+            if (name === "name") {
+                nextState.slug = convertToSlug(value);
+            }
+
+            return nextState;
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {

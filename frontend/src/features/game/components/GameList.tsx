@@ -8,27 +8,55 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { PaginationControls } from "@/components/shared/PaginationControls";
 
 const GameList: React.FC = () => {
+    // Trạng thái lưu trữ danh sách Game
     const [games, setGames] = useState<Game[]>([]);
+    // Trạng thái hiển thị khi đang tải dữ liệu (loading)
     const [loading, setLoading] = useState(true);
+    // Trạng thái lưu trữ lỗi nếu tải thất bại
     const [error, setError] = useState<string | null>(null);
+    // Trạng thái cho chuỗi tìm kiếm nhập trực tiếp từ ô Input
     const [searchTerm, setSearchTerm] = useState("");
     
-    // Modal state
+    // Các trạng thái phân trang (Pagination State)
+    const [page, setPage] = useState(1); // Trang hiện tại (mặc định trang 1)
+    const [pageSize, setPageSize] = useState(10); // Số hàng trên mỗi trang (mặc định 10)
+    const [total, setTotal] = useState(0); // Tổng số bản ghi khớp trên toàn hệ thống
+    const [debouncedSearch, setDebouncedSearch] = useState(""); // Chuỗi tìm kiếm sau khi đã debounce
+
+    // Trạng thái điều khiển Modal Thêm mới / Chỉnh sửa
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedGame, setSelectedGame] = useState<Game | null>(null);
     const [isDeleting, setIsDeleting] = useState<number | null>(null);
 
+    // Debounce: Chờ người dùng dừng gõ 300ms rồi mới cập nhật debouncedSearch
+    // Quy tắc reset trang: Reset page về 1 khi từ khóa tìm kiếm thay đổi
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+            setPage(1);
+        }, 300);
+        return () => clearTimeout(handler);
+    }, [searchTerm]);
+
+    // Gọi lại API khi bất kỳ tham số nào (page, pageSize, debouncedSearch) thay đổi
     useEffect(() => {
         fetchGames();
-    }, []);
+    }, [page, pageSize, debouncedSearch]);
 
+    // Hàm gọi API lấy danh sách game từ Backend
     const fetchGames = async () => {
         try {
             setLoading(true);
-            const data = await gameService.getAllGames();
-            setGames(data);
+            const res = await gameService.getAllGames({
+                page,
+                page_size: pageSize,
+                search: debouncedSearch
+            });
+            setGames(res.items);
+            setTotal(res.total);
             setError(null);
         } catch (err: any) {
             setError("Không thể tải danh sách game. Vui lòng thử lại sau.");
@@ -38,23 +66,27 @@ const GameList: React.FC = () => {
         }
     };
 
+    // Mở Modal để thêm mới game
     const handleAdd = () => {
         setSelectedGame(null);
         setIsModalOpen(true);
     };
 
+    // Mở Modal để chỉnh sửa thông tin game đã chọn
     const handleEdit = (game: Game) => {
         setSelectedGame(game);
         setIsModalOpen(true);
     };
 
+    // Gọi API xóa mềm game theo id
     const handleDelete = async (id: number) => {
         if (!window.confirm("Bạn có chắc chắn muốn xóa game này? Tất cả các tài khoản thuộc game này có thể bị ảnh hưởng.")) return;
         
         try {
             setIsDeleting(id);
             await gameService.deleteGame(id);
-            setGames(prev => prev.filter(g => g.id !== id));
+            // Sau khi xóa thành công, gọi lại API để load lại trang và cập nhật số lượng bản ghi chính xác
+            fetchGames();
         } catch (err: any) {
             alert("Xóa game thất bại. Vui lòng thử lại.");
         } finally {
@@ -62,14 +94,11 @@ const GameList: React.FC = () => {
         }
     };
 
+    // Đóng Modal thêm/sửa game
     const handleModalClose = () => {
         setIsModalOpen(false);
         setSelectedGame(null);
     };
-
-    const filteredGames = games?.filter(game => 
-        game.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
 
     if (loading) {
         return (
@@ -125,8 +154,8 @@ const GameList: React.FC = () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {filteredGames.length > 0 ? (
-                        filteredGames.map((game) => (
+                    {games.length > 0 ? (
+                        games.map((game) => (
                             <TableRow key={game.id}>
                                 <TableCell>
                                     <div className="flex items-center gap-4">
@@ -218,30 +247,19 @@ const GameList: React.FC = () => {
                 </TableBody>
             </Table>
 
-            {/* Footer / Pagination */}
-            <div className="px-6 py-4 bg-bg-secondary/50 border-t border-border-color flex items-center justify-between">
-                <p className="text-sm text-text-secondary font-medium">
-                    Hiển thị <span className="text-text-main font-bold">{filteredGames.length}</span> / <span className="text-text-main font-bold">{games.length}</span> game
-                </p>
-                <div className="flex gap-2">
-                    <Button 
-                        variant="outline" 
-                        size="sm" 
-                        disabled 
-                        className="text-text-secondary/40 cursor-not-allowed bg-white"
-                    >
-                        Trước
-                    </Button>
-                    <Button 
-                        variant="outline" 
-                        size="sm" 
-                        disabled 
-                        className="text-text-secondary/40 cursor-not-allowed bg-white"
-                    >
-                        Sau
-                    </Button>
-                </div>
-            </div>
+            {/* Thanh Footer Phân Trang Sử Dụng Component Dùng Chung */}
+            <PaginationControls
+                page={page}
+                pageSize={pageSize}
+                total={total}
+                itemsLength={games.length}
+                onPageChange={(newPage) => setPage(newPage)}
+                onPageSizeChange={(newPageSize) => {
+                    setPageSize(newPageSize);
+                    setPage(1); // Reset về trang 1 khi đổi page size
+                }}
+                pageSizeOptions={[10, 20, 50]}
+            />
 
             <GameModal 
                 isOpen={isModalOpen}

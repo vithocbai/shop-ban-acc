@@ -18,7 +18,7 @@ Tài liệu này bám sát cấu trúc Admin Dashboard quy định trong `ARCHIT
 
 ## 2. Quản lý Tài khoản (Account Management)
 - [ ] **Tài khoản game**: Danh sách, đăng bán (Dynamic JSON fields), chỉnh sửa.
-- [ ] **Danh mục game**: Quản lý các loại game (Liên Quân, Ngọc Rồng...).
+- [x] **Danh mục game**: Quản lý các loại game (Liên Quân, Ngọc Rồng...).
 
 ## 3. Quản lý Đơn hàng (Order Management)
 - [ ] **Danh sách đơn hàng**: Quản lý các đơn mua tài khoản.

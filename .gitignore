@@ -1,0 +1,52 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+.Python
+
+# === Môi trường Python ===
+.venv/
+venv/
+env/
+ENV/
+
+# === Django ===
+*.sqlite3
+staticfiles/
+mediafiles/
+media/
+
+# === Node / Frontend ===
+node_modules/
+.next/
+dist/
+build/
+.cache/
+
+# === Môi trường ===
+.env
+.env.local
+.env.*.local
+*.env
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# === Docker ===
+*.log
+logs/
+
+# === Git ===
+*.orig

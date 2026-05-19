@@ -219,19 +219,133 @@ services/account.service.ts
 
 ## Component Library: shadcn/ui
 
-* Dùng **shadcn/ui** làm component library chính (Button, Input, Dialog, Table, Card...).
+* Dùng **shadcn/ui** làm component library chính.
 * Cài component bằng: `npx shadcn add <tên-component>`
-* **TailwindCSS** vẫn là nền tảng – dùng Tailwind class để custom/điều chỉnh thêm khi cần.
+* **TailwindCSS** vẫn là nền tảng – dùng Tailwind class để custom thêm khi cần.
+
+---
+
+## ✅ Import đúng chuẩn shadcn/ui
+
+**Đường dẫn import** (sau khi cài bằng `npx shadcn add`):
+
+```tsx
+// ✅ Luôn import từ @/components/ui/<tên> (alias) hoặc đường dẫn tương đối
+import { Button }   from "@/components/ui/button";
+import { Input }    from "@/components/ui/input";
+import { Label }    from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge }    from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+```
+
+> Nếu project chưa cấu hình alias `@/`, dùng đường dẫn tương đối:
+> `import { Input } from "../../../components/ui/input";`
+
+---
+
+## ✅ Ví dụ sử dụng đúng
+
+### Input + Label + Error
+
+```tsx
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn }    from "@/lib/utils";
+
+<div className="space-y-1.5">
+  <Label htmlFor="email">Email</Label>
+  <Input
+    id="email"
+    type="email"
+    placeholder="Nhập email..."
+    className={cn(hasError && "border-destructive focus-visible:ring-destructive")}
+  />
+  {hasError && (
+    <p className="text-sm text-destructive">{errorMessage}</p>
+  )}
+</div>
+```
+
+### Button với trạng thái loading
+
+```tsx
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+
+<Button type="submit" disabled={isLoading} className="w-full">
+  {isLoading && <Loader2 className="animate-spin" data-icon="inline-start" />}
+  {isLoading ? "Đang xử lý..." : "Đăng nhập"}
+</Button>
+```
+
+### Card
+
+```tsx
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+<Card>
+  <CardHeader>
+    <CardTitle>Tiêu đề</CardTitle>
+  </CardHeader>
+  <CardContent>
+    {/* Nội dung */}
+  </CardContent>
+</Card>
+```
+
+### Dialog (Modal)
+
+```tsx
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
+<Dialog open={isOpen} onOpenChange={setIsOpen}>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Tiêu đề Modal</DialogTitle>
+    </DialogHeader>
+    {/* Nội dung modal */}
+  </DialogContent>
+</Dialog>
+```
+
+### Table
+
+```tsx
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
+<Table>
+  <TableHeader>
+    <TableRow>
+      <TableHead>Tên</TableHead>
+      <TableHead>Trạng thái</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    {data.map((row) => (
+      <TableRow key={row.id}>
+        <TableCell>{row.name}</TableCell>
+        <TableCell><Badge>{row.status}</Badge></TableCell>
+      </TableRow>
+    ))}
+  </TableBody>
+</Table>
+```
 
 ---
 
 ## ❌ Không dùng:
 
-* inline style
-* bootstrap
-* material ui
-* ant design
-* hành vi viết thủ công những component đã có trong shadcn/ui
+* Thẻ HTML thuần (`<input>`, `<button>`, `<label>`) khi đã có component shadcn/ui tương đương
+* inline style / style prop
+* Bootstrap, Material UI, Ant Design
+* Hardcode hex color vào className (dùng CSS variables: `text-destructive`, `bg-primary`...)
+* Tự viết lại component đã có trong shadcn/ui
 
 ---
 

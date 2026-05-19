@@ -203,38 +203,41 @@ any
 
 # 9. UI Philosophy
 
-# Thiết Kế Shop Game
+## Thiết Kế Shop Game
 
-## Theme
-
-* trắng chủ đạo
-* hiện đại
-* sạch sẽ
-* gaming nhẹ
-* tối giản
+* Nền trắng chủ đạo, hiện đại, tối giản, gaming nhẹ
+* Component Library: **shadcn/ui** (Radix UI primitives + Tailwind)
+* Icon: **lucide-react** (mặc định)
 
 ---
 
 ## Font
 
-Roboto
+* **Roboto** (Google Fonts) — khai báo trong `globals.css`
 
 ---
 
-## Primary Color
+## Color System (CSS Variables)
 
-```text id="jlwm212"
-#008BFF
-```
+Dùng CSS variables — **không hardcode hex**:
+
+| CSS Variable | Giá trị | Tailwind class |
+| ------------ | ------- | -------------- |
+| `--primary` | `#008BFF` | `bg-primary`, `text-primary` |
+| `--background` | `#FFFFFF` | `bg-background` |
+| `--muted` | `#F9F7FA` | `bg-muted` |
+| `--border` | `#E5E7E9` | `border-border` |
+| `--foreground` | `#1E293B` | `text-foreground` |
+| `--muted-foreground` | `#647488` | `text-muted-foreground` |
+| `--destructive` | `#EF4444` | `text-destructive` |
 
 ---
 
 ## Border Radius
 
-```text id="jlwm214"
-rounded-xl
-rounded-2xl
-```
+* Cấu hình qua `--radius` trong `globals.css`.
+* Thứ tự ưu tiên: `rounded-md` → `rounded-lg` → `rounded-xl`
+* ❌ Không tùy tiện dùng `rounded-2xl` nếu không đồng nhất ở cả trang.
 
 ---
 

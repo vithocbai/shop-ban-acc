@@ -787,19 +787,13 @@ PostgreSQL + Redis
 
 # 17. UI Design Philosophy
 
-# Yêu Cầu Thiết Kế – Shop Acc Game
+## Thiết Kế Tổng Quan
 
-## Tổng Quan
-
-* Màu trắng chủ đạo
-* Giao diện hiện đại
-* Sạch sẽ
-* Font chữ Roboto
-* Button màu #008BFF
-* Mobile First
-* Responsive toàn bộ
-* Dễ mở rộng game mới
-* UX tối ưu mua acc nhanh
+* Nền trắng chủ đạo, hiện đại, tối giản, gaming nhẹ
+* Font Roboto, Button màu primary, Mobile First, Responsive toàn bộ
+* Component Library: **shadcn/ui** (Radix UI + Tailwind)
+* Icon Library: **lucide-react**
+* Không hardcode hex vào class — dùng **CSS variables** của shadcn
 
 ---
 
@@ -818,32 +812,28 @@ PostgreSQL + Redis
 
 ---
 
-# Hệ Màu
+# Hệ Màu (CSS Variables — shadcn/ui)
 
-| Thành phần     | Màu     |
-| -------------- | ------- |
-| Background     | #FFFFFF |
-| Background phụ | #F9F7FA |
-| Border         | #E5E7E9 |
-| Primary        | #008BFF |
-| Text chính     | #1E293B |
-| Text phụ       | #647488 |
-| Success        | #10B981 |
-| Error          | #EF4444 |
+Cấu hình trong `globals.css`. Dùng qua Tailwind class — **không hardcode hex**:
+
+| CSS Variable | Giá trị | Tailwind class |
+| ------------------- | ------- | -------------- |
+| `--primary` | `#008BFF` | `bg-primary` / `text-primary` |
+| `--background` | `#FFFFFF` | `bg-background` |
+| `--card` | `#FFFFFF` | `bg-card` |
+| `--muted` | `#F9F7FA` | `bg-muted` |
+| `--border` | `#E5E7E9` | `border-border` |
+| `--foreground` | `#1E293B` | `text-foreground` |
+| `--muted-foreground`| `#647488` | `text-muted-foreground` |
+| `--destructive` | `#EF4444` | `text-destructive` |
 
 ---
 
 # Font Chữ
 
-Roboto
-
-Font weight:
-
-* 300
-* 400
-* 500
-* 600
-* 700
+* Font chính: **Roboto** (Google Fonts)
+* Khai báo trong `globals.css` hoặc `layout.tsx`
+* Font weight: 300 / 400 / 500 / 600 / 700
 
 ---
 

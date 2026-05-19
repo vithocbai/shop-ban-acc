@@ -530,16 +530,20 @@ Roboto
 
 ## Components
 
-* Button
-* Card
-* Modal
-* Input
-* Select
-* Sidebar
-* Table
-* Drawer
-* Tabs
-* Toast
+> Dùng **shadcn/ui** cho tất cả UI component. Cài bằng `npx shadcn add <name>`:
+
+| Component | shadcn/ui |
+| --------- | --------- |
+| Button | `button` |
+| Card | `card` |
+| Dialog/Modal | `dialog` |
+| Input | `input` |
+| Select | `select` |
+| Sidebar | `sidebar` |
+| Table | `table` |
+| Sheet/Drawer | `sheet` |
+| Tabs | `tabs` |
+| Toast | `sonner` |
 
 ---
 

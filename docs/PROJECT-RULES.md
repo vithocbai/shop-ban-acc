@@ -237,63 +237,67 @@ services/account.service.ts
 
 # 12. Tailwind Rules
 
-## Quy tắc
+## Quy tắc kết hợp shadcn/ui + Tailwind
 
-### ❌ Không viết class quá dài
+* Tailwind chỉ dùng để **custom thêm** lên các component shadcn/ui, không viết UI từ đầu.
+* ❌ Không viết className quá dài và lặp lại — tách vào `cn()` hoặc variant.
+* ✅ Dùng hàm `cn()` (từ `@/lib/utils`) để merge class có điều kiện.
 
----
-
-### ✅ Tách reusable class
-
-```tsx id="yjvqgs"
-const buttonClass = ""
+```tsx
+// ✅ Đúng
+<Button className={cn("w-full", isLoading && "opacity-50")} />
 ```
 
 ---
 
 # 13. UI Design Rules
 
-# Thiết Kế Tổng Quan
+## Thiết Kế Tổng Quan
 
-## Theme
-
-* trắng chủ đạo
-* hiện đại
-* gaming nhẹ
-* tối giản
-* sạch sẽ
+* Nền trắng chủ đạo, hiện đại, tối giản, gaming nhẹ
+* Component Library: **shadcn/ui** (Radix UI primitives + Tailwind)
+* Icon Library: **lucide-react** (mặc định của shadcn)
 
 ---
 
 ## Font
 
-Roboto
+* Font chính: **Roboto** (Google Fonts)
+* Khai báo trong `globals.css` hoặc `layout.tsx`, không hardcode inline.
 
 ---
 
-## Primary Color
+## Color System (CSS Variables của shadcn/ui)
 
-```text id="4wt0vz"
-#008BFF
-```
+Cấu hình màu qua CSS variables trong `globals.css` — **không hardcode hex vào Tailwind class**:
+
+| CSS Variable | Giá trị mặc định | Dùng cho |
+| ------------ | ---------------- | -------- |
+| `--primary` | `#008BFF` | Nút chính, link, focus |
+| `--background` | `#FFFFFF` | Nền trang |
+| `--card` | `#FFFFFF` | Nền card |
+| `--muted` | `#F9F7FA` | Nền phụ, header bảng |
+| `--border` | `#E5E7E9` | Viền |
+| `--foreground` | `#1E293B` | Text chính |
+| `--muted-foreground`| `#647488` | Text phụ |
+| `--destructive` | `#EF4444` | Lỗi, xóa |
+
+Dùng trong Tailwind bằng: `bg-primary`, `text-foreground`, `border-border`...
 
 ---
 
 ## Border Radius
 
-```text id="jl6gc4"
-rounded-xl
-rounded-2xl
-```
+* Cấu hình qua `--radius` trong `globals.css` (shadcn/ui chuẩn).
+* Dùng class: `rounded-md` (button nhỏ), `rounded-lg` (card/dialog), `rounded-xl` (panel lớn).
+* ❌ Không dùng `rounded-2xl` tùy tiện — phải nhất quán với `--radius`.
 
 ---
 
 ## Shadow
 
-```text id="uc4l5w"
-shadow-sm
-shadow-md
-```
+* Dùng `shadow-sm` cho card thông thường, `shadow-md` cho modal/dropdown.
+* shadcn/ui component tự áp dụng shadow phù hợp — không override tùy tiện.
 
 ---
 

@@ -390,7 +390,7 @@ Cấu hình màu qua CSS variables trong `globals.css` — **không hardcode hex
 | `--primary` | `#008BFF` | Nút chính, link, focus |
 | `--background` | `#FFFFFF` | Nền trang |
 | `--card` | `#FFFFFF` | Nền card |
-| `--muted` | `#F9F7FA` | Nền phụ, header bảng |
+| `--muted` | `#FFFFFF` | Nền phụ, header bảng |
 | `--border` | `#E5E7E9` | Viền |
 | `--foreground` | `#1E293B` | Text chính |
 | `--muted-foreground`| `#647488` | Text phụ |

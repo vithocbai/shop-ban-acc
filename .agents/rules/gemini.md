@@ -192,115 +192,49 @@ any
 
 ---
 
-## ✅ Import path chuẩn
-
-```tsx
-import { Button }   from "@/components/ui/button";
-import { Input }    from "@/components/ui/input";
-import { Label }    from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge }    from "@/components/ui/badge";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { cn }       from "@/lib/utils";
-```
-
-> Nếu chưa có alias `@/`, dùng đường dẫn tương đối:
-> `import { Input } from "../../../components/ui/input";`
-
----
-
-## ✅ Ví dụ code đúng chuẩn
-
-### Form field
-
-```tsx
-<div className="space-y-1.5">
-  <Label htmlFor="email">Email</Label>
-  <Input
-    id="email"
-    type="email"
-    placeholder="Nhập email..."
-    className={cn(hasError && "border-destructive focus-visible:ring-destructive")}
-  />
-  {hasError && <p className="text-sm text-destructive">{errorMessage}</p>}
-</div>
-```
-
-### Button loading
-
-```tsx
-<Button type="submit" disabled={isLoading} className="w-full">
-  {isLoading && <Loader2 className="animate-spin" data-icon="inline-start" />}
-  {isLoading ? "Đang xử lý..." : "Xác nhận"}
-</Button>
-```
-
-### Modal (Dialog)
-
-```tsx
-<Dialog open={isOpen} onOpenChange={setIsOpen}>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>Tiêu đề</DialogTitle>
-    </DialogHeader>
-    {/* nội dung */}
-  </DialogContent>
-</Dialog>
-```
-
----
-
 ## ❌ Không dùng:
 
-* Thẻ HTML thuần (`<input>`, `<button>`, `<label>`) khi đã có component shadcn/ui tương đương
-* inline CSS / style prop
-* bootstrap, material ui, ant design
-* Hardcode hex (dùng CSS variables: `bg-primary`, `text-destructive`, `border-border`...)
+* inline CSS
+* bootstrap
+* material ui
+* ant design
 
 ---
 
 # 9. UI Philosophy
 
-## Thiết Kế Shop Game
+# Thiết Kế Shop Game
 
-* Nền trắng chủ đạo, hiện đại, tối giản, gaming nhẹ
-* Component Library: **shadcn/ui** (Radix UI primitives + Tailwind)
-* Icon: **lucide-react** (mặc định)
+## Theme
+
+* trắng chủ đạo
+* hiện đại
+* sạch sẽ
+* gaming nhẹ
+* tối giản
 
 ---
 
 ## Font
 
-* **Roboto** (Google Fonts) — khai báo trong `globals.css`
+Roboto
 
 ---
 
-## Color System (CSS Variables)
+## Primary Color
 
-Dùng CSS variables — **không hardcode hex**:
-
-| CSS Variable | Giá trị | Tailwind class |
-| ------------ | ------- | -------------- |
-| `--primary` | `#008BFF` | `bg-primary`, `text-primary` |
-| `--background` | `#FFFFFF` | `bg-background` |
-| `--muted` | `#F9F7FA` | `bg-muted` |
-| `--border` | `#E5E7E9` | `border-border` |
-| `--foreground` | `#1E293B` | `text-foreground` |
-| `--muted-foreground` | `#647488` | `text-muted-foreground` |
-| `--destructive` | `#EF4444` | `text-destructive` |
+```text id="jlwm212"
+#008BFF
+```
 
 ---
 
 ## Border Radius
 
-* Cấu hình qua `--radius` trong `globals.css`.
-* Thứ tự ưu tiên: `rounded-md` → `rounded-lg` → `rounded-xl`
-* ❌ Không tùy tiện dùng `rounded-2xl` nếu không đồng nhất ở cả trang.
+```text id="jlwm214"
+rounded-xl
+rounded-2xl
+```
 
 ---
 
@@ -406,7 +340,7 @@ Dùng:
 JSONB
 ```
 
----
+---#F9F7FA
 
 # 15. API Rules
 
@@ -426,7 +360,7 @@ JSONB
 
 ### Error
 
-```json id="jlwm232"
+```json id="jlwm232
 {
   "success": false,
   "message": "Validation Error",

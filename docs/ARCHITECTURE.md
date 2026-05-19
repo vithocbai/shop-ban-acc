@@ -821,7 +821,7 @@ Cấu hình trong `globals.css`. Dùng qua Tailwind class — **không hardcode 
 | `--primary` | `#008BFF` | `bg-primary` / `text-primary` |
 | `--background` | `#FFFFFF` | `bg-background` |
 | `--card` | `#FFFFFF` | `bg-card` |
-| `--muted` | `#F9F7FA` | `bg-muted` |
+| `--muted` | `#FFFFFF` | `bg-muted` |
 | `--border` | `#E5E7E9` | `border-border` |
 | `--foreground` | `#1E293B` | `text-foreground` |
 | `--muted-foreground`| `#647488` | `text-muted-foreground` |

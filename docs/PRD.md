@@ -519,7 +519,7 @@ Roboto
 | -------------- | ------- |
 | Primary        | #008BFF |
 | Background     | #FFFFFF |
-| Secondary BG   | #F9F7FA |
+| Secondary BG   | #FFFFFF |
 | Border         | #E5E7E9 |
 | Text Primary   | #1E293B |
 | Text Secondary | #647488 |

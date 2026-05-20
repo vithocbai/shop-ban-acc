@@ -36,6 +36,9 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
         sort_order: 0,
         is_hot: false,
         theme_color: "#008BFF",
+        icon: "",
+        banner: "",
+        thumbnail: "",
     });
 
     const [isLoading, setIsLoading] = useState(false);
@@ -51,9 +54,9 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                 sort_order: game.sort_order,
                 is_hot: game.is_hot,
                 theme_color: game.theme_color || "#008BFF",
-                icon: game.icon,
-                banner: game.banner,
-                thumbnail: game.thumbnail,
+                icon: game.icon || "",
+                banner: game.banner || "",
+                thumbnail: game.thumbnail || "",
             });
         } else {
             setFormData({
@@ -64,6 +67,9 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                 sort_order: 0,
                 is_hot: false,
                 theme_color: "#008BFF",
+                icon: "",
+                banner: "",
+                thumbnail: "",
             });
         }
     }, [game, isOpen]);
@@ -72,10 +78,10 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
         const { name, value, type } = e.target as any;
         const checked = (e.target as HTMLInputElement).checked;
 
-        setFormData(prev => {
+        setFormData((prev) => {
             const nextState = {
                 ...prev,
-                [name]: type === "checkbox" ? checked : value
+                [name]: type === "checkbox" ? checked : value,
             };
 
             // Nếu người dùng đang gõ trường "name", tự động cập nhật "slug" tương ứng
@@ -85,6 +91,31 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
 
             return nextState;
         });
+    };
+
+    const handleFileUpload = async (
+        e: React.ChangeEvent<HTMLInputElement>,
+        fieldName: "icon" | "thumbnail" | "banner",
+    ) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsLoading(true);
+        try {
+            // TODO: Khi có API thật, hãy upload file lên server và lấy URL thật về để lưu vào DB
+            // Tạm thời dùng URL.createObjectURL để có thể xem trước chính xác ảnh thật vừa chọn
+            const previewUrl = URL.createObjectURL(file);
+
+            setFormData((prev) => ({ ...prev, [fieldName]: previewUrl }));
+        } catch (error) {
+            setError("Lỗi tải ảnh lên.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleRemoveImage = (fieldName: "icon" | "thumbnail" | "banner") => {
+        setFormData((prev) => ({ ...prev, [fieldName]: "" }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -114,13 +145,11 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
             <div className="bg-white rounded-md shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200 border border-border-color">
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-border-color flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-text-main">
-                        {game ? "Chỉnh sửa Game" : "Thêm Game mới"}
-                    </h3>
+                    <h3 className="text-lg font-bold text-text-main">{game ? "Chỉnh sửa Game" : "Thêm Game mới"}</h3>
                     <Button
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={onClose} 
+                        variant="ghost"
+                        size="icon"
+                        onClick={onClose}
                         className="h-9 w-9 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer"
                     >
                         <X size={20} />
@@ -137,7 +166,9 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-1.5">
-                            <Label className="font-bold text-text-main">Tên Game <span className="text-error">*</span></Label>
+                            <Label className="font-bold text-text-main">
+                                Tên Game <span className="text-error">*</span>
+                            </Label>
                             <Input
                                 required
                                 name="name"
@@ -147,7 +178,9 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <Label className="font-bold text-text-main">Slug (Đường dẫn) <span className="text-error">*</span></Label>
+                            <Label className="font-bold text-text-main">
+                                Slug (Đường dẫn) <span className="text-error">*</span>
+                            </Label>
                             <Input
                                 required
                                 name="slug"
@@ -227,43 +260,136 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                         </label>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        {/* Trường Icon */}
                         <div className="space-y-1.5">
-                            <Label className="font-bold text-text-main">Icon URL</Label>
-                            <Input
-                                name="icon"
-                                value={formData.icon}
-                                onChange={handleInputChange}
-                                placeholder="https://example.com/icon.png"
-                            />
+                            <Label className="font-bold text-text-main">Icon</Label>
+                            <div className="flex flex-col gap-2">
+                                {formData.icon && (
+                                    <div className="relative group w-16 h-16">
+                                        <img
+                                            src={formData.icon}
+                                            alt="Icon preview"
+                                            className="w-full h-full object-cover rounded-md border border-border-color"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveImage("icon")}
+                                            className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70 flex items-center justify-center"
+                                        >
+                                            <X size={12} />
+                                        </button>
+                                    </div>
+                                )}
+                                <div className="relative flex items-center gap-2">
+                                    <Input
+                                        type="file"
+                                        id="file-icon"
+                                        accept="image/*"
+                                        onChange={(e) => handleFileUpload(e, "icon")}
+                                        className="hidden" // Ẩn hoàn toàn input mặc định
+                                    />
+                                    <label
+                                        htmlFor="file-icon"
+                                        className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 cursor-pointer transition-colors"
+                                    >
+                                        Chọn ảnh
+                                    </label>
+                                    <span className="text-xs text-text-secondary truncate max-w-[120px]">
+                                        {formData.icon ? "Đã tải ảnh lên" : "Chưa có file"}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
+                        {/* Trường Thumbnail */}
                         <div className="space-y-1.5">
-                            <Label className="font-bold text-text-main">Thumbnail URL</Label>
-                            <Input
-                                name="thumbnail"
-                                value={formData.thumbnail}
-                                onChange={handleInputChange}
-                                placeholder="https://example.com/thumb.png"
-                            />
+                            <Label className="font-bold text-text-main">Thumbnail</Label>
+                            <div className="flex flex-col gap-2">
+                                {formData.thumbnail && (
+                                    <div className="relative group w-full h-16">
+                                        <img
+                                            src={formData.thumbnail}
+                                            alt="Thumbnail preview"
+                                            className="w-full h-full object-cover rounded-md border border-border-color"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveImage("thumbnail")}
+                                            className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70 flex items-center justify-center"
+                                        >
+                                            <X size={12} />
+                                        </button>
+                                    </div>
+                                )}
+                                <div className="relative flex items-center gap-2">
+                                    <input
+                                        type="file"
+                                        id="file-thumbnail"
+                                        accept="image/*"
+                                        onChange={(e) => handleFileUpload(e, "thumbnail")}
+                                        className="hidden"
+                                    />
+                                    <label
+                                        htmlFor="file-thumbnail"
+                                        className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 cursor-pointer transition-colors"
+                                    >
+                                        Chọn ảnh
+                                    </label>
+                                    <span className="text-xs text-text-secondary truncate max-w-[120px]">
+                                        {formData.thumbnail ? "Đã tải ảnh lên" : "Chưa có file"}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Trường Banner */}
+                        <div className="space-y-1.5">
+                            <Label className="font-bold text-text-main">Banner</Label>
+                            <div className="flex flex-col gap-2">
+                                {formData.banner && (
+                                    <div className="relative group w-full h-16">
+                                        <img
+                                            src={formData.banner}
+                                            alt="Banner preview"
+                                            className="w-full h-full object-cover rounded-md border border-border-color"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveImage("banner")}
+                                            className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70 flex items-center justify-center"
+                                        >
+                                            <X size={12} />
+                                        </button>
+                                    </div>
+                                )}
+                                <div className="relative flex items-center gap-2">
+                                    <input
+                                        type="file"
+                                        id="file-banner"
+                                        accept="image/*"
+                                        onChange={(e) => handleFileUpload(e, "banner")}
+                                        className="hidden"
+                                    />
+                                    <label
+                                        htmlFor="file-banner"
+                                        className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 cursor-pointer transition-colors"
+                                    >
+                                        Chọn ảnh
+                                    </label>
+                                    <span className="text-xs text-text-secondary truncate max-w-[120px]">
+                                        {formData.banner ? "Đã tải ảnh lên" : "Chưa có file"}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
 
                 {/* Footer Buttons */}
                 <div className="px-6 py-4 border-t border-border-color flex items-center justify-end gap-3 bg-bg-secondary/50">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={onClose}
-                        className="font-bold px-5"
-                    >
+                    <Button type="button" variant="outline" onClick={onClose} className="font-bold px-5">
                         Hủy bỏ
                     </Button>
-                    <Button
-                        onClick={handleSubmit}
-                        disabled={isLoading}
-                        className="font-bold px-8"
-                    >
+                    <Button onClick={handleSubmit} disabled={isLoading} className="font-bold px-8">
                         {isLoading ? (
                             <Loader2 className="animate-spin" size={18} />
                         ) : (

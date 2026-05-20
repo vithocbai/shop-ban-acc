@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Plus, Search, Edit2, Trash2, MoreVertical, Star, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, Star, Eye, EyeOff, Loader2 } from "lucide-react";
 import { gameService } from "../services/game.service";
 import type { Game } from "../types";
 import GameModal from "./GameModal";
@@ -148,8 +148,9 @@ const GameList: React.FC = () => {
                     <TableHeader className="sticky top-0 z-10 bg-bg-secondary">
                         <TableRow>
                             <TableHead>Game</TableHead>
+                            <TableHead className="text-center">Thumbnail</TableHead>
+                            <TableHead className="text-center">Banner</TableHead>
                             <TableHead className="text-center">Trạng thái</TableHead>
-                            <TableHead className="text-center">Thứ tự</TableHead>
                             <TableHead className="text-center">Nổi bật</TableHead>
                             <TableHead className="text-right">Thao tác</TableHead>
                         </TableRow>
@@ -176,6 +177,28 @@ const GameList: React.FC = () => {
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-center">
+                                        <div className="flex items-center justify-center">
+                                            {game.thumbnail ? (
+                                                <div className="w-16 h-9 rounded-md bg-bg-secondary flex items-center justify-center overflow-hidden border border-border-color">
+                                                    <img src={game.thumbnail} alt={`${game.name} thumbnail`} className="w-full h-full object-cover" />
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-text-secondary"></span>
+                                            )}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        <div className="flex items-center justify-center">
+                                            {game.banner ? (
+                                                <div className="w-20 h-8 rounded-md bg-bg-secondary flex items-center justify-center overflow-hidden border border-border-color">
+                                                    <img src={game.banner} alt={`${game.name} banner`} className="w-full h-full object-cover" />
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-text-secondary"></span>
+                                            )}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="text-center">
                                         {game.status === "ACTIVE" ? (
                                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-success/10 text-success text-xs font-bold border border-success/20">
                                                 <Eye size={14} />
@@ -191,9 +214,6 @@ const GameList: React.FC = () => {
                                                 Bảo trì
                                             </span>
                                         )}
-                                    </TableCell>
-                                    <TableCell className="text-center font-medium text-text-secondary">
-                                        {game.sort_order}
                                     </TableCell>
                                     <TableCell className="text-center">
                                         {game.is_hot ? (
@@ -227,20 +247,13 @@ const GameList: React.FC = () => {
                                             >
                                                 {isDeleting === game.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
                                             </Button>
-                                            <Button 
-                                                variant="ghost" 
-                                                size="icon" 
-                                                className="h-8 w-8 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer"
-                                            >
-                                                <MoreVertical size={16} />
-                                            </Button>
                                         </div>
                                     </TableCell>
                                 </TableRow>
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={5} className="py-20 text-center text-text-secondary font-medium">
+                                <TableCell colSpan={7} className="py-20 text-center text-text-secondary font-medium">
                                     Không tìm thấy game nào khớp với tìm kiếm.
                                 </TableCell>
                             </TableRow>

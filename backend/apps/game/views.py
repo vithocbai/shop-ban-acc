@@ -26,6 +26,37 @@ class GameViewSet(viewsets.ModelViewSet):
     # Sử dụng trường 'slug' thay cho 'id' làm khóa chính khi gọi API chi tiết
     lookup_field = 'slug'
 
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        
+        assert lookup_url_kwarg in self.kwargs, (
+            'Expected view %s to be called with a URL keyword argument '
+            'named "%s". Fix your URL conf, or set the `.lookup_field` '
+            'attribute on the view string.' %
+            (self.__class__.__name__, lookup_url_kwarg)
+        )
+
+        lookup_value = self.kwargs[lookup_url_kwarg]
+
+        # 1. Thử tìm kiếm theo ID nếu giá trị lookup là số nguyên dương
+        if lookup_value.isdigit():
+            try:
+                obj = queryset.get(id=int(lookup_value))
+                self.check_object_permissions(self.request, obj)
+                return obj
+            except queryset.model.DoesNotExist:
+                pass
+
+        # 2. Nếu không phải số hoặc tìm theo ID không ra, tìm theo slug
+        try:
+            obj = queryset.get(slug=lookup_value)
+            self.check_object_permissions(self.request, obj)
+            return obj
+        except queryset.model.DoesNotExist:
+            from django.http import Http404
+            raise Http404("Không tìm thấy game nào khớp với ID hoặc Slug được cấp.")
+
     def get_permissions(self):
         # Cho phép mọi người (Anonymous) truy cập xem danh sách và chi tiết game
         if self.action in ['list', 'retrieve']:

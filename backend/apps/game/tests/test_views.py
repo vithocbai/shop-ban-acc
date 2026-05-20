@@ -91,3 +91,90 @@ class GamePaginationTests(APITestCase):
         # Trường 'data' phải là một mảng (list) chứa tất cả 5 game trực tiếp chứ không nằm trong 'items'
         self.assertIsInstance(response.data['data'], list)
         self.assertEqual(len(response.data['data']), 5)
+
+
+class GameLookupAndModifyTests(APITestCase):
+    """
+    Kiểm thử hành động fix(backend): support dual ID/Slug lookup in GameViewSet to resolve PUT/DELETE 404
+
+- Override get_object in GameViewSet to dynamically search by numeric ID (for admin operations like PUT and DELETE) and fallback to SEO slug lookup.
+- Add robust integration tests in test_views.py covering GET, PUT, and DELETE operations via both ID and Slug.
+, Update, Delete với cả ID (Admin) và Slug (Public).
+    """
+
+    def setUp(self):
+        self.admin_user = User.objects.create_superuser(
+            username="admin",
+            email="admin@shopgame.com",
+            password="adminpassword123",
+            role="ADMIN"
+        )
+        self.game = Game.objects.create(
+            name="Liên Quân Mobile",
+            slug="lien-quan-mobile",
+            status=Game.Status.ACTIVE,
+            sort_order=1
+        )
+        # Lấy URL cơ bản
+        self.detail_by_slug_url = f"/api/games/lien-quan-mobile/"
+        self.detail_by_id_url = f"/api/games/{self.game.id}/"
+
+    def test_retrieve_by_slug_success(self):
+        """
+        Kiểm tra người dùng public truy cập chi tiết game bằng Slug thành công.
+        """
+        response = self.client.get(self.detail_by_slug_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['name'], self.game.name)
+        self.assertEqual(response.data['slug'], self.game.slug)
+
+    def test_retrieve_by_id_success(self):
+        """
+        Kiểm tra truy cập chi tiết game bằng ID thành công.
+        """
+        response = self.client.get(self.detail_by_id_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['name'], self.game.name)
+        self.assertEqual(response.data['id'], self.game.id)
+
+    def test_admin_update_by_id_success(self):
+        """
+        Kiểm tra Admin có thể cập nhật game bằng ID thành công.
+        """
+        self.client.force_authenticate(user=self.admin_user)
+        update_data = {
+            "name": "Liên Quân Mobile Pro",
+            "slug": "lien-quan-mobile-pro",
+            "status": "ACTIVE",
+            "sort_order": 5
+        }
+        response = self.client.put(self.detail_by_id_url, update_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        # Reload từ database để kiểm chứng
+        self.game.refresh_from_db()
+        self.assertEqual(self.game.name, "Liên Quân Mobile Pro")
+        self.assertEqual(self.game.slug, "lien-quan-mobile-pro")
+
+    def test_admin_delete_by_id_success(self):
+        """
+        Kiểm tra Admin có thể xóa mềm game bằng ID thành công.
+        """
+        self.client.force_authenticate(user=self.admin_user)
+        response = self.client.delete(self.detail_by_id_url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        
+        # Vì sử dụng SoftDeleteModel nên game không mất hoàn toàn mà set deleted_at khác null
+        self.game.refresh_from_db()
+        self.assertIsNotNone(self.game.deleted_at)
+
+    def test_retrieve_not_found(self):
+        """
+        Kiểm tra truy cập game không tồn tại trả về 404.
+        """
+        response = self.client.get("/api/games/999999/")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        
+        response = self.client.get("/api/games/non-existent-slug/")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+

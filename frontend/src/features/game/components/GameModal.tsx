@@ -266,7 +266,7 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                             <Label className="font-bold text-text-main">Icon</Label>
                             <div className="flex flex-col gap-2">
                                 {formData.icon && (
-                                    <div className="relative group w-16 h-16">
+                                    <div className="relative group w-26 h-26">
                                         <img
                                             src={formData.icon}
                                             alt="Icon preview"
@@ -306,7 +306,7 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                             <Label className="font-bold text-text-main">Thumbnail</Label>
                             <div className="flex flex-col gap-2">
                                 {formData.thumbnail && (
-                                    <div className="relative group w-full h-16">
+                                    <div className="relative group w-full h-26">
                                         <img
                                             src={formData.thumbnail}
                                             alt="Thumbnail preview"
@@ -346,7 +346,7 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                             <Label className="font-bold text-text-main">Banner</Label>
                             <div className="flex flex-col gap-2">
                                 {formData.banner && (
-                                    <div className="relative group w-full h-16">
+                                    <div className="relative group w-full h-26">
                                         <img
                                             src={formData.banner}
                                             alt="Banner preview"

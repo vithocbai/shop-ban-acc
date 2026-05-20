@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 interface GameModalProps {
     isOpen: boolean;
@@ -43,8 +44,11 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
 
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
     useEffect(() => {
+        setError(null);
+        setFieldErrors({});
         if (game) {
             setFormData({
                 name: game.name,
@@ -78,6 +82,14 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
         const { name, value, type } = e.target as any;
         const checked = (e.target as HTMLInputElement).checked;
 
+        if (fieldErrors[name]) {
+            setFieldErrors((prev) => {
+                const next = { ...prev };
+                delete next[name];
+                return next;
+            });
+        }
+
         setFormData((prev) => {
             const nextState = {
                 ...prev,
@@ -87,6 +99,13 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
             // Nếu người dùng đang gõ trường "name", tự động cập nhật "slug" tương ứng
             if (name === "name") {
                 nextState.slug = convertToSlug(value);
+                if (fieldErrors.slug) {
+                    setFieldErrors((prev) => {
+                        const next = { ...prev };
+                        delete next.slug;
+                        return next;
+                    });
+                }
             }
 
             return nextState;
@@ -101,6 +120,14 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
         if (!file) return;
 
         setIsLoading(true);
+        if (fieldErrors[fieldName]) {
+            setFieldErrors((prev) => {
+                const next = { ...prev };
+                delete next[fieldName];
+                return next;
+            });
+        }
+
         try {
             // TODO: Khi có API thật, hãy upload file lên server và lấy URL thật về để lưu vào DB
             // Tạm thời dùng URL.createObjectURL để có thể xem trước chính xác ảnh thật vừa chọn
@@ -108,7 +135,7 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
 
             setFormData((prev) => ({ ...prev, [fieldName]: previewUrl }));
         } catch (error) {
-            setError("Lỗi tải ảnh lên.");
+            setFieldErrors((prev) => ({ ...prev, [fieldName]: "Lỗi tải ảnh lên." }));
         } finally {
             setIsLoading(false);
         }
@@ -116,12 +143,35 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
 
     const handleRemoveImage = (fieldName: "icon" | "thumbnail" | "banner") => {
         setFormData((prev) => ({ ...prev, [fieldName]: "" }));
+        if (fieldErrors[fieldName]) {
+            setFieldErrors((prev) => {
+                const next = { ...prev };
+                delete next[fieldName];
+                return next;
+            });
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setError(null);
+        setFieldErrors({});
+
+        // Validation cơ bản
+        const errors: Record<string, string> = {};
+        if (!formData.name.trim()) {
+            errors.name = "Tên game là bắt buộc.";
+        }
+        if (!formData.slug.trim()) {
+            errors.slug = "Slug (đường dẫn) là bắt buộc.";
+        }
+
+        if (Object.keys(errors).length > 0) {
+            setFieldErrors(errors);
+            setIsLoading(false);
+            return;
+        }
 
         try {
             if (game) {
@@ -132,7 +182,34 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
             onSuccess();
             onClose();
         } catch (err: any) {
-            setError(err.response?.data?.message || "Đã có lỗi xảy ra. Vui lòng kiểm tra lại.");
+            if (err.response?.status === 400 && typeof err.response?.data === "object") {
+                const data = err.response.data;
+                const parsedErrors: Record<string, string> = {};
+                let generalMessage = "Vui lòng sửa các lỗi bên dưới.";
+                
+                Object.keys(data).forEach((key) => {
+                    const val = data[key];
+                    if (Array.isArray(val)) {
+                        parsedErrors[key] = val.join(" ");
+                    } else if (typeof val === "string") {
+                        parsedErrors[key] = val;
+                    }
+                });
+
+                if (Object.keys(parsedErrors).length > 0) {
+                    setFieldErrors(parsedErrors);
+                    if (data.non_field_errors) {
+                        generalMessage = Array.isArray(data.non_field_errors) ? data.non_field_errors.join(" ") : String(data.non_field_errors);
+                    } else if (data.detail) {
+                        generalMessage = String(data.detail);
+                    }
+                    setError(generalMessage);
+                } else {
+                    setError(err.response?.data?.message || "Đã có lỗi xảy ra. Vui lòng kiểm tra lại.");
+                }
+            } else {
+                setError(err.response?.data?.message || "Đã có lỗi xảy ra. Vui lòng kiểm tra lại.");
+            }
         } finally {
             setIsLoading(false);
         }
@@ -175,7 +252,11 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                                 value={formData.name}
                                 onChange={handleInputChange}
                                 placeholder="Ví dụ: Liên Quân Mobile"
+                                className={cn(fieldErrors.name && "border-error focus-visible:ring-error")}
                             />
+                            {fieldErrors.name && (
+                                <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.name}</p>
+                            )}
                         </div>
                         <div className="space-y-1.5">
                             <Label className="font-bold text-text-main">
@@ -187,7 +268,11 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                                 value={formData.slug}
                                 onChange={handleInputChange}
                                 placeholder="Ví dụ: lien-quan-mobile"
+                                className={cn(fieldErrors.slug && "border-error focus-visible:ring-error")}
                             />
+                            {fieldErrors.slug && (
+                                <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.slug}</p>
+                            )}
                         </div>
                     </div>
 
@@ -198,9 +283,15 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                             value={formData.description}
                             onChange={handleInputChange}
                             rows={3}
-                            className="block w-full px-4 py-2.5 bg-bg-secondary border border-border-color rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary transition-all resize-none text-text-main placeholder:text-text-secondary"
+                            className={cn(
+                                "block w-full px-4 py-2.5 bg-bg-secondary border border-border-color rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary transition-all resize-none text-text-main placeholder:text-text-secondary",
+                                fieldErrors.description && "border-error focus:outline-none focus:ring-1 focus:ring-error focus:border-error"
+                            )}
                             placeholder="Mô tả ngắn về game..."
                         />
+                        {fieldErrors.description && (
+                            <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.description}</p>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -210,12 +301,18 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                                 name="status"
                                 value={formData.status}
                                 onChange={handleInputChange}
-                                className="block w-full px-4 py-2.5 bg-bg-secondary border border-border-color rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary transition-all text-text-main"
+                                className={cn(
+                                    "block w-full px-4 py-2.5 bg-bg-secondary border border-border-color rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary transition-all text-text-main",
+                                    fieldErrors.status && "border-error focus:outline-none focus:ring-1 focus:ring-error focus:border-error"
+                                )}
                             >
                                 <option value="ACTIVE">Hoạt động</option>
                                 <option value="HIDDEN">Ẩn</option>
                                 <option value="MAINTENANCE">Bảo trì</option>
                             </select>
+                            {fieldErrors.status && (
+                                <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.status}</p>
+                            )}
                         </div>
                         <div className="space-y-1.5">
                             <Label className="font-bold text-text-main">Thứ tự hiển thị</Label>
@@ -224,7 +321,11 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                                 name="sort_order"
                                 value={formData.sort_order}
                                 onChange={handleInputChange}
+                                className={cn(fieldErrors.sort_order && "border-error focus-visible:ring-error")}
                             />
+                            {fieldErrors.sort_order && (
+                                <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.sort_order}</p>
+                            )}
                         </div>
                         <div className="space-y-1.5">
                             <Label className="font-bold text-text-main">Màu chủ đạo</Label>
@@ -241,9 +342,12 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                                     name="theme_color"
                                     value={formData.theme_color}
                                     onChange={handleInputChange}
-                                    className="flex-1"
+                                    className={cn("flex-1", fieldErrors.theme_color && "border-error focus-visible:ring-error")}
                                 />
                             </div>
+                            {fieldErrors.theme_color && (
+                                <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.theme_color}</p>
+                            )}
                         </div>
                     </div>
 
@@ -291,7 +395,10 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                                     />
                                     <label
                                         htmlFor="file-icon"
-                                        className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 cursor-pointer transition-colors"
+                                        className={cn(
+                                            "inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 cursor-pointer transition-colors",
+                                            fieldErrors.icon && "border-error text-error"
+                                        )}
                                     >
                                         Chọn ảnh
                                     </label>
@@ -299,6 +406,9 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                                         {formData.icon ? "Đã tải ảnh lên" : "Chưa có file"}
                                     </span>
                                 </div>
+                                {fieldErrors.icon && (
+                                    <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.icon}</p>
+                                )}
                             </div>
                         </div>
                         {/* Trường Thumbnail */}
@@ -331,7 +441,10 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                                     />
                                     <label
                                         htmlFor="file-thumbnail"
-                                        className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 cursor-pointer transition-colors"
+                                        className={cn(
+                                            "inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 cursor-pointer transition-colors",
+                                            fieldErrors.thumbnail && "border-error text-error"
+                                        )}
                                     >
                                         Chọn ảnh
                                     </label>
@@ -339,6 +452,9 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                                         {formData.thumbnail ? "Đã tải ảnh lên" : "Chưa có file"}
                                     </span>
                                 </div>
+                                {fieldErrors.thumbnail && (
+                                    <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.thumbnail}</p>
+                                )}
                             </div>
                         </div>
                         {/* Trường Banner */}
@@ -371,7 +487,10 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                                     />
                                     <label
                                         htmlFor="file-banner"
-                                        className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 cursor-pointer transition-colors"
+                                        className={cn(
+                                            "inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 cursor-pointer transition-colors",
+                                            fieldErrors.banner && "border-error text-error"
+                                        )}
                                     >
                                         Chọn ảnh
                                     </label>
@@ -379,6 +498,9 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                                         {formData.banner ? "Đã tải ảnh lên" : "Chưa có file"}
                                     </span>
                                 </div>
+                                {fieldErrors.banner && (
+                                    <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.banner}</p>
+                                )}
                             </div>
                         </div>
                     </div>

@@ -5,18 +5,16 @@ import type { Game } from "../types";
 import GameModal from "./GameModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PaginationControls } from "@/components/shared/PaginationControls";
+import { toast } from "react-toastify";
 
 const GameList: React.FC = () => {
     // Trạng thái lưu trữ danh sách Game
     const [games, setGames] = useState<Game[]>([]);
     // Trạng thái hiển thị khi đang tải dữ liệu (loading)
     const [loading, setLoading] = useState(true);
-    // Trạng thái lưu trữ lỗi nếu tải thất bại
-    const [error, setError] = useState<string | null>(null);
     // Trạng thái cho chuỗi tìm kiếm nhập trực tiếp từ ô Input
     const [searchTerm, setSearchTerm] = useState("");
     
@@ -57,9 +55,8 @@ const GameList: React.FC = () => {
             });
             setGames(res.items);
             setTotal(res.total);
-            setError(null);
         } catch (err: any) {
-            setError("Không thể tải danh sách game. Vui lòng thử lại sau.");
+            toast.error("Không thể tải danh sách game. Vui lòng thử lại sau.");
             console.error(err);
         } finally {
             setLoading(false);
@@ -85,10 +82,11 @@ const GameList: React.FC = () => {
         try {
             setIsDeleting(id);
             await gameService.deleteGame(id);
+            toast.success("Xóa game thành công!");
             // Sau khi xóa thành công, gọi lại API để load lại trang và cập nhật số lượng bản ghi chính xác
             fetchGames();
         } catch (err: any) {
-            alert("Xóa game thất bại. Vui lòng thử lại.");
+            toast.error("Xóa game thất bại. Vui lòng thử lại.");
         } finally {
             setIsDeleting(null);
         }
@@ -133,14 +131,6 @@ const GameList: React.FC = () => {
                     Thêm Game mới
                 </Button>
             </div>
-
-            {error && (
-                <div className="shrink-0">
-                    <Alert variant="destructive">
-                        <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                </div>
-            )}
 
             {/* Table */}
             <Card className="overflow-hidden flex-1 flex flex-col min-h-0">

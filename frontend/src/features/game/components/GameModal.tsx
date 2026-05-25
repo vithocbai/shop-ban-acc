@@ -3,10 +3,10 @@ import { X, Save, Loader2 } from "lucide-react";
 import type { Game, GameCreateInput } from "../types";
 import { gameService } from "../services/game.service";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { toast } from "react-toastify";
 
 interface GameModalProps {
     isOpen: boolean;
@@ -43,11 +43,9 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
     });
 
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
     useEffect(() => {
-        setError(null);
         setFieldErrors({});
         if (game) {
             setFormData({
@@ -136,6 +134,7 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
             setFormData((prev) => ({ ...prev, [fieldName]: previewUrl }));
         } catch (error) {
             setFieldErrors((prev) => ({ ...prev, [fieldName]: "Lỗi tải ảnh lên." }));
+            toast.error("Không thể upload ảnh, vui lòng thử lại.");
         } finally {
             setIsLoading(false);
         }
@@ -155,7 +154,6 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        setError(null);
         setFieldErrors({});
 
         // Validation cơ bản
@@ -176,8 +174,10 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
         try {
             if (game) {
                 await gameService.updateGame(game.id, formData);
+                toast.success("Cập nhật thông tin game thành công!");
             } else {
                 await gameService.createGame(formData);
+                toast.success("Thêm game mới thành công!");
             }
             onSuccess();
             onClose();
@@ -203,12 +203,12 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                     } else if (data.detail) {
                         generalMessage = String(data.detail);
                     }
-                    setError(generalMessage);
+                    toast.error(generalMessage);
                 } else {
-                    setError(err.response?.data?.message || "Đã có lỗi xảy ra. Vui lòng kiểm tra lại.");
+                    toast.error(err.response?.data?.message || "Đã có lỗi xảy ra. Vui lòng kiểm tra lại.");
                 }
             } else {
-                setError(err.response?.data?.message || "Đã có lỗi xảy ra. Vui lòng kiểm tra lại.");
+                toast.error(err.response?.data?.message || "Đã có lỗi xảy ra. Vui lòng kiểm tra lại.");
             }
         } finally {
             setIsLoading(false);
@@ -235,12 +235,6 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
 
                 {/* Form Body */}
                 <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-5">
-                    {error && (
-                        <Alert variant="destructive">
-                            <AlertDescription>{error}</AlertDescription>
-                        </Alert>
-                    )}
-
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-1.5">
                             <Label className="font-bold text-text-main">

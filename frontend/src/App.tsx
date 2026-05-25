@@ -3,6 +3,8 @@ import AdminLayout from "./components/layout/AdminLayout";
 import AuthPage from "./pages/admin/auth";
 import GameManagementPage from "./pages/admin/GameManagement";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -71,6 +73,7 @@ function App() {
                     <Route path="/" element={<div className="p-10 text-center"><h1>Chào mừng đến với Shop Acc Game</h1><p>Giao diện người dùng đang phát triển...</p><a href="/login" className="text-primary underline">Đăng nhập ngay</a></div>} />
                 </Routes>
             </Router>
+            <ToastContainer position="top-right" autoClose={3000} theme="colored" />
         </AuthProvider>
     );
 }

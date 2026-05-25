@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { toast } from "react-toastify";
+import api from "@/services/api";
 
 interface GameModalProps {
     isOpen: boolean;
@@ -127,14 +128,21 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
         }
 
         try {
-            // TODO: Khi có API thật, hãy upload file lên server và lấy URL thật về để lưu vào DB
-            // Tạm thời dùng URL.createObjectURL để có thể xem trước chính xác ảnh thật vừa chọn
-            const previewUrl = URL.createObjectURL(file);
+            const inputFormData = new FormData();
+            inputFormData.append("file", file);
 
-            setFormData((prev) => ({ ...prev, [fieldName]: previewUrl }));
-        } catch (error) {
-            setFieldErrors((prev) => ({ ...prev, [fieldName]: "Lỗi tải ảnh lên." }));
-            toast.error("Không thể upload ảnh, vui lòng thử lại.");
+            const response = await api.post("/upload/", inputFormData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                }
+            }) 
+            const fileUrl = response.data?.url;
+            setFormData((prev) => ({ ...prev, [fieldName]: fileUrl }));
+            toast.success("Tải ảnh lên thành công!");
+        } catch (error: any) {
+            const errorMsg = error.response?.data?.error || "Lỗi tải ảnh lên.";
+            setFieldErrors((prev) => ({ ...prev, [fieldName]: errorMsg }));
+             toast.error(`Không thể upload ảnh: ${errorMsg}`);
         } finally {
             setIsLoading(false);
         }

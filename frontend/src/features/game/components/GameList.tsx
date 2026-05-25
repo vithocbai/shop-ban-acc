@@ -137,21 +137,21 @@ const GameList: React.FC = () => {
                 <Table className="bg-white" containerClassName="flex-1 overflow-auto min-h-0">
                     <TableHeader className="sticky top-0 z-10 bg-bg-secondary">
                         <TableRow>
-                            <TableHead>Game</TableHead>
-                            <TableHead className="text-center">Thumbnail</TableHead>
-                            <TableHead className="text-center">Banner</TableHead>
-                            <TableHead className="text-center">Trạng thái</TableHead>
-                            <TableHead className="text-center">Nổi bật</TableHead>
-                            <TableHead className="text-right">Thao tác</TableHead>
+                            <TableHead className="w-[20%]">Game</TableHead>
+                            <TableHead className="w-[25%] text-center">Thumbnail</TableHead>
+                            <TableHead className="w-[25%] text-center">Banner</TableHead>
+                            <TableHead className="w-[12%] text-center">Trạng thái</TableHead>
+                            <TableHead className="w-[10%] text-center">Game hot</TableHead>
+                            <TableHead className="w-[10%] text-right">Thao tác</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {games.length > 0 ? (
                             games.map((game) => (
                                 <TableRow key={game.id}>
-                                    <TableCell>
+                                    <TableCell className="w-[20%]">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-md bg-bg-secondary flex items-center justify-center overflow-hidden border border-border-color">
+                                            <div className="w-22 h-22 rounded-md bg-bg-secondary flex items-center justify-center overflow-hidden border border-border-color shrink-0">
                                                 {game.icon ? (
                                                     <img src={game.icon} alt={game.name} className="w-full h-full object-cover" />
                                                 ) : (
@@ -160,35 +160,35 @@ const GameList: React.FC = () => {
                                                     </div>
                                                 )}
                                             </div>
-                                            <div>
-                                                <p className="font-bold text-text-main">{game.name}</p>
-                                                <p className="text-xs text-text-secondary">{game.slug}</p>
+                                            <div className="min-w-0">
+                                                <p className="font-bold text-text-main truncate" title={game.name}>{game.name}</p>
+                                                <p className="text-xs text-text-secondary truncate" title={game.slug}>{game.slug}</p>
                                             </div>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-center">
+                                    <TableCell className="w-[25%] text-center">
                                         <div className="flex items-center justify-center">
                                             {game.thumbnail ? (
-                                                <div className="w-16 h-9 rounded-md bg-bg-secondary flex items-center justify-center overflow-hidden border border-border-color">
-                                                    <img src={game.thumbnail} alt={`${game.name} thumbnail`} className="w-full h-full object-cover" />
+                                                <div className="w-36 h-22 rounded-md bg-bg-secondary flex items-center justify-center overflow-hidden border border-border-color shadow-sm">
+                                                    <img src={game.thumbnail} alt={`${game.name} thumbnail`} className="w-full h-full object-cover hover:scale-110 transition-transform duration-200" />
                                                 </div>
                                             ) : (
-                                                <span className="text-xs text-text-secondary"></span>
+                                                <span className="text-xs text-text-secondary italic">Chưa có</span>
                                             )}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-center">
+                                    <TableCell className="w-[25%] text-center">
                                         <div className="flex items-center justify-center">
                                             {game.banner ? (
-                                                <div className="w-20 h-8 rounded-md bg-bg-secondary flex items-center justify-center overflow-hidden border border-border-color">
-                                                    <img src={game.banner} alt={`${game.name} banner`} className="w-full h-full object-cover" />
+                                                <div className="w-36 h-22 rounded-md bg-bg-secondary flex items-center justify-center overflow-hidden border border-border-color shadow-sm">
+                                                    <img src={game.banner} alt={`${game.name} banner`} className="w-full h-full object-cover hover:scale-110 transition-transform duration-200" />
                                                 </div>
                                             ) : (
-                                                <span className="text-xs text-text-secondary"></span>
+                                                <span className="text-xs text-text-secondary italic">Chưa có</span>
                                             )}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-center">
+                                    <TableCell className="w-[12%] text-center whitespace-nowrap">
                                         {game.status === "ACTIVE" ? (
                                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-success/10 text-success text-xs font-bold border border-success/20">
                                                 <Eye size={14} />
@@ -205,7 +205,7 @@ const GameList: React.FC = () => {
                                             </span>
                                         )}
                                     </TableCell>
-                                    <TableCell className="text-center">
+                                    <TableCell className="w-[8%] text-center">
                                         {game.is_hot ? (
                                             <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-warning/10 text-warning border border-warning/20">
                                                 <Star size={16} fill="currentColor" />
@@ -216,7 +216,7 @@ const GameList: React.FC = () => {
                                             </div>
                                         )}
                                     </TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell className="w-[10%] text-right">
                                         <div className="flex items-center justify-end gap-1">
                                             <Button 
                                                 variant="ghost" 

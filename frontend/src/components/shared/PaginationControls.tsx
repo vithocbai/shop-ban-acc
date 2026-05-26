@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "../ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Select } from "../ui/select";
 
 interface PaginationControlsProps {
     // Trang hiện tại (1-indexed)
@@ -82,21 +83,21 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
                 <span className="text-sm text-text-secondary font-medium whitespace-nowrap">
                     Hiển thị
                 </span>
-                <select
+                <Select
                     id="reusable-select-rows-per-page"
                     value={pageSize}
                     onChange={(e) => {
                         const newSize = Number(e.target.value);
                         onPageSizeChange(newSize);
                     }}
-                    className="h-9 px-2 rounded-md border border-border-color bg-white text-sm text-text-main focus:outline-none focus:ring-1 focus:ring-primary/20 cursor-pointer"
+                    className="h-9 px-2 w-fit cursor-pointer"
                 >
                     {pageSizeOptions.map((option) => (
                         <option key={option} value={option}>
                             {option}
                         </option>
                     ))}
-                </select>
+                </Select>
                 <span className="text-sm text-text-secondary font-medium whitespace-nowrap">
                     trên mỗi trang
                 </span>

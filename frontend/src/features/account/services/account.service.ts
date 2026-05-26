@@ -13,27 +13,22 @@ export const accountService = {
         game?: number;
         status?: string;
     }): Promise<PaginatedResponse<Account>> => {
-        const response = await api.get<ApiResponse<PaginatedResponse<Account>>>("/accounts/", { params });
+        const response = await api.get<ApiResponse<any>>("/accounts/", { params });
 
-        // Trường hợp 1: Backend trả về cấu hình Envelope chuẩn
         if (response.data && response.data.success && response.data.data) {
-            return response.data.data;
-        }
-
-        // Trường hợp 2: Dữ liệu thô đã chứa phân trang trực tiếp
-        const rawData = response.data as any;
-        if (rawData && rawData.items) {
-            return rawData;
-        }
-
-        // Trường hợp 3: Fallback nếu API trả về một mảng thô
-        if (Array.isArray(response.data)) {
-            return {
-                items: response.data,
-                total: response.data.length,
-                page: 1,
-                page_size: response.data.length
-            };
+            const data = response.data.data;
+            
+            // Nếu data là mảng (trường hợp no_pagination=true)
+            if (Array.isArray(data)) {
+                return {
+                    items: data,
+                    total: data.length,
+                    page: 1,
+                    page_size: data.length
+                };
+            }
+            
+            return data as PaginatedResponse<Account>;
         }
 
         return { items: [], total: 0, page: 1, page_size: 10 };

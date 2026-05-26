@@ -4,8 +4,9 @@ from rest_framework.response import Response
 from .models import Order
 from .serializers import OrderSerializer, CheckoutSerializer
 from .services.purchase import purchase_account
+from common.mixins import ResponseEnvelopeMixin
 
-class OrderViewSet(viewsets.ReadOnlyModelViewSet):
+class OrderViewSet(ResponseEnvelopeMixin, viewsets.ReadOnlyModelViewSet):
     """
     ViewSet quản lý đơn hàng.
     - list/retrieve: Xem lịch sử đơn hàng của User.

@@ -8,8 +8,9 @@ from .serializers import TransactionSerializer, DepositSerializer
 from .services.balance import update_user_balance
 from apps.notification.services.notifier import notify_user
 from apps.notification.models import Notification
+from common.mixins import ResponseEnvelopeMixin
 
-class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
+class TransactionViewSet(ResponseEnvelopeMixin, viewsets.ReadOnlyModelViewSet):
     """
     ViewSet hiển thị lịch sử giao dịch của người dùng hiện tại.
     """
@@ -20,7 +21,7 @@ class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
         return Transaction.objects.filter(user=self.request.user)
 
 
-class DepositViewSet(viewsets.ModelViewSet):
+class DepositViewSet(ResponseEnvelopeMixin, viewsets.ModelViewSet):
     """
     ViewSet quản lý yêu cầu nạp tiền.
     - User: Tạo yêu cầu và xem lịch sử của mình.

@@ -1,11 +1,11 @@
 from rest_framework import viewsets, permissions, filters
-from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Game
 from .serializers import GameSerializer
+from common.mixins import ResponseEnvelopeMixin
 
 
-class GameViewSet(viewsets.ModelViewSet):
+class GameViewSet(ResponseEnvelopeMixin, viewsets.ModelViewSet):
     """
     ViewSet quản lý danh sách Game.
     - Public: Chỉ được xem danh sách (list) và chi tiết (retrieve) các game ACTIVE.
@@ -70,23 +70,6 @@ class GameViewSet(viewsets.ModelViewSet):
         if not self.request.user.is_staff:
             queryset = queryset.filter(status=Game.Status.ACTIVE)
         return queryset
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        # Thực hiện phân trang nếu được cấu hình và không tắt phân trang
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        # Nếu phân trang bị tắt (no_pagination=true), bọc danh sách vào Response Envelope chuẩn
-        serializer = self.get_serializer(queryset, many=True)
-        return Response({
-            "success": True,
-            "message": "Lấy danh sách thành công",
-            "data": serializer.data
-        })
 
 
 

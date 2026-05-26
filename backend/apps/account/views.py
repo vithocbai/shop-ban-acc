@@ -1,11 +1,11 @@
 from rest_framework import viewsets, permissions, filters
-from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Account
 from .serializers import AccountListSerializer, AccountDetailSerializer, AccountWriteSerializer
+from common.mixins import ResponseEnvelopeMixin
 
 
-class AccountViewSet(viewsets.ModelViewSet):
+class AccountViewSet(ResponseEnvelopeMixin, viewsets.ModelViewSet):
     """
     ViewSet quản lý danh sách tài khoản game.
     - Public: Chỉ được xem danh sách (list) và chi tiết (retrieve) các account AVAILABLE.
@@ -82,20 +82,3 @@ class AccountViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Tự động gán người tạo (created_by) là user hiện tại."""
         serializer.save(created_by=self.request.user)
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        # Thực hiện phân trang nếu được cấu hình
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        # Nếu phân trang bị tắt, bọc danh sách vào Response Envelope chuẩn
-        serializer = self.get_serializer(queryset, many=True)
-        return Response({
-            "success": True,
-            "message": "Lấy danh sách tài khoản thành công",
-            "data": serializer.data
-        })

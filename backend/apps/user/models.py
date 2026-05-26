@@ -1,6 +1,20 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 from common.models import TimestampedModel, SoftDeleteModel
+
+class CustomUserManager(UserManager):
+    def create_superuser(self, username, email=None, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        # Tự động gán role SUPER_ADMIN khi chạy lệnh createsuperuser
+        extra_fields.setdefault("role", "SUPER_ADMIN")
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
+
+        return self._create_user(username, email, password, **extra_fields)
 
 class User(AbstractUser, TimestampedModel, SoftDeleteModel):
     """
@@ -40,6 +54,8 @@ class User(AbstractUser, TimestampedModel, SoftDeleteModel):
     # Sử dụng email để đăng nhập thay vì username
     REQUIRED_FIELDS = ['username']
     USERNAME_FIELD = 'email'
+
+    objects = CustomUserManager()
 
     class Meta:
         verbose_name = "Người dùng"

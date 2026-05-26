@@ -18,6 +18,7 @@ Tài liệu này tổng hợp danh sách các công việc Backend, bám sát ki
 - [x] **Refactor Architecture**: Đồng bộ hóa cấu trúc cây thư mục (Singular naming, core apps).
 - [x] Tích hợp Swagger/Redoc để tự động làm tài liệu API.
 - [x] Viết Script Seed Data (Dữ liệu mẫu cho Game, Account, Admin).
+- [x] Chuẩn hóa Phân trang (Pagination) & Response Envelope cho toàn bộ API (`ResponseEnvelopeMixin`).
 
 ## 2. Người dùng & Phân quyền (User)
 - [x] Triển khai Custom User Model (Email làm định danh, Balance, Role, Status).
@@ -69,4 +70,4 @@ Tài liệu này tổng hợp danh sách các công việc Backend, bám sát ki
 - [x] Viết Unit Test cho Core Logic.
 
 ---
-*Cập nhật lần cuối: 12/05/2026*
+*Cập nhật lần cuối: 26/05/2026*

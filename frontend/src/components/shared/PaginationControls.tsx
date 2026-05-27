@@ -1,7 +1,13 @@
 import React from "react";
 import { Button } from "../ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Select } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface PaginationControlsProps {
     // Trang hiện tại (1-indexed)
@@ -37,7 +43,7 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
     onPageSizeChange,
     pageSizeOptions = [10, 20, 50, 100]
 }) => {
-    
+
     // Tính toán tổng số trang
     const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
@@ -83,26 +89,33 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
                 <span className="text-sm text-text-secondary font-medium whitespace-nowrap">
                     Hiển thị
                 </span>
+
                 <Select
-                    id="reusable-select-rows-per-page"
-                    value={pageSize}
-                    onChange={(e) => {
-                        const newSize = Number(e.target.value);
-                        onPageSizeChange(newSize);
+                    value={String(pageSize)}
+                    onValueChange={(value) => {
+                        onPageSizeChange(Number(value));
                     }}
-                    className="h-9 px-2 w-fit cursor-pointer"
                 >
-                    {pageSizeOptions.map((option) => (
-                        <option key={option} value={option}>
-                            {option}
-                        </option>
-                    ))}
+                    <SelectTrigger className="h-9 w-[80px] cursor-pointer">
+                        <SelectValue />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                        {pageSizeOptions.map((option) => (
+                            <SelectItem
+                                key={option}
+                                value={String(option)}
+                            >
+                                {option}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
                 </Select>
+
                 <span className="text-sm text-text-secondary font-medium whitespace-nowrap">
                     trên mỗi trang
                 </span>
             </div>
-
             {/* Phía phải: Các nút bấm điều hướng trang cụ thể */}
             <div className="flex items-center gap-1.5 md:justify-self-end justify-end">
                 {/* Nút lùi về trang trước */}
@@ -111,9 +124,8 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
                     size="icon"
                     disabled={page === 1}
                     onClick={handlePrevious}
-                    className={`h-9 w-9 p-0 flex items-center justify-center bg-white border border-border-color rounded-md ${
-                        page === 1 ? "opacity-50 text-text-secondary/40 disabled:pointer-events-auto disabled:cursor-not-allowed" : "text-text-main hover:bg-bg-secondary cursor-pointer"
-                    }`}
+                    className={`h-9 w-9 p-0 flex items-center justify-center bg-white border border-border-color rounded-md ${page === 1 ? "opacity-50 text-text-secondary/40 disabled:pointer-events-auto disabled:cursor-not-allowed" : "text-text-main hover:bg-bg-secondary cursor-pointer"
+                        }`}
                 >
                     <ChevronLeft size={16} />
                 </Button>
@@ -133,11 +145,10 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
                             key={pageNumber}
                             variant={isCurrent ? "default" : "outline"}
                             onClick={() => onPageChange(Number(pageNumber))}
-                            className={`h-9 w-9 p-0 rounded-md font-medium text-sm transition-colors cursor-pointer ${
-                                isCurrent
+                            className={`h-9 w-9 p-0 rounded-md font-medium text-sm transition-colors cursor-pointer ${isCurrent
                                     ? "bg-black text-white hover:bg-black/90 font-bold"
                                     : "bg-white border border-border-color text-text-secondary hover:text-text-main hover:bg-bg-secondary"
-                            }`}
+                                }`}
                         >
                             {pageNumber}
                         </Button>
@@ -150,9 +161,8 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
                     size="icon"
                     disabled={page >= totalPages}
                     onClick={handleNext}
-                    className={`h-9 w-9 p-0 flex items-center justify-center bg-white border border-border-color rounded-md ${
-                        page >= totalPages ? "opacity-50 text-text-secondary/40 disabled:pointer-events-auto disabled:cursor-not-allowed" : "text-text-main hover:bg-bg-secondary cursor-pointer"
-                    }`}
+                    className={`h-9 w-9 p-0 flex items-center justify-center bg-white border border-border-color rounded-md ${page >= totalPages ? "opacity-50 text-text-secondary/40 disabled:pointer-events-auto disabled:cursor-not-allowed" : "text-text-main hover:bg-bg-secondary cursor-pointer"
+                        }`}
                 >
                     <ChevronRight size={16} />
                 </Button>

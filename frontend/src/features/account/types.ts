@@ -50,7 +50,28 @@ export interface AccountCreateInput {
     account_data?: Record<string, any>;
     is_featured?: boolean;
     is_hot?: boolean;
+    views: number;
     images?: { image_url: string; sort_order: number }[];
 }
 
 export interface AccountUpdateInput extends Partial<AccountCreateInput> {}
+
+export const INITIAL_ACCOUNT_FORM: AccountCreateInput = {
+    game: 0,
+    title: "",
+    slug: "",
+    account_code: "",
+    thumbnail: "",
+    price: 0,
+    original_price: 0,
+    discount_percent: 0,
+    status: "AVAILABLE",
+    login_type: "",
+    account_type: "",
+    short_description: "",
+    description: "",
+    account_data: {},
+    is_featured: false,
+    is_hot: false,
+    views: 0
+};

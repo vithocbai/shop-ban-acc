@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { X, Save, Loader2, Plus, Trash2 } from "lucide-react";
+import {
+    X,
+    Save,
+    Loader2,
+    Plus,
+    Trash2,
+    UploadCloud,
+    Image as ImageIcon,
+    Gamepad2,
+    RefreshCw,
+    Eye,
+} from "lucide-react";
 import type { Account, AccountCreateInput } from "../types";
+import { INITIAL_ACCOUNT_FORM } from "../types";
 import type { Game } from "../../game/types";
 import { accountService } from "../services/account.service";
 import { Button } from "@/components/ui/button";
@@ -31,28 +43,16 @@ const convertToSlug = (text: string): string => {
         .replace(/^-+|-+$/g, "");
 };
 
-const INITIAL_FORM: AccountCreateInput = {
-    game: 0,
-    title: "",
-    slug: "",
-    account_code: "",
-    thumbnail: "",
-    price: 0,
-    original_price: 0,
-    discount_percent: 0,
-    status: "AVAILABLE",
-    login_type: "",
-    account_type: "",
-    short_description: "",
-    description: "",
-    account_data: {},
-    is_featured: false,
-    is_hot: false,
-    images: [],
-};
+
+// Hàm định nghĩa trạng thái tài khoản
+const STATUS_CONFIG: Record<string, {label: string; className: string}> = {
+    AVAILABLE: { label: "Đang bán", className: "bg-green-100 text-green-700 border border-green-200",},
+    PENDING: { label: "Đang chờ", className: "bg-yellow-100 text-yellow-700 border border-yellow-200",},
+    SOLD: { label: "Đã bán", className: "bg-red-100 text-red-700 border border-red-200",},
+}
 
 const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess, account, gameList }) => {
-    const [formData, setFormData] = useState<AccountCreateInput>({ ...INITIAL_FORM });
+    const [formData, setFormData] = useState<AccountCreateInput>({ ...INITIAL_ACCOUNT_FORM });
     const [isLoading, setIsLoading] = useState(false);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
@@ -82,6 +82,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
                 account_data: account.account_data || {},
                 is_featured: account.is_featured,
                 is_hot: account.is_hot,
+                views: account.views,
                 images: [],
             });
             // Populate JSONB entries from existing data
@@ -95,23 +96,25 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
                 (account.images || []).map((img) => ({
                     image_url: img.image_url,
                     sort_order: img.sort_order,
-                }))
+                })),
             );
         } else {
-            setFormData({ ...INITIAL_FORM });
+            setFormData({ ...INITIAL_ACCOUNT_FORM });
             setJsonEntries([]);
             setGalleryUrls([]);
         }
     }, [account, isOpen]);
 
-    const handleInputChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-    ) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target as any;
         const checked = (e.target as HTMLInputElement).checked;
 
         if (fieldErrors[name]) {
-            setFieldErrors((prev) => { const next = { ...prev }; delete next[name]; return next; });
+            setFieldErrors((prev) => {
+                const next = { ...prev };
+                delete next[name];
+                return next;
+            });
         }
 
         setFormData((prev) => {
@@ -122,7 +125,11 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
             if (name === "title") {
                 nextState.slug = convertToSlug(value);
                 if (fieldErrors.slug) {
-                    setFieldErrors((prev) => { const next = { ...prev }; delete next.slug; return next; });
+                    setFieldErrors((prev) => {
+                        const next = { ...prev };
+                        delete next.slug;
+                        return next;
+                    });
                 }
             }
             return nextState;
@@ -130,15 +137,16 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
     };
 
     // --- File Upload ---
-    const handleFileUpload = async (
-        e: React.ChangeEvent<HTMLInputElement>,
-        fieldName: "thumbnail"
-    ) => {
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldName: "thumbnail") => {
         const file = e.target.files?.[0];
         if (!file) return;
         setIsLoading(true);
         if (fieldErrors[fieldName]) {
-            setFieldErrors((prev) => { const next = { ...prev }; delete next[fieldName]; return next; });
+            setFieldErrors((prev) => {
+                const next = { ...prev };
+                delete next[fieldName];
+                return next;
+            });
         }
         try {
             const inputFormData = new FormData();
@@ -174,10 +182,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
                 headers: { "Content-Type": "multipart/form-data" },
             });
             const fileUrl = response.data?.url;
-            setGalleryUrls((prev) => [
-                ...prev,
-                { image_url: fileUrl, sort_order: prev.length },
-            ]);
+            setGalleryUrls((prev) => [...prev, { image_url: fileUrl, sort_order: prev.length }]);
             toast.success("Thêm ảnh gallery thành công!");
         } catch (error: any) {
             toast.error("Không thể upload ảnh gallery.");
@@ -198,9 +203,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
     };
 
     const handleJsonEntryChange = (index: number, field: "key" | "value", val: string) => {
-        setJsonEntries((prev) =>
-            prev.map((entry, i) => (i === index ? { ...entry, [field]: val } : entry))
-        );
+        setJsonEntries((prev) => prev.map((entry, i) => (i === index ? { ...entry, [field]: val } : entry)));
     };
 
     const handleRemoveJsonEntry = (index: number) => {
@@ -275,29 +278,35 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
     };
 
     if (!isOpen) return null;
-
+  
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
-            <div className="bg-white rounded-md shadow-2xl w-full max-w-4xl max-h-[92vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200 border border-border-color">
+            <div className="bg-white rounded-md shadow-2xl w-full max-w-[1200px] max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200 border border-border-color">
                 {/* Header */}
-                <div className="px-6 py-4 border-b border-border-color flex items-center justify-between">
+                <div className="px-6 py-4 border-b border-border-color flex items-center justify-between bg-white z-10">
                     <h3 className="text-lg font-bold text-text-main">
                         {account ? "Chỉnh sửa Tài khoản" : "Thêm Tài khoản mới"}
                     </h3>
-                    <Button variant="ghost" size="icon" onClick={onClose} className="h-9 w-9 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={onClose}
+                        className="h-9 w-9 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer"
+                    >
                         <X size={20} />
                     </Button>
                 </div>
 
-                {/* Form Body */}
-                <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
-
-                    {/* === Section 1: Thông tin cơ bản === */}
-                    <div>
-                        <h4 className="font-bold text-text-main mb-3 pb-2 border-b border-border-color text-sm uppercase tracking-wide">
-                            Thông tin cơ bản
-                        </h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Split Layout Container */}
+                <div className="flex flex-col md:flex-row flex-1 overflow-hidden bg-bg-secondary/10">
+                    {/* Cột trái: Form Nhập Liệu */}
+                    <form
+                        id="account-form"
+                        onSubmit={handleSubmit}
+                        className="flex-1 overflow-y-auto p-4 space-y-5 border-r border-border-color bg-white"
+                    >
+                        {/* Hàng 1: Game, Mã tài khoản */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             {/* Game */}
                             <div className="space-y-1.5">
                                 <Label className="font-bold text-text-main">
@@ -309,15 +318,20 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
                                     onChange={handleInputChange as any}
                                     className={cn(
                                         "block w-full px-4 py-2.5 bg-bg-secondary border border-border-color rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary transition-all text-text-main",
-                                        fieldErrors.game && "border-error focus:ring-error focus:border-error"
+                                        fieldErrors.game &&
+                                            "border-error focus:outline-none focus:ring-1 focus:ring-error focus:border-error",
                                     )}
                                 >
                                     <option value={0}>-- Chọn game --</option>
                                     {gameList.map((g) => (
-                                        <option key={g.id} value={g.id}>{g.name}</option>
+                                        <option key={g.id} value={g.id}>
+                                            {g.name}
+                                        </option>
                                     ))}
                                 </select>
-                                {fieldErrors.game && <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.game}</p>}
+                                {fieldErrors.game && (
+                                    <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.game}</p>
+                                )}
                             </div>
 
                             {/* Mã tài khoản */}
@@ -329,10 +343,12 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
                                     name="account_code"
                                     value={formData.account_code}
                                     onChange={handleInputChange}
-                                    placeholder="VD: LQ-001"
+                                    placeholder="Ví dụ: ACC12345"
                                     className={cn(fieldErrors.account_code && "border-error focus-visible:ring-error")}
                                 />
-                                {fieldErrors.account_code && <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.account_code}</p>}
+                                {fieldErrors.account_code && (
+                                    <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.account_code}</p>
+                                )}
                             </div>
 
                             {/* Tiêu đề */}
@@ -344,190 +360,299 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
                                     name="title"
                                     value={formData.title}
                                     onChange={handleInputChange}
-                                    placeholder="VD: Acc Liên Quân VIP 120 Skin"
+                                    placeholder="Ví dụ: Tài khoản siêu VIP rank Thách Đấu..."
                                     className={cn(fieldErrors.title && "border-error focus-visible:ring-error")}
                                 />
-                                {fieldErrors.title && <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.title}</p>}
+                                {fieldErrors.title && (
+                                    <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.title}</p>
+                                )}
                             </div>
 
                             {/* Slug */}
                             <div className="space-y-1.5">
                                 <Label className="font-bold text-text-main">
-                                    Slug <span className="text-error">*</span>
+                                    Slug (Đường dẫn) <span className="text-error">*</span>
                                 </Label>
                                 <Input
                                     name="slug"
                                     value={formData.slug}
                                     onChange={handleInputChange}
-                                    placeholder="acc-lien-quan-vip-120-skin"
+                                    placeholder="Ví dụ: tai-khoan-sieu-vip-rank-thach-dau"
                                     className={cn(fieldErrors.slug && "border-error focus-visible:ring-error")}
                                 />
-                                {fieldErrors.slug && <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.slug}</p>}
+                                {fieldErrors.slug && (
+                                    <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.slug}</p>
+                                )}
                             </div>
                         </div>
-                    </div>
 
-                    {/* === Section 2: Giá & Khuyến mại === */}
-                    <div>
-                        <h4 className="font-bold text-text-main mb-3 pb-2 border-b border-border-color text-sm uppercase tracking-wide">
-                            Giá & Khuyến mại
-                        </h4>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Hàng 2: Giá & Khuyến mại */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                             <div className="space-y-1.5">
                                 <Label className="font-bold text-text-main">
                                     Giá bán (VNĐ) <span className="text-error">*</span>
                                 </Label>
                                 <Input
+                                    required
                                     type="number"
                                     name="price"
                                     value={formData.price}
                                     onChange={handleInputChange}
-                                    placeholder="500000"
                                     className={cn(fieldErrors.price && "border-error focus-visible:ring-error")}
                                 />
-                                {fieldErrors.price && <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.price}</p>}
+                                {fieldErrors.price && (
+                                    <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.price}</p>
+                                )}
                             </div>
                             <div className="space-y-1.5">
-                                <Label className="font-bold text-text-main">Giá gốc (VNĐ)</Label>
+                                <Label className="font-bold text-text-main">
+                                    Giá gốc (VNĐ) <span className="text-error">*</span>
+                                </Label>
                                 <Input
+                                    required
                                     type="number"
                                     name="original_price"
-                                    value={formData.original_price || ""}
+                                    value={formData.original_price}
                                     onChange={handleInputChange}
-                                    placeholder="700000"
+                                    className={cn(
+                                        fieldErrors.original_price && "border-error focus-visible:ring-error",
+                                    )}
                                 />
+                                {fieldErrors.original_price && (
+                                    <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.original_price}</p>
+                                )}
                             </div>
                             <div className="space-y-1.5">
                                 <Label className="font-bold text-text-main">Giảm giá (%)</Label>
                                 <Input
                                     type="number"
                                     name="discount_percent"
-                                    value={formData.discount_percent || ""}
+                                    value={formData.discount_percent}
                                     onChange={handleInputChange}
-                                    placeholder="30"
+                                    className={cn(
+                                        fieldErrors.discount_percent && "border-error focus-visible:ring-error",
+                                    )}
                                     min={0}
                                     max={100}
                                 />
+                                {fieldErrors.discount_percent && (
+                                    <p className="text-[12px] text-error mt-0.5 italic">
+                                        {fieldErrors.discount_percent}
+                                    </p>
+                                )}
                             </div>
                         </div>
-                    </div>
 
-                    {/* === Section 3: Phân loại === */}
-                    <div>
-                        <h4 className="font-bold text-text-main mb-3 pb-2 border-b border-border-color text-sm uppercase tracking-wide">
-                            Phân loại
-                        </h4>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Hàng 3: Phân loại */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-center">
                             <div className="space-y-1.5">
                                 <Label className="font-bold text-text-main">Trạng thái</Label>
                                 <select
                                     name="status"
                                     value={formData.status}
                                     onChange={handleInputChange as any}
-                                    className="block w-full px-4 py-2.5 bg-bg-secondary border border-border-color rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary transition-all text-text-main"
+                                    className={cn(
+                                        "block w-full px-4 py-2.5 bg-bg-secondary border border-border-color rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary transition-all text-text-main",
+                                        fieldErrors.status &&
+                                            "border-error focus:outline-none focus:ring-1 focus:ring-error focus:border-error",
+                                    )}
                                 >
                                     <option value="AVAILABLE">Đang bán</option>
-                                    <option value="RESERVED">Đang giữ</option>
+                                    <option value="PENDING">Đang chờ</option>
                                     <option value="SOLD">Đã bán</option>
-                                    <option value="LOCKED">Đã khóa</option>
-                                    <option value="HIDDEN">Tạm ẩn</option>
                                 </select>
+                                {fieldErrors.status && (
+                                    <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.status}</p>
+                                )}
                             </div>
-                            <div className="space-y-1.5">
-                                <Label className="font-bold text-text-main">Loại đăng nhập</Label>
-                                <Input
-                                    name="login_type"
-                                    value={formData.login_type || ""}
-                                    onChange={handleInputChange}
-                                    placeholder="VD: Facebook, Google, Garena"
-                                />
-                            </div>
-                            <div className="space-y-1.5">
-                                <Label className="font-bold text-text-main">Loại tài khoản</Label>
-                                <Input
-                                    name="account_type"
-                                    value={formData.account_type || ""}
-                                    onChange={handleInputChange}
-                                    placeholder="VD: Tài khoản chính chủ"
-                                />
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-6 mt-3">
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <input
                                     type="checkbox"
                                     name="is_hot"
                                     checked={formData.is_hot}
-                                    onChange={handleInputChange}
+                                    onChange={handleInputChange as any}
                                     className="w-4 h-4 text-primary rounded border-border-color focus:ring-primary/20 cursor-pointer"
                                 />
-                                <span className="text-sm font-bold text-text-main select-none">HOT</span>
+                                <span className="text-sm font-bold text-text-main select-none">Tài khoản HOT</span>
                             </label>
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <input
                                     type="checkbox"
                                     name="is_featured"
                                     checked={formData.is_featured}
-                                    onChange={handleInputChange}
+                                    onChange={handleInputChange as any}
                                     className="w-4 h-4 text-primary rounded border-border-color focus:ring-primary/20 cursor-pointer"
                                 />
-                                <span className="text-sm font-bold text-text-main select-none">Nổi bật</span>
+                                <span className="text-sm font-bold text-text-main select-none">Tài khoản Nổi bật</span>
                             </label>
                         </div>
-                    </div>
 
-                    {/* === Section 4: Mô tả === */}
-                    <div>
-                        <h4 className="font-bold text-text-main mb-3 pb-2 border-b border-border-color text-sm uppercase tracking-wide">
-                            Mô tả
-                        </h4>
-                        <div className="space-y-4">
-                            <div className="space-y-1.5">
-                                <Label className="font-bold text-text-main">Mô tả ngắn</Label>
-                                <textarea
-                                    name="short_description"
-                                    value={formData.short_description || ""}
-                                    onChange={handleInputChange}
-                                    rows={2}
-                                    className="block w-full px-4 py-2.5 bg-bg-secondary border border-border-color rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary transition-all resize-none text-text-main placeholder:text-text-secondary"
-                                    placeholder="Mô tả ngắn gọn về tài khoản..."
+                        {/* Hàng 4: Hình ảnh Media */}
+                        {/* Upload Thumbnail */}
+                        <div className="space-y-1.5">
+                            <Label className="font-bold text-text-main flex items-center gap-2">
+                                <ImageIcon size={16} className="text-text-secondary" />
+                                Ảnh đại diện (Thumbnail)
+                            </Label>
+                            <div
+                                className={cn(
+                                    "border-2 border-dashed border-border-color bg-white rounded-lg flex flex-col items-center justify-center text-center hover:bg-bg-secondary/50 transition-colors relative group min-h-[160px] overflow-hidden",
+                                    fieldErrors.thumbnail && "border-error bg-error/5",
+                                )}
+                            >
+                                {formData.thumbnail ? (
+                                    <>
+                                        <img
+                                            src={formData.thumbnail}
+                                            alt="Thumbnail preview"
+                                            className="w-full h-full object-cover absolute inset-0"
+                                        />
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 pointer-events-none">
+                                            <span className="text-white font-medium text-sm flex items-center gap-2">
+                                                <RefreshCw size={16} /> Đổi ảnh khác
+                                            </span>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                handleRemoveImage("thumbnail");
+                                            }}
+                                            className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-error flex items-center justify-center z-20"
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    </>
+                                ) : (
+                                    <div className="pointer-events-none p-6">
+                                        <UploadCloud size={32} className="text-text-secondary mb-2 mx-auto" />
+                                        <p className="text-sm font-bold text-text-main mb-1">
+                                            Kéo thả hoặc click vào đây
+                                        </p>
+                                        <p className="text-xs text-text-secondary">Hỗ trợ JPG, PNG, WEBP</p>
+                                    </div>
+                                )}
+                                <input
+                                    type="file"
+                                    id="file-thumbnail-account"
+                                    accept="image/*"
+                                    onChange={(e) => handleFileUpload(e, "thumbnail")}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-0"
+                                    title=""
                                 />
                             </div>
-                            <div className="space-y-1.5">
-                                <Label className="font-bold text-text-main">Mô tả chi tiết</Label>
-                                <textarea
-                                    name="description"
-                                    value={formData.description || ""}
-                                    onChange={handleInputChange}
-                                    rows={4}
-                                    className="block w-full px-4 py-2.5 bg-bg-secondary border border-border-color rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary transition-all resize-none text-text-main placeholder:text-text-secondary"
-                                    placeholder="Mô tả chi tiết, thông tin đăng nhập, ghi chú..."
-                                />
-                            </div>
+                            {fieldErrors.thumbnail && (
+                                <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.thumbnail}</p>
+                            )}
                         </div>
-                    </div>
 
-                    {/* === Section 5: Dữ liệu Game (Dynamic JSONB) === */}
-                    <div>
-                        <h4 className="font-bold text-text-main mb-3 pb-2 border-b border-border-color text-sm uppercase tracking-wide">
-                            Thuộc tính Game (Dữ liệu động)
-                        </h4>
-                        <p className="text-xs text-text-secondary mb-3">
-                            Thêm các thuộc tính riêng cho game (VD: Rank, Skin, Server...). Dữ liệu sẽ được lưu dưới dạng JSON.
-                        </p>
-                        <div className="space-y-2">
+                        {/* Upload Gallery */}
+                        <div className="space-y-1.5">
+                            <Label className="font-bold text-text-main flex items-center gap-2">
+                                <Gamepad2 size={16} className="text-text-secondary" />
+                                Bộ sưu tập ảnh ({galleryUrls.length})
+                            </Label>
+                            <div className="border-2 border-dashed border-border-color bg-white rounded-lg hover:bg-bg-secondary/50 transition-colors relative group min-h-[100px] flex flex-col items-center justify-center p-4">
+                                <div className="pointer-events-none flex items-center gap-3">
+                                    <div className="bg-white p-2 rounded-full shadow-sm border border-border-color">
+                                        <Plus size={20} className="text-primary" />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="text-sm font-bold text-text-main">Thêm ảnh Gallery</p>
+                                        <p className="text-xs text-text-secondary">Upload nhiều ảnh cùng lúc</p>
+                                    </div>
+                                </div>
+                                <input
+                                    type="file"
+                                    id="file-gallery-account"
+                                    accept="image/*"
+                                    onChange={handleGalleryUpload}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-0"
+                                    title=""
+                                    multiple
+                                />
+                            </div>
+
+                            {/* Danh sách ảnh đã upload */}
+                            {galleryUrls.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                    {galleryUrls.map((img, index) => (
+                                        <div key={index} className="relative group w-[70px] h-[70px]">
+                                            <img
+                                                src={img.image_url}
+                                                alt={`Gallery ${index + 1}`}
+                                                className="w-full h-full object-cover rounded-md border border-border-color"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveGallery(index)}
+                                                className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-error flex items-center justify-center"
+                                            >
+                                                <X size={12} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Hàng 4: Mô tả */}
+                        <div className="space-y-1.5">
+                            <Label className="font-bold text-text-main">Mô tả ngắn</Label>
+                            <textarea
+                                name="short_description"
+                                value={formData.short_description || ""}
+                                onChange={handleInputChange as any}
+                                rows={2}
+                                className={cn(
+                                    "block w-full px-4 py-2.5 bg-bg-secondary border border-border-color rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary transition-all resize-none text-text-main placeholder:text-text-secondary",
+                                    fieldErrors.short_description &&
+                                        "border-error focus:outline-none focus:ring-1 focus:ring-error focus:border-error",
+                                )}
+                                placeholder="Mô tả ngắn gọn về tài khoản..."
+                            />
+                            {fieldErrors.short_description && (
+                                <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.short_description}</p>
+                            )}
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <Label className="font-bold text-text-main">Mô tả chi tiết</Label>
+                            <textarea
+                                name="description"
+                                value={formData.description || ""}
+                                onChange={handleInputChange as any}
+                                rows={4}
+                                className={cn(
+                                    "block w-full px-4 py-2.5 bg-bg-secondary border border-border-color rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary transition-all resize-none text-text-main placeholder:text-text-secondary",
+                                    fieldErrors.description &&
+                                        "border-error focus:outline-none focus:ring-1 focus:ring-error focus:border-error",
+                                )}
+                                placeholder="Mô tả chi tiết, thông tin đăng nhập, ghi chú..."
+                            />
+                            {fieldErrors.description && (
+                                <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.description}</p>
+                            )}
+                        </div>
+
+                        {/* Hàng 5: Thuộc tính Game (Dữ liệu động) */}
+                        <div className="space-y-1.5 mt-4 border-t border-border-color pt-4">
+                            <p className="text-xs text-text-secondary mb-3">
+                                Thêm các thuộc tính riêng cho game (VD: Rank, Skin, Server...). Dữ liệu sẽ được lưu dưới
+                                dạng JSON.
+                            </p>
                             {jsonEntries.map((entry, index) => (
-                                <div key={index} className="flex items-center gap-2">
+                                <div key={index} className="flex gap-2 items-start mb-2">
                                     <Input
+                                        placeholder="Tên thuộc tính (VD: rank)"
                                         value={entry.key}
                                         onChange={(e) => handleJsonEntryChange(index, "key", e.target.value)}
-                                        placeholder="Tên thuộc tính (VD: rank)"
-                                        className="flex-1"
+                                        className="w-1/3"
                                     />
                                     <Input
+                                        placeholder="Giá trị (VD: Kim cương)"
                                         value={entry.value}
                                         onChange={(e) => handleJsonEntryChange(index, "value", e.target.value)}
-                                        placeholder="Giá trị (VD: Cao Thủ)"
                                         className="flex-1"
                                     />
                                     <Button
@@ -535,7 +660,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
                                         variant="ghost"
                                         size="icon"
                                         onClick={() => handleRemoveJsonEntry(index)}
-                                        className="h-9 w-9 text-text-secondary hover:text-error hover:bg-error/10 cursor-pointer shrink-0"
+                                        className="text-error hover:text-error hover:bg-error/10 shrink-0 h-9 w-9"
                                     >
                                         <Trash2 size={16} />
                                     </Button>
@@ -546,121 +671,180 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
                                 variant="outline"
                                 size="sm"
                                 onClick={handleAddJsonEntry}
-                                className="text-xs gap-1.5"
+                                className="text-xs gap-1.5 font-bold"
                             >
                                 <Plus size={14} />
                                 Thêm thuộc tính
                             </Button>
                         </div>
-                    </div>
+                    </form>
 
-                    {/* === Section 6: Ảnh === */}
-                    <div>
-                        <h4 className="font-bold text-text-main mb-3 pb-2 border-b border-border-color text-sm uppercase tracking-wide">
-                            Ảnh tài khoản
-                        </h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Thumbnail chính */}
-                            <div className="space-y-1.5">
-                                <Label className="font-bold text-text-main">Ảnh đại diện (Thumbnail)</Label>
-                                <div className="flex flex-col gap-2">
-                                    {formData.thumbnail && (
-                                        <div className="relative group w-full h-32">
-                                            <img
-                                                src={formData.thumbnail}
-                                                alt="Thumbnail preview"
-                                                className="w-full h-full object-cover rounded-md border border-border-color"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => handleRemoveImage("thumbnail")}
-                                                className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70 flex items-center justify-center"
-                                            >
-                                                <X size={12} />
-                                            </button>
-                                        </div>
-                                    )}
-                                    <div className="relative flex items-center gap-2">
-                                        <input
-                                            type="file"
-                                            id="file-thumbnail-account"
-                                            accept="image/*"
-                                            onChange={(e) => handleFileUpload(e, "thumbnail")}
-                                            className="hidden"
+                    {/* Cột phải: Hình ảnh & Xem trước */}
+                    <div className="w-full md:w-[380px] lg:w-[420px] p-4 overflow-y-auto flex flex-col gap-6">
+                        {/* Live Preview Card */}
+                        <div className="flex-1 flex flex-col gap-3">
+                            {/* 1. Thẻ hiển thị chính */}
+                            <div className="bg-white border border-border-color rounded-lg overflow-hidden flex flex-col shadow-sm mx-auto p-4  w-full">
+                                <h4 className="font-bold text-sm text-text-main mb-3">Xem trước thẻ tài khoản</h4>
+                                <div className="h-40 bg-bg-secondary relative flex items-center justify-center border-b border-border-color">
+                                    {formData.thumbnail ? (
+                                        <img
+                                            src={formData.thumbnail}
+                                            alt="Preview"
+                                            className="w-full h-full object-cover"
                                         />
-                                        <label
-                                            htmlFor="file-thumbnail-account"
-                                            className={cn(
-                                                "inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 cursor-pointer transition-colors",
-                                                fieldErrors.thumbnail && "border-error text-error"
-                                            )}
-                                        >
-                                            Chọn ảnh
-                                        </label>
-                                        <span className="text-xs text-text-secondary">
-                                            {formData.thumbnail ? "Đã tải ảnh lên" : "Chưa có file"}
+                                    ) : (
+                                        <ImageIcon size={32} className="text-text-secondary/30" />
+                                    )}
+                                    {formData.is_hot && (
+                                        <span className="absolute top-2 left-2 bg-error text-white text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider shadow-sm">
+                                            Hot
                                         </span>
+                                    )}
+                                </div>
+                                <div className="p-3 flex flex-col justify-between">
+                                    <div>
+                                        <div className="text-[12px] text-text-secondary uppercase mb-1 font-medium flex items-center justify-between">
+                                            <span>Mã: {formData.account_code || ""}</span>
+                                            {formData.is_featured && <span className="text-primary">VIP</span>}
+                                        </div>
+                                        <h5 className="font-bold text-text-main text-sm line-clamp-2 leading-tight h-10">
+                                            {formData.title || "Tên tài khoản sẽ hiển thị tại đây..."}
+                                        </h5>
                                     </div>
-                                    {fieldErrors.thumbnail && <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.thumbnail}</p>}
+                                    <div></div>
+                                    <div className="mt-3 pt-3 border-t border-border-color border-dashed flex items-end justify-between">
+                                        <div>
+                                            <div className="items-center gap-1 flex">
+                                                <div>
+                                                    {(formData.discount_percent || 0) > 0 && (
+                                                        <div className="text-text-secondary text-sm line-through font-medium">
+                                                            {formData.original_price
+                                                                ? formData.original_price.toLocaleString() + "đ"
+                                                                : ""}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <span className="px-2 text-xs font-bold text-white shadow-sm bg-error">
+                                                    {formData.discount_percent}%
+                                                </span>
+                                            </div>
+                                            <div className="text-error font-bold text-base leading-none mt-1">
+                                                {formData.price ? formData.price.toLocaleString() + "đ" : "0đ"}
+                                            </div>
+                                        </div>
+                                        <div className="text-text-secondary text-sm px-3 py-1.5 font-medium">
+                                            {formData.views ? formData.views + " lượt xem" : "0 lượt xem"}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Gallery */}
-                            <div className="space-y-1.5">
-                                <Label className="font-bold text-text-main">Ảnh Gallery ({galleryUrls.length} ảnh)</Label>
-                                <div className="flex flex-wrap gap-2">
-                                    {galleryUrls.map((img, index) => (
-                                        <div key={index} className="relative group w-20 h-20">
-                                            <img
-                                                src={img.image_url}
-                                                alt={`Gallery ${index + 1}`}
-                                                className="w-full h-full object-cover rounded-md border border-border-color"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => handleRemoveGallery(index)}
-                                                className="absolute top-0.5 right-0.5 bg-black/50 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70 flex items-center justify-center"
+                            {/* 2. Thông tin tóm tắt (Khối bạn cần thêm) */}
+                            <div className="bg-white border border-border-color rounded-lg p-4 shadow-sm">
+                                <h4 className="font-bold text-sm text-text-main mb-3">Thông tin tóm tắt</h4>
+                                <div className="text-xs space-y-2.5">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-text-secondary font-medium">Game</span>
+                                        <span className="font-medium text-text-main">
+                                            {gameList.find((g) => g.id === Number(formData.game))?.name ||
+                                                "Liên Quân Mobile"}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-text-secondary font-medium">Mã tài khoản</span>
+                                        <span className="font-medium text-text-main">
+                                            {formData.account_code || "---"}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-text-secondary font-medium">Giá bán</span>
+                                        <span className="font-bold text-text-main">
+                                            {formData.price ? formData.price.toLocaleString() + "đ" : "0đ"}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-text-secondary font-medium">Giá gốc</span>
+                                        <span className="font-medium text-text-main">
+                                            {formData.original_price
+                                                ? formData.original_price.toLocaleString() + "đ"
+                                                : "0đ"}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-text-secondary font-medium">Giảm giá</span>
+                                        <span className="font-medium text-text-main">{formData.discount_percent}%</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-text-secondary font-medium">Trạng thái</span>
+                                        <span
+                                            className={cn(
+                                                "font-bold px-2 py-0.5 text-[10px] rounded",
+                                                STATUS_CONFIG[formData.status || "AVAILABLE"]?.className || "bg-gray-100 text-gray-700 border-gray-200",
+                                            )}
+                                        >
+                                            {STATUS_CONFIG[formData.status || "AVAILABLE"]?.label || formData.status}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-text-secondary font-medium">Tài khoản hot</span>
+                                        <span className="font-medium text-text-main flex items-center gap-0.5">
+                                            {formData.is_hot ? "Có 🔥" : "Không"}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-text-secondary font-medium">Tài khoản nổi bật</span>
+                                        <span className="font-medium text-text-main">
+                                            {formData.is_featured ? "Có" : "Không"}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 3. Ảnh gallery */}
+                            <div className="bg-white border border-border-color rounded-lg p-4 shadow-sm">
+                                <h4 className="font-bold text-sm text-text-main mb-3">
+                                    Ảnh gallery ({galleryUrls.length})
+                                </h4>
+                                {galleryUrls.length > 0 ? (
+                                    <div className="grid grid-cols-5 gap-1.5">
+                                        {galleryUrls.slice(0, 5).map((img, idx) => (
+                                            <div
+                                                key={idx}
+                                                className="relative aspect-square rounded-md overflow-hidden border border-border-color"
                                             >
-                                                <X size={10} />
-                                            </button>
-                                            <span className="absolute bottom-0.5 left-0.5 bg-black/50 text-white text-[10px] px-1 rounded">
-                                                {index + 1}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                                <div className="relative flex items-center gap-2 mt-2">
-                                    <input
-                                        type="file"
-                                        id="file-gallery-account"
-                                        accept="image/*"
-                                        onChange={handleGalleryUpload}
-                                        className="hidden"
-                                    />
-                                    <label
-                                        htmlFor="file-gallery-account"
-                                        className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 cursor-pointer transition-colors"
-                                    >
-                                        <Plus size={14} className="mr-1.5" />
-                                        Thêm ảnh
-                                    </label>
-                                </div>
+                                                <img
+                                                    src={img.image_url}
+                                                    alt="Gallery item"
+                                                    className="w-full h-full object-cover"
+                                                />
+                                                {idx === 4 && galleryUrls.length > 5 && (
+                                                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-xs font-bold">
+                                                        +{galleryUrls.length - 5}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-xs italic text-text-secondary">Chưa có ảnh trong bộ sưu tập</p>
+                                )}
                             </div>
                         </div>
                     </div>
-                </form>
+                </div>
 
                 {/* Footer Buttons */}
-                <div className="px-6 py-4 border-t border-border-color flex items-center justify-end gap-3 bg-bg-secondary/50">
+                <div className="px-6 py-4 border-t border-border-color flex items-center justify-end gap-3 bg-white z-10">
                     <Button type="button" variant="outline" onClick={onClose} className="font-bold px-5">
                         Hủy bỏ
                     </Button>
-                    <Button onClick={handleSubmit} disabled={isLoading} className="font-bold px-8">
+                    <Button type="submit" form="account-form" disabled={isLoading} className="font-bold px-8">
                         {isLoading ? (
                             <Loader2 className="animate-spin" size={18} />
                         ) : (
                             <>
-                                <Save size={18} />
+                                <Save size={18} className="mr-2" />
                                 {account ? "Lưu thay đổi" : "Tạo tài khoản"}
                             </>
                         )}

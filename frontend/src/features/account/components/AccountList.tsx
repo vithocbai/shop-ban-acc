@@ -359,13 +359,15 @@ const AccountList: React.FC = () => {
                     pageSizeOptions={[10, 20, 50]}
                 />
 
-                <AccountModal
-                    isOpen={isModalOpen}
-                    onClose={handleModalClose}
-                    onSuccess={fetchAccounts}
-                    account={selectedAccount}
-                    gameList={gameList}
-                />
+                {isModalOpen && (
+                    <AccountModal
+                        isOpen={isModalOpen}
+                        onClose={handleModalClose}
+                        onSuccess={fetchAccounts}
+                        account={selectedAccount}
+                        gameList={gameList}
+                    />
+                )}
             </Card>
         </div>
     );

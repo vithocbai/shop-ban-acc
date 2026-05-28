@@ -9,9 +9,8 @@ import {
     Image as ImageIcon,
     Gamepad2,
     RefreshCw,
-    Eye,
 } from "lucide-react";
-import type { Account, AccountCreateInput } from "../types";
+import type { Account, AccountCreateInput, AccountStatus } from "../types";
 import { INITIAL_ACCOUNT_FORM } from "../types";
 import type { Game } from "../../game/types";
 import { accountService } from "../services/account.service";
@@ -21,6 +20,13 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { toast } from "react-toastify";
 import api from "@/services/api";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 interface AccountModalProps {
     isOpen: boolean;
@@ -52,28 +58,10 @@ const STATUS_CONFIG: Record<string, {label: string; className: string}> = {
 }
 
 const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess, account, gameList }) => {
-    const [formData, setFormData] = useState<AccountCreateInput>({ ...INITIAL_ACCOUNT_FORM });
-    const [isLoading, setIsLoading] = useState(false);
-    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-
-    // JSONB key-value editor state (hỗ trợ schema động)
-    const [jsonEntries, setJsonEntries] = useState<{
-        key: string;
-        value: string;
-        label?: string;
-        isSchema?: boolean;
-        type?: "text" | "number" | "select";
-        options?: string[];
-    }[]>([]);
-
-    // Gallery state
-    const [galleryUrls, setGalleryUrls] = useState<{ image_url: string; sort_order: number }[]>([]);
-
-    useEffect(() => {
-        setFieldErrors({});
+    const [formData, setFormData] = useState<AccountCreateInput>(() => {
         if (account) {
-            setFormData({
-                game: account.game,
+            return {
+                game: account.game && typeof account.game === 'object' ? (account.game as any).id : (account.game || 0),
                 title: account.title,
                 slug: account.slug,
                 account_code: account.account_code,
@@ -94,21 +82,37 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
                     image_url: img.image_url,
                     sort_order: img.sort_order,
                 })),
-            });
-            // (Khởi tạo jsonEntries sẽ được xử lý ở useEffect bên dưới dựa vào formData.game)
-            // Populate gallery
-            setGalleryUrls(
-                (account.images || []).map((img) => ({
-                    image_url: img.image_url,
-                    sort_order: img.sort_order,
-                })),
-            );
-        } else {
-            setFormData({ ...INITIAL_ACCOUNT_FORM });
-            setJsonEntries([]); // Reset temporarily, useEffect bên dưới sẽ vẽ lại theo schema
-            setGalleryUrls([]);
+            };
         }
-    }, [account, isOpen]);
+        return { ...INITIAL_ACCOUNT_FORM };
+    });
+    
+    const [isLoading, setIsLoading] = useState(false);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+    // JSONB key-value editor state (hỗ trợ schema động)
+    const [jsonEntries, setJsonEntries] = useState<{
+        key: string;
+        value: string;
+        label?: string;
+        isSchema?: boolean;
+        type?: "text" | "number" | "select";
+        options?: string[];
+    }[]>([]);
+
+    // Gallery state
+    const [galleryUrls, setGalleryUrls] = useState<{ image_url: string; sort_order: number }[]>(() => {
+        if (account && account.images) {
+            return account.images.map((img) => ({
+                image_url: img.image_url,
+                sort_order: img.sort_order,
+            }));
+        }
+        return [];
+    });
+
+    // Bỏ useEffect đầu tiên vì đã khởi tạo state trực tiếp từ prop (lazy initialization).
+    // Modal luôn bị unmount khi đóng (if (!isOpen) return null;) nên state luôn được làm mới.
 
     // Lắng nghe thay đổi của game để generate form thuộc tính động
     useEffect(() => {
@@ -349,23 +353,36 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
                                 <Label className="font-bold text-text-main">
                                     Game <span className="text-error">*</span>
                                 </Label>
-                                <select
-                                    name="game"
-                                    value={formData.game}
-                                    onChange={handleInputChange as any}
-                                    className={cn(
-                                        "block w-full px-4 py-2.5 bg-bg-secondary border border-border-color rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary transition-all text-text-main",
-                                        fieldErrors.game &&
-                                            "border-error focus:outline-none focus:ring-1 focus:ring-error focus:border-error",
-                                    )}
+                                <Select
+                                    value={formData.game ? String(formData.game) : undefined}
+                                    onValueChange={(val) => {
+                                        if (fieldErrors.game) {
+                                            setFieldErrors((prev) => {
+                                                const next = { ...prev };
+                                                delete next.game;
+                                                return next;
+                                            });
+                                        }
+                                        setFormData((prev) => ({ ...prev, game: Number(val) }));
+                                    }}
                                 >
-                                    <option value={0}>-- Chọn game --</option>
-                                    {gameList.map((g) => (
-                                        <option key={g.id} value={g.id}>
-                                            {g.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                    <SelectTrigger
+                                        className={cn(
+                                            "w-full px-4 py-5 bg-bg-secondary border border-border-color rounded-md text-sm text-text-main",
+                                            fieldErrors.game &&
+                                                "border-error focus:ring-1 focus:ring-error focus:border-error"
+                                        )}
+                                    >
+                                        <SelectValue placeholder="-- Chọn game --" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {gameList.map((g) => (
+                                            <SelectItem key={g.id} value={String(g.id)}>
+                                                {g.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                                 {fieldErrors.game && (
                                     <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.game}</p>
                                 )}
@@ -484,20 +501,36 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-center">
                             <div className="space-y-1.5">
                                 <Label className="font-bold text-text-main">Trạng thái</Label>
-                                <select
-                                    name="status"
+                                <Select
                                     value={formData.status}
-                                    onChange={handleInputChange as any}
-                                    className={cn(
-                                        "block w-full px-4 py-2.5 bg-bg-secondary border border-border-color rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary transition-all text-text-main",
-                                        fieldErrors.status &&
-                                            "border-error focus:outline-none focus:ring-1 focus:ring-error focus:border-error",
-                                    )}
+                                    onValueChange={(val) => {
+                                        if (fieldErrors.status) {
+                                            setFieldErrors((prev) => {
+                                                const next = { ...prev };
+                                                delete next.status;
+                                                return next;
+                                            });
+                                        }
+                                        setFormData((prev) => ({ ...prev, status: val as AccountStatus }));
+                                    }}
                                 >
-                                    <option value="AVAILABLE">Đang bán</option>
-                                    <option value="PENDING">Đang chờ</option>
-                                    <option value="SOLD">Đã bán</option>
-                                </select>
+                                    <SelectTrigger
+                                        className={cn(
+                                            "w-full px-4 py-5 bg-bg-secondary border border-border-color rounded-md text-sm text-text-main",
+                                            fieldErrors.status &&
+                                                "border-error focus:ring-1 focus:ring-error focus:border-error"
+                                        )}
+                                    >
+                                        <SelectValue placeholder="Trạng thái" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="AVAILABLE">Đang bán</SelectItem>
+                                        <SelectItem value="RESERVED">Đang giữ chỗ</SelectItem>
+                                        <SelectItem value="SOLD">Đã bán</SelectItem>
+                                        <SelectItem value="LOCKED">Đang khóa</SelectItem>
+                                        <SelectItem value="HIDDEN">Tạm ẩn</SelectItem>
+                                    </SelectContent>
+                                </Select>
                                 {fieldErrors.status && (
                                     <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.status}</p>
                                 )}
@@ -697,16 +730,19 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
                                     </div>
                                     <div className="flex-1 flex gap-2">
                                         {entry.isSchema && entry.type === "select" && entry.options ? (
-                                            <select
+                                            <Select
                                                 value={entry.value}
-                                                onChange={(e) => handleJsonEntryChange(index, "value", e.target.value)}
-                                                className="block w-full px-4 py-2 bg-white border border-border-color rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary transition-all text-text-main"
+                                                onValueChange={(val) => handleJsonEntryChange(index, "value", val)}
                                             >
-                                                <option value="">Chọn {(entry.label || entry.key).toLowerCase()}</option>
-                                                {entry.options.map(opt => (
-                                                    <option key={opt} value={opt}>{opt}</option>
-                                                ))}
-                                            </select>
+                                                <SelectTrigger className="w-full bg-white border border-border-color text-text-main py-5">
+                                                    <SelectValue placeholder={`Chọn ${(entry.label || entry.key).toLowerCase()}`} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {entry.options.map(opt => (
+                                                        <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         ) : (
                                             <Input
                                                 type={entry.type === "number" ? "number" : "text"}

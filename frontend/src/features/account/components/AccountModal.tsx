@@ -56,8 +56,15 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
     const [isLoading, setIsLoading] = useState(false);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-    // JSONB key-value editor state
-    const [jsonEntries, setJsonEntries] = useState<{ key: string; value: string }[]>([]);
+    // JSONB key-value editor state (hỗ trợ schema động)
+    const [jsonEntries, setJsonEntries] = useState<{
+        key: string;
+        value: string;
+        label?: string;
+        isSchema?: boolean;
+        type?: "text" | "number" | "select";
+        options?: string[];
+    }[]>([]);
 
     // Gallery state
     const [galleryUrls, setGalleryUrls] = useState<{ image_url: string; sort_order: number }[]>([]);
@@ -71,8 +78,8 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
                 slug: account.slug,
                 account_code: account.account_code,
                 thumbnail: account.thumbnail || "",
-                price: account.price,
-                original_price: account.original_price || 0,
+                price: Number(account.price) || 0,
+                original_price: account.original_price ? Number(account.original_price) : 0,
                 discount_percent: account.discount_percent || 0,
                 status: account.status,
                 login_type: account.login_type || "",
@@ -83,14 +90,12 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
                 is_featured: account.is_featured,
                 is_hot: account.is_hot,
                 views: account.views,
-                images: [],
+                images: (account.images || []).map((img) => ({
+                    image_url: img.image_url,
+                    sort_order: img.sort_order,
+                })),
             });
-            // Populate JSONB entries from existing data
-            const entries = Object.entries(account.account_data || {}).map(([key, value]) => ({
-                key,
-                value: String(value),
-            }));
-            setJsonEntries(entries.length > 0 ? entries : []);
+            // (Khởi tạo jsonEntries sẽ được xử lý ở useEffect bên dưới dựa vào formData.game)
             // Populate gallery
             setGalleryUrls(
                 (account.images || []).map((img) => ({
@@ -100,10 +105,42 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
             );
         } else {
             setFormData({ ...INITIAL_ACCOUNT_FORM });
-            setJsonEntries([]);
+            setJsonEntries([]); // Reset temporarily, useEffect bên dưới sẽ vẽ lại theo schema
             setGalleryUrls([]);
         }
     }, [account, isOpen]);
+
+    // Lắng nghe thay đổi của game để generate form thuộc tính động
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const selectedGame = gameList.find((g) => g.id === Number(formData.game));
+        const schema = selectedGame?.attributes_schema || [];
+        
+        // Data hiện tại (từ account edit hoặc formData cũ)
+        const currentData = account?.account_data || {};
+
+        // Tạo danh sách entry từ schema
+        const schemaEntries = schema.map((attr) => ({
+            key: attr.key,
+            label: attr.label,
+            isSchema: true,
+            type: attr.type,
+            options: attr.options,
+            value: currentData[attr.key] !== undefined ? String(currentData[attr.key]) : "",
+        }));
+
+        // Giữ lại các entry custom không nằm trong schema
+        const customEntries = Object.entries(currentData)
+            .filter(([k]) => !schema.find((attr) => attr.key === k))
+            .map(([k, v]) => ({
+                key: k,
+                value: String(v),
+                isSchema: false,
+            }));
+
+        setJsonEntries([...schemaEntries, ...customEntries]);
+    }, [formData.game, isOpen, account, gameList]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target as any;
@@ -637,33 +674,61 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
 
                         {/* Hàng 5: Thuộc tính Game (Dữ liệu động) */}
                         <div className="space-y-1.5 mt-4 border-t border-border-color pt-4">
+                            <Label className="font-bold text-text-main text-base">Thuộc tính Game</Label>
                             <p className="text-xs text-text-secondary mb-3">
-                                Thêm các thuộc tính riêng cho game (VD: Rank, Skin, Server...). Dữ liệu sẽ được lưu dưới
-                                dạng JSON.
+                                Các thuộc tính đặc trưng theo Game đã chọn. Bạn có thể thêm thuộc tính tùy chỉnh nếu cần.
                             </p>
                             {jsonEntries.map((entry, index) => (
-                                <div key={index} className="flex gap-2 items-start mb-2">
-                                    <Input
-                                        placeholder="Tên thuộc tính (VD: rank)"
-                                        value={entry.key}
-                                        onChange={(e) => handleJsonEntryChange(index, "key", e.target.value)}
-                                        className="w-1/3"
-                                    />
-                                    <Input
-                                        placeholder="Giá trị (VD: Kim cương)"
-                                        value={entry.value}
-                                        onChange={(e) => handleJsonEntryChange(index, "value", e.target.value)}
-                                        className="flex-1"
-                                    />
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => handleRemoveJsonEntry(index)}
-                                        className="text-error hover:text-error hover:bg-error/10 shrink-0 h-9 w-9"
-                                    >
-                                        <Trash2 size={16} />
-                                    </Button>
+                                <div key={index} className="flex gap-2 items-start mb-3 bg-bg-secondary p-3 rounded-md border border-border-color/50">
+                                    <div className="w-1/3">
+                                        {entry.isSchema ? (
+                                            <div>
+                                                <Label className="font-semibold text-sm mb-1 block">
+                                                    {entry.label || entry.key} <span className="text-xs text-text-secondary font-normal">({entry.key})</span>
+                                                </Label>
+                                            </div>
+                                        ) : (
+                                            <Input
+                                                placeholder="Tên thuộc tính (VD: rank)"
+                                                value={entry.key}
+                                                onChange={(e) => handleJsonEntryChange(index, "key", e.target.value)}
+                                            />
+                                        )}
+                                    </div>
+                                    <div className="flex-1 flex gap-2">
+                                        {entry.isSchema && entry.type === "select" && entry.options ? (
+                                            <select
+                                                value={entry.value}
+                                                onChange={(e) => handleJsonEntryChange(index, "value", e.target.value)}
+                                                className="block w-full px-4 py-2 bg-white border border-border-color rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary transition-all text-text-main"
+                                            >
+                                                <option value="">Chọn {(entry.label || entry.key).toLowerCase()}</option>
+                                                {entry.options.map(opt => (
+                                                    <option key={opt} value={opt}>{opt}</option>
+                                                ))}
+                                            </select>
+                                        ) : (
+                                            <Input
+                                                type={entry.type === "number" ? "number" : "text"}
+                                                placeholder={entry.isSchema ? `Nhập ${(entry.label || entry.key).toLowerCase()}...` : "Giá trị"}
+                                                value={entry.value}
+                                                onChange={(e) => handleJsonEntryChange(index, "value", e.target.value)}
+                                                className="bg-white"
+                                            />
+                                        )}
+                                        
+                                        {!entry.isSchema && (
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleRemoveJsonEntry(index)}
+                                                className="text-error hover:text-error hover:bg-error/10 shrink-0 h-9 w-9"
+                                            >
+                                                <Trash2 size={16} />
+                                            </Button>
+                                        )}
+                                    </div>
                                 </div>
                             ))}
                             <Button
@@ -671,10 +736,10 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
                                 variant="outline"
                                 size="sm"
                                 onClick={handleAddJsonEntry}
-                                className="text-xs gap-1.5 font-bold"
+                                className="text-xs gap-1.5 font-bold mt-2"
                             >
                                 <Plus size={14} />
-                                Thêm thuộc tính
+                                Thêm thuộc tính tùy chỉnh
                             </Button>
                         </div>
                     </form>

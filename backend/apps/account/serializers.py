@@ -16,6 +16,7 @@ class AccountListSerializer(serializers.ModelSerializer):
     Serializer rút gọn dùng cho danh sách trang chủ/danh mục.
     """
     game_name = serializers.CharField(source='game.name', read_only=True)
+    images = AccountImageSerializer(many=True, read_only=True)
     
     class Meta:
         model = Account
@@ -24,7 +25,7 @@ class AccountListSerializer(serializers.ModelSerializer):
             'account_code', 'thumbnail', 'price', 
             'original_price', 'discount_percent', 'status',
             'is_hot', 'is_featured', 'account_data',
-            'views', 'created_at'
+            'images', 'views', 'created_at'
         ]
 
 

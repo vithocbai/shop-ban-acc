@@ -10,6 +10,6 @@ class GameSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'slug', 'icon', 'banner', 
             'thumbnail', 'description', 'theme_color', 
-            'is_hot', 'status'
+            'is_hot', 'status', 'attributes_schema'
         ]
         read_only_fields = ['id', 'slug']

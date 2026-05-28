@@ -41,6 +41,9 @@ class Game(TimestampedModel, SoftDeleteModel):
     # Đánh dấu game có nổi bật/hot hay không
     is_hot = models.BooleanField(default=False, verbose_name="Game nổi bật")
     
+    # Cấu hình schema cho thuộc tính động của tài khoản thuộc game này
+    attributes_schema = models.JSONField(default=list, blank=True, verbose_name="Cấu hình thuộc tính động")
+    
     # Trạng thái hiện tại của game
     status = models.CharField(
         max_length=20, 

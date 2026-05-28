@@ -27,6 +27,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { STATUS_CONFIG } from "./AccountList";
 
 interface AccountModalProps {
     isOpen: boolean;
@@ -48,14 +49,6 @@ const convertToSlug = (text: string): string => {
         .replace(/-+/g, "-")
         .replace(/^-+|-+$/g, "");
 };
-
-
-// Hàm định nghĩa trạng thái tài khoản
-const STATUS_CONFIG: Record<string, {label: string; className: string}> = {
-    AVAILABLE: { label: "Đang bán", className: "bg-green-100 text-green-700 border border-green-200",},
-    PENDING: { label: "Đang chờ", className: "bg-yellow-100 text-yellow-700 border border-yellow-200",},
-    SOLD: { label: "Đã bán", className: "bg-red-100 text-red-700 border border-red-200",},
-}
 
 const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess, account, gameList }) => {
     const [formData, setFormData] = useState<AccountCreateInput>(() => {

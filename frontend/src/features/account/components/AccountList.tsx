@@ -14,9 +14,16 @@ import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import { toast } from "react-toastify";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 // Cấu hình badge cho từng trạng thái tài khoản
-const STATUS_CONFIG: Record<AccountStatus, { label: string; className: string; icon?: React.ReactNode }> = {
+export const STATUS_CONFIG: Record<AccountStatus, { label: string; className: string; icon?: React.ReactNode }> = {
     AVAILABLE: {
         label: "Đang bán",
         className: "bg-success/10 text-success border-success/20",
@@ -178,30 +185,44 @@ const AccountList: React.FC = () => {
                     </div>
 
                     {/* Filter Game */}
-                    <select
-                        value={filterGame}
-                        onChange={(e) => { setFilterGame(e.target.value ? Number(e.target.value) : ""); setPage(1); }}
-                        className="h-10 px-3 rounded-md border border-border-color bg-bg-secondary text-sm text-text-main focus:outline-none focus:ring-1 focus:ring-primary/20 cursor-pointer min-w-[150px]"
+                    <Select
+                        value={filterGame ? String(filterGame) : "all"}
+                        onValueChange={(val) => {
+                            setFilterGame(val === "all" ? "" : Number(val));
+                            setPage(1);
+                        }}
                     >
-                        <option value="">Tất cả Game</option>
-                        {gameList.map((g) => (
-                            <option key={g.id} value={g.id}>{g.name}</option>
-                        ))}
-                    </select>
+                        <SelectTrigger className="w-[180px] bg-bg-secondary border-border-color">
+                            <SelectValue placeholder="Tất cả Game" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Tất cả Game</SelectItem>
+                            {gameList.map((g) => (
+                                <SelectItem key={g.id} value={String(g.id)}>{g.name}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
 
                     {/* Filter Status */}
-                    <select
-                        value={filterStatus}
-                        onChange={(e) => { setFilterStatus(e.target.value); setPage(1); }}
-                        className="h-10 px-3 rounded-md border border-border-color bg-bg-secondary text-sm text-text-main focus:outline-none focus:ring-1 focus:ring-primary/20 cursor-pointer min-w-[140px]"
+                    <Select
+                        value={filterStatus || "all"}
+                        onValueChange={(val) => {
+                            setFilterStatus(val === "all" ? "" : val);
+                            setPage(1);
+                        }}
                     >
-                        <option value="">Tất cả trạng thái</option>
-                        <option value="AVAILABLE">Đang bán</option>
-                        <option value="RESERVED">Đang giữ</option>
-                        <option value="SOLD">Đã bán</option>
-                        <option value="LOCKED">Đã khóa</option>
-                        <option value="HIDDEN">Tạm ẩn</option>
-                    </select>
+                        <SelectTrigger className="w-[180px] bg-bg-secondary border-border-color">
+                            <SelectValue placeholder="Tất cả trạng thái" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                            <SelectItem value="AVAILABLE">Đang bán</SelectItem>
+                            <SelectItem value="RESERVED">Đang giữ</SelectItem>
+                            <SelectItem value="SOLD">Đã bán</SelectItem>
+                            <SelectItem value="LOCKED">Đã khóa</SelectItem>
+                            <SelectItem value="HIDDEN">Tạm ẩn</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
 
                 <Button onClick={handleAdd} className="flex items-center gap-2">
@@ -229,7 +250,7 @@ const AccountList: React.FC = () => {
                             accounts.map((account, index) => {
                                 const statusConfig = STATUS_CONFIG[account.status];
                                 return (
-                                    <TableRow key={account.id}>                                        
+                                    <TableRow key={account.id}>
                                         {/* Tài khoản: Thumbnail + Title + Code */}
                                         <TableCell>
                                             <div className="flex items-center gap-3">

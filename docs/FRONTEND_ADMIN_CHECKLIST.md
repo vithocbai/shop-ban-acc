@@ -47,12 +47,12 @@ Tài liệu này phân rã các Task Frontend cực kỳ chi tiết, bám sát l
 
 ## 4. Quản lý Đơn hàng (Order Management)
 
-- [ ] **Route & Pages** — Tạo `OrderManagement.tsx` và gắn route `/admin/orders`.
-- [ ] **Bảng danh sách đơn hàng** — Gọi API GET `/orders/`.
-- [ ] **Thông tin hiển thị** — Mã đơn (Order ID), Người mua (Username), Tài khoản Game đã mua, Tổng tiền, Thời gian, Trạng thái (Hoàn thành/Thất bại).
-- [ ] **Drawer/Modal Chi tiết Đơn hàng** — Khởi tạo `OrderDetailDrawer.tsx`.
-- [ ] Hiển thị thông tin thanh toán, logs đối soát.
-- [ ] Hiển thị account credentials (username/password game) được giao cho khách (Chỉ admin có quyền mới được xem).
+- [x] **Route & Pages** — Tạo `OrderManagement.tsx` và gắn route `/admin/orders`.
+- [x] **Bảng danh sách đơn hàng** — Gọi API GET `/orders/`.
+- [x] **Thông tin hiển thị** — Mã đơn (Order ID), Người mua (Username), Tài khoản Game đã mua, Tổng tiền, Thời gian, Trạng thái (Hoàn thành/Thất bại).
+- [x] **Drawer/Modal Chi tiết Đơn hàng** — Khởi tạo `OrderDetailDrawer.tsx`.
+- [x] Hiển thị thông tin thanh toán, logs đối soát.
+- [x] Hiển thị account credentials (username/password game) được giao cho khách (Chỉ admin có quyền mới được xem).
 
 ## 5. Quản lý Người dùng (User Management)
 

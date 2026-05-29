@@ -3,6 +3,7 @@ import AdminLayout from "./components/layout/AdminLayout";
 import AuthPage from "./pages/admin/auth";
 import GameManagementPage from "./pages/admin/GameManagement";
 import AccountManagementPage from "./pages/admin/AccountManagement";
+import OrderManagementPage from "./pages/admin/OrderManagement";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -65,7 +66,7 @@ function App() {
                         <Route path="dashboard" element={<Dashboard />} />
                         <Route path="games" element={<GameManagementPage />} />
                         <Route path="accounts" element={<AccountManagementPage />} />
-                        <Route path="orders" element={<div>Quản lý Đơn hàng (Coming soon)</div>} />
+                        <Route path="orders" element={<OrderManagementPage />} />
                         <Route path="users" element={<div>Quản lý Người dùng (Coming soon)</div>} />
                         <Route path="deposits" element={<div>Quản lý Nạp tiền (Coming soon)</div>} />
                     </Route>

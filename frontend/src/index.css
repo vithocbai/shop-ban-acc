@@ -12,6 +12,15 @@
     --color-error: #ef4444;
     --color-warning: #f59e0b;
 
+    /* Shadcn UI required colors mapped to project colors */
+    --color-background: var(--color-bg-main);
+    --color-foreground: var(--color-text-main);
+    --color-border: var(--color-border-color);
+    --color-popover: var(--color-bg-main);
+    --color-popover-foreground: var(--color-text-main);
+    --color-muted: var(--color-bg-secondary);
+    --color-muted-foreground: var(--color-text-secondary);
+
     --font-roboto: "Roboto", sans-serif;
     --radius: 0.75rem;
 }

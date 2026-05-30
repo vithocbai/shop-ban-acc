@@ -8,13 +8,7 @@ import { Loader2, Search, Edit } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import { toast } from "react-toastify";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatPrice } from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";
@@ -115,7 +109,13 @@ const UserList: React.FC = () => {
                         />
                     </div>
 
-                    <Select value={roleFilter} onValueChange={(val) => { setRoleFilter(val); setPage(1); }}>
+                    <Select
+                        value={roleFilter}
+                        onValueChange={(val) => {
+                            setRoleFilter(val);
+                            setPage(1);
+                        }}
+                    >
                         <SelectTrigger className="w-[180px] bg-bg-secondary border-border-color">
                             <SelectValue placeholder="Tất cả quyền" />
                         </SelectTrigger>
@@ -127,7 +127,13 @@ const UserList: React.FC = () => {
                         </SelectContent>
                     </Select>
 
-                    <Select value={statusFilter} onValueChange={(val) => { setStatusFilter(val); setPage(1); }}>
+                    <Select
+                        value={statusFilter}
+                        onValueChange={(val) => {
+                            setStatusFilter(val);
+                            setPage(1);
+                        }}
+                    >
                         <SelectTrigger className="w-[180px] bg-bg-secondary border-border-color">
                             <SelectValue placeholder="Tất cả trạng thái" />
                         </SelectTrigger>
@@ -145,84 +151,97 @@ const UserList: React.FC = () => {
             <Card className="overflow-hidden flex-1 flex flex-col min-h-0">
                 <Table className="bg-white" containerClassName="flex-1 overflow-auto min-h-0">
                     <TableHeader className="sticky top-0 z-10 bg-bg-secondary">
+                        <TableRow>
+                            <TableHead className="w-[18%]">Tài khoản</TableHead>
+                            <TableHead className="w-[15%] text-center">Số điện thoại</TableHead>
+                            <TableHead className="w-[15%] text-center">Quyền hạn</TableHead>
+                            <TableHead className="w-[15%] text-right">Số dư (VNĐ)</TableHead>
+                            <TableHead className="w-[22%] text-center">Trạng thái</TableHead>
+                            <TableHead className="w-[15%] text-center">Ngày tạo</TableHead>
+                            <TableHead className="w-[15%] text-right">Thao tác</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {isLoading ? (
                             <TableRow>
-                                <TableHead className="w-[80px]">ID</TableHead>
-                                <TableHead>Tài khoản</TableHead>
-                                <TableHead className="text-right">Số dư (VNĐ)</TableHead>
-                                <TableHead className="text-center">Quyền</TableHead>
-                                <TableHead className="text-center">Trạng thái</TableHead>
-                                <TableHead className="text-center">Ngày tạo</TableHead>
-                                <TableHead className="text-right">Thao tác</TableHead>
+                                <TableCell colSpan={7} className="h-32 text-center">
+                                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" />
+                                    <p className="text-sm text-text-secondary mt-2">Đang tải dữ liệu...</p>
+                                </TableCell>
                             </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {isLoading ? (
-                                <TableRow>
-                                    <TableCell colSpan={7} className="h-32 text-center">
-                                        <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" />
-                                        <p className="text-sm text-text-secondary mt-2">Đang tải dữ liệu...</p>
-                                    </TableCell>
-                                </TableRow>
-                            ) : users.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={7} className="h-32 text-center text-text-secondary">
-                                        Không tìm thấy người dùng nào khớp với bộ lọc.
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                users.map((user) => {
-                                    const roleConf = ROLE_MAP[user.role] || { label: user.role, color: "bg-gray-200 text-black" };
-                                    const statusConf = STATUS_MAP[user.status] || { label: user.status, color: "bg-gray-200 text-black" };
+                        ) : users.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={7} className="h-32 text-center text-text-secondary">
+                                    Không tìm thấy người dùng nào khớp với bộ lọc.
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            users.map((user) => {
+                                const roleConf = ROLE_MAP[user.role] || {
+                                    label: user.role,
+                                    color: "bg-gray-200 text-black",
+                                };
+                                const statusConf = STATUS_MAP[user.status] || {
+                                    label: user.status,
+                                    color: "bg-gray-200 text-black",
+                                };
 
-                                    return (
-                                        <TableRow key={user.id}>
-                                            <TableCell className="font-bold text-text-main">
-                                                #{user.id}
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex items-center gap-3">
-                                                    {user.avatar ? (
-                                                        <img src={user.avatar} alt="avatar" className="w-10 h-10 rounded-full object-cover bg-bg-secondary" />
-                                                    ) : (
-                                                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">
-                                                            {user.username?.charAt(0).toUpperCase() || "?"}
-                                                        </div>
-                                                    )}
-                                                    <div>
-                                                        <p className="font-bold text-sm text-text-main">{user.username || "Chưa cập nhật"}</p>
-                                                        <p className="text-xs text-text-secondary">{user.email}</p>
+                                return (
+                                    <TableRow key={user.id}>
+                                        <TableCell>
+                                            <div className="flex items-center gap-3">
+                                                {user.avatar ? (
+                                                    <img
+                                                        src={user.avatar}
+                                                        alt="avatar"
+                                                        className="w-10 h-10 rounded-full object-cover bg-bg-secondary"
+                                                    />
+                                                ) : (
+                                                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">
+                                                        {user.username?.charAt(0).toUpperCase() || "?"}
                                                     </div>
+                                                )}
+                                                <div>
+                                                    <p className="font-bold text-sm text-text-main">
+                                                        {user.username || "Chưa cập nhật"}
+                                                    </p>
+                                                    <p className="text-xs text-text-secondary">{user.email}</p>
                                                 </div>
-                                            </TableCell>
-                                            <TableCell className="text-right font-bold text-success">
-                                                {formatPrice(Number(user.balance))}
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                <Badge className={roleConf.color}>{roleConf.label}</Badge>
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                <Badge className={statusConf.color}>{statusConf.label}</Badge>
-                                            </TableCell>
-                                            <TableCell className="text-center text-sm text-text-secondary">
-                                                {new Date(user.created_at).toLocaleDateString("vi-VN")}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <Button 
-                                                    variant="outline" 
-                                                    size="sm" 
-                                                    className="gap-1 h-8 px-2 border-border-color cursor-pointer"
-                                                    onClick={() => handleViewDetail(user)}
-                                                >
-                                                    <Edit size={14} />
-                                                    Chi tiết
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    );
-                                })
-                            )}
-                        </TableBody>
-                    </Table>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-center">
+                                            {user.phone || <span className="text-text-secondary">Chưa cập nhật</span>}
+                                        </TableCell>
+                                        <TableCell className="text-center">
+                                            <Badge className={roleConf.color}>{roleConf.label}</Badge>
+                                        </TableCell>
+                                        <TableCell className="text-right font-bold text-success">
+                                            {formatPrice(Number(user.balance))}
+                                        </TableCell>
+
+                                        <TableCell className="text-center">
+                                            <Badge className={statusConf.color}>{statusConf.label}</Badge>
+                                        </TableCell>
+                                        <TableCell className="text-center text-sm text-text-secondary">
+                                            {new Date(user.date_joined).toLocaleDateString("vi-VN")}
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="gap-1 h-8 px-2 border-border-color cursor-pointer"
+                                                onClick={() => handleViewDetail(user)}
+                                            >
+                                                <Edit size={14} />
+                                                Chi tiết
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })
+                        )}
+                    </TableBody>
+                </Table>
 
                 <PaginationControls
                     page={page}
@@ -230,7 +249,10 @@ const UserList: React.FC = () => {
                     total={total}
                     itemsLength={users.length}
                     onPageChange={setPage}
-                    onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+                    onPageSizeChange={(size) => {
+                        setPageSize(size);
+                        setPage(1);
+                    }}
                     pageSizeOptions={[10, 20, 50]}
                 />
             </Card>

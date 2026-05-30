@@ -56,14 +56,14 @@ Tài liệu này phân rã các Task Frontend cực kỳ chi tiết, bám sát l
 
 ## 5. Quản lý Người dùng (User Management)
 
-- [ ] **Route & Pages** — Tạo `UserManagement.tsx` và gắn route `/admin/users`.
-- [ ] **Bảng danh sách user** — Gọi API GET `/users/`, hiển thị Avatar, Username, Email, Số dư (Balance VND), Role, Trạng thái (Active/Banned).
-- [ ] **Thanh công cụ** — Lọc theo Role, Tìm kiếm Email/Username.
-- [ ] **Modal Chi tiết/Cập nhật** — Khởi tạo `UserDetailModal.tsx`.
-- [ ] Thay đổi Role (Admin, User).
-- [ ] **Biến động số dư** — Nút "Cộng/Trừ tiền tay" đi kèm input nhập Lý do (Ghi log hệ thống).
-- [ ] Khóa/Mở khóa tài khoản người dùng (Ban/Unban).
-- [ ] Xem lịch sử mua hàng, lịch sử nạp tiền của user đó (Render thành các tab con bên trong Modal chi tiết).
+- [x] **Route & Pages** — Tạo `UserManagement.tsx` và gắn route `/admin/users`.
+- [x] **Bảng danh sách user** — Gọi API GET `/users/`, hiển thị Avatar, Username, Email, Số dư (Balance VND), Role, Trạng thái (Active/Banned).
+- [x] **Thanh công cụ** — Lọc theo Role, Tìm kiếm Email/Username.
+- [x] **Modal Chi tiết/Cập nhật** — Khởi tạo `UserDetailModal.tsx`.
+- [x] Thay đổi Role (Admin, User).
+- [x] **Biến động số dư** — Nút "Cộng/Trừ tiền tay" đi kèm input nhập Lý do (Ghi log hệ thống).
+- [x] Khóa/Mở khóa tài khoản người dùng (Ban/Unban).
+- [x] Xem lịch sử mua hàng, lịch sử nạp tiền của user đó (Render thành các tab con bên trong Modal chi tiết).
 
 ## 6. Quản lý Nạp tiền (Deposit Management)
 

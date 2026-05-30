@@ -1,804 +1,156 @@
-# API-CONTRACT.md
-
 # 🔌 API CONTRACT
 
-Frontend ↔ Backend Communication Standard
-Shop bán acc game – Django REST Framework + ReactJS
+Tài liệu quy định chuẩn giao tiếp API (RESTful) giữa Frontend và Backend cho dự án **Shop bán acc game**.
 
 ---
 
-# 1. API Overview
+# 1. TỔNG QUAN (Overview)
 
 ## Base URL
+- **Development**: `http://localhost:8000/api`
+- **Production**: `https://api.domain.com/`
 
-```text id="mhmv9f"
-Development:
-http://localhost:8000/api
-
-Production:
-https://domain.com/api
-```
-
----
-
-# 2. API Standards
-
-## Request Format
-
-### Headers
-
-```http id="u6qvqb"
+## Headers Mặc Định
+Mọi request mang tính chất xác thực đều phải truyền Header sau:
+```http
 Content-Type: application/json
 Authorization: Bearer <access_token>
 ```
 
 ---
 
-## Response Format
+# 2. CHUẨN RESPONSE FORMAT (Data Envelope)
 
-### Success Response
+Tất cả các API trả về JSON phải bọc trong một `envelope` thống nhất để Frontend dễ dàng bắt lỗi và hiển thị.
 
-```json id="5lyhvb"
+## 2.1. Phản Hồi Thành Công (Success)
+```json
 {
   "success": true,
-  "message": "Success",
-  "data": {}
+  "message": "Thông báo thành công (nếu có)",
+  "data": {
+    "id": 1,
+    "name": "Dữ liệu trả về"
+  }
 }
 ```
 
----
-
-### Error Response
-
-```json id="2c5ffx"
+## 2.2. Phản Hồi Lỗi (Error)
+```json
 {
   "success": false,
-  "message": "Validation Error",
-  "errors": {}
+  "message": "Mô tả lỗi chính",
+  "errors": {
+    "email": ["Email đã tồn tại."],
+    "password": ["Mật khẩu quá ngắn."]
+  }
 }
 ```
 
----
-
-# 3. Authentication APIs
-
-# AUTH MODULE
-
-## Login
-
-### POST `/auth/login/`
-
-### Request
-
-```json id="x5cwwl"
-{
-  "email": "user@gmail.com",
-  "password": "123456"
-}
-```
-
----
-
-### Response
-
-```json id="7tz9vl"
+## 2.3. Phản Hồi Phân Trang (Pagination)
+Chuẩn phân trang áp dụng cho mọi danh sách dữ liệu (Accounts, Orders, Users...).
+```json
 {
   "success": true,
-  "message": "Login success",
+  "message": "Lấy danh sách thành công",
   "data": {
-    "access_token": "",
-    "refresh_token": "",
-    "user": {
-      "id": 1,
-      "username": "admin",
-      "email": "admin@gmail.com",
-      "role": "admin"
-    }
-  }
-}
-```
-
----
-
-## Register
-
-### POST `/auth/register/`
-
-### Request
-
-```json id="duwtq4"
-{
-  "username": "quang",
-  "email": "quang@gmail.com",
-  "password": "123456",
-  "confirm_password": "123456"
-}
-```
-
----
-
-## Refresh Token
-
-### POST `/auth/refresh/`
-
----
-
-## Logout
-
-### POST `/auth/logout/`
-
----
-
-# 4. User APIs
-
-# USER MODULE
-
-## Get Profile
-
-### GET `/users/profile/`
-
----
-
-## Update Profile
-
-### PUT `/users/profile/`
-
-### Request
-
-```json id="yotd9j"
-{
-  "username": "new_name",
-  "phone": "0123456789"
-}
-```
-
----
-
-## Change Password
-
-### POST `/users/change-password/`
-
----
-
-## Purchase History
-
-### GET `/users/orders/`
-
----
-
-## Deposit History
-
-### GET `/users/transactions/`
-
----
-
-# 5. Game APIs
-
-# GAME MODULE
-
-## Get All Games
-
-### GET `/games/`
-
-### Response
-
-```json id="im2skz"
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "name": "Liên Quân",
-      "slug": "lien-quan",
-      "icon": "",
-      "banner": ""
-    }
-  ]
-}
-```
-
----
-
-## Get Game Detail
-
-### GET `/games/:slug/`
-
----
-
-# 6. Account APIs
-
-# ACCOUNT MODULE
-
-## Get Account List
-
-### GET `/accounts/`
-
-## Query Params
-
-```text id="3qk3cd"
-?page=1
-&limit=20
-&game=lien-quan
-&rank=cao-thu
-&price_min=100000
-&price_max=500000
-&sort=latest
-```
-
----
-
-## Response
-
-```json id="vx6v0i"
-{
-  "success": true,
-  "data": {
-    "items": [],
-    "pagination": {
-      "page": 1,
-      "total": 100
-    }
-  }
-}
-```
-
----
-
-## Get Account Detail
-
-### GET `/accounts/:id/`
-
-### Response
-
-```json id="9w0zwo"
-{
-  "id": 1,
-  "title": "Acc Liên Quân VIP",
-  "price": 500000,
-  "thumbnail": "",
-  "gallery": [],
-  "status": "AVAILABLE",
-  "description": "",
-  "game": {
-    "id": 1,
-    "name": "Liên Quân"
-  },
-  "account_data": {
-    "rank": "Cao Thủ",
-    "skins": 120
-  }
-}
-```
-
----
-
-## Related Accounts
-
-### GET `/accounts/:id/related/`
-
----
-
-## Search Accounts
-
-### GET `/accounts/search/`
-
----
-
-# 7. Cart APIs
-
-# CART MODULE
-
-## Get Cart
-
-### GET `/cart/`
-
----
-
-## Add To Cart
-
-### POST `/cart/add/`
-
-### Request
-
-```json id="6mkx0m"
-{
-  "account_id": 15
-}
-```
-
----
-
-## Remove Cart Item
-
-### DELETE `/cart/remove/:id/`
-
----
-
-## Clear Cart
-
-### DELETE `/cart/clear/`
-
----
-
-# 8. Order APIs
-
-# ORDER MODULE
-
-## Create Order
-
-### POST `/orders/create/`
-
-### Request
-
-```json id="b8h9s8"
-{
-  "payment_method": "BANKING",
-  "items": [
-    {
-      "account_id": 15
-    }
-  ]
-}
-```
-
----
-
-## Order Detail
-
-### GET `/orders/:id/`
-
----
-
-## Order History
-
-### GET `/orders/history/`
-
----
-
-## Order Delivery Info
-
-### GET `/orders/:id/delivery/`
-
-### Response
-
-```json id="yjkz8f"
-{
-  "account_username": "",
-  "account_password": "",
-  "email_info": ""
-}
-```
-
----
-
-# 9. Payment APIs
-
-# PAYMENT MODULE
-
-## Create Payment
-
-### POST `/payments/create/`
-
----
-
-## Generate QR
-
-### GET `/payments/:id/qr/`
-
----
-
-## Verify Payment
-
-### POST `/payments/verify/`
-
----
-
-## Payment Webhook
-
-### POST `/payments/webhook/`
-
----
-
-# 10. Transaction APIs
-
-# TRANSACTION MODULE
-
-## Transaction History
-
-### GET `/transactions/`
-
----
-
-## Deposit Money
-
-### POST `/transactions/deposit/`
-
----
-
-# 11. News APIs
-
-# NEWS MODULE
-
-## Get News List
-
-### GET `/news/`
-
----
-
-## Get News Detail
-
-### GET `/news/:slug/`
-
----
-
-# 12. Banner APIs
-
-# BANNER MODULE
-
-## Homepage Banners
-
-### GET `/banners/home/`
-
----
-
-## Popup Banner
-
-### GET `/banners/popup/`
-
----
-
-# 13. Notification APIs
-
-# NOTIFICATION MODULE
-
-## Get Notifications
-
-### GET `/notifications/`
-
----
-
-## Read Notification
-
-### POST `/notifications/:id/read/`
-
----
-
-# 14. Upload APIs
-
-# UPLOAD MODULE
-
-## Upload Image
-
-### POST `/uploads/image/`
-
-### FormData
-
-```text id="u08k6v"
-file: image
-```
-
----
-
-## Upload Multiple Images
-
-### POST `/uploads/multiple/`
-
----
-
-# 15. Admin APIs
-
-# ADMIN MODULE
-
----
-
-# Admin Authentication
-
-## Admin Login
-
-### POST `/admin/auth/login/`
-
----
-
-# Admin Dashboard
-
-## Dashboard Statistics
-
-### GET `/admin/dashboard/statistics/`
-
-### Response
-
-```json id="s9gtyo"
-{
-  "total_users": 1000,
-  "total_orders": 5000,
-  "total_revenue": 100000000
-}
-```
-
----
-
-# 16. Admin Game Management
-
-## Get Games
-
-### GET `/admin/games/`
-
----
-
-## Create Game
-
-### POST `/admin/games/create/`
-
----
-
-## Update Game
-
-### PUT `/admin/games/:id/`
-
----
-
-## Delete Game
-
-### DELETE `/admin/games/:id/`
-
----
-
-# 17. Admin Account Management
-
-## Get Accounts
-
-### GET `/admin/accounts/`
-
----
-
-## Create Account
-
-### POST `/admin/accounts/create/`
-
-### Request
-
-```json id="jlwmih"
-{
-  "game_id": 1,
-  "title": "Acc VIP",
-  "price": 500000,
-  "account_data": {
-    "rank": "Cao Thủ"
-  }
-}
-```
-
----
-
-## Update Account
-
-### PUT `/admin/accounts/:id/`
-
----
-
-## Delete Account
-
-### DELETE `/admin/accounts/:id/`
-
----
-
-## Lock Account
-
-### POST `/admin/accounts/:id/lock/`
-
----
-
-# 18. Admin User Management
-
-## User List
-
-### GET `/admin/users/`
-
----
-
-## User Detail
-
-### GET `/admin/users/:id/`
-
----
-
-## Ban User
-
-### POST `/admin/users/:id/ban/`
-
----
-
-## Change User Role
-
-### POST `/admin/users/:id/role/`
-
----
-
-# 19. Admin Order Management
-
-## Order List
-
-### GET `/admin/orders/`
-
----
-
-## Order Detail
-
-### GET `/admin/orders/:id/`
-
----
-
-## Update Order Status
-
-### POST `/admin/orders/:id/status/`
-
----
-
-# 20. Admin Deposit Management
-
-## Deposit Requests
-
-### GET `/admin/deposits/`
-
----
-
-## Approve Deposit
-
-### POST `/admin/deposits/:id/approve/`
-
----
-
-## Reject Deposit
-
-### POST `/admin/deposits/:id/reject/`
-
----
-
-# 21. Admin News Management
-
-## Create News
-
-### POST `/admin/news/create/`
-
----
-
-## Update News
-
-### PUT `/admin/news/:id/`
-
----
-
-## Delete News
-
-### DELETE `/admin/news/:id/`
-
----
-
-# 22. Admin Banner Management
-
-## Create Banner
-
-### POST `/admin/banners/create/`
-
----
-
-## Update Banner
-
-### PUT `/admin/banners/:id/`
-
----
-
-## Delete Banner
-
-### DELETE `/admin/banners/:id/`
-
----
-
-# 23. Admin Notification Management
-
-## Create System Notification
-
-### POST `/admin/notifications/create/`
-
----
-
-# 24. Admin Analytics APIs
-
-## Revenue Report
-
-### GET `/admin/analytics/revenue/`
-
----
-
-## User Statistics
-
-### GET `/admin/analytics/users/`
-
----
-
-## Best Selling Games
-
-### GET `/admin/analytics/top-games/`
-
----
-
-# 25. HTTP Status Codes
-
-| Code | Meaning               |
-| ---- | --------------------- |
-| 200  | Success               |
-| 201  | Created               |
-| 400  | Validation Error      |
-| 401  | Unauthorized          |
-| 403  | Forbidden             |
-| 404  | Not Found             |
-| 500  | Internal Server Error |
-
----
-
-# 26. Pagination Standard
-
-### Response
-
-```json id="4t7b8l"
-{
-  "items": [],
-  "pagination": {
+    "items": [
+      { "id": 1, "title": "Acc Liên Quân" }
+    ],
+    "total": 105,
     "page": 1,
-    "limit": 20,
-    "total": 100,
-    "total_pages": 5
+    "page_size": 20
   }
 }
 ```
 
 ---
 
-# 27. Security Standards
+# 3. NHÓM API AUTH & USER
 
-## JWT Authentication
+## 3.1. Authentication (Xác thực)
+- `POST /auth/login/` - Đăng nhập (Trả về JWT Access/Refresh tokens).
+- `POST /auth/register/` - Đăng ký tài khoản.
+- `POST /auth/refresh/` - Cấp lại Access Token mới.
+- `POST /auth/logout/` - Đăng xuất.
 
-* access token
-* refresh token
-
----
-
-## Rate Limiting
-
-* login
-* payment
-* admin APIs
+## 3.2. Users (Người dùng)
+- `GET /users/profile/` - Lấy thông tin cá nhân hiện tại.
+- `PUT /users/profile/` - Cập nhật thông tin (Tên, Số điện thoại...).
+- `POST /users/change-password/` - Đổi mật khẩu.
 
 ---
 
-## Validation
+# 4. NHÓM API GAME & ACCOUNT
 
-* serializer validation
-* request sanitization
+## 4.1. Games (Danh mục Game)
+- `GET /games/` - Lấy danh sách tất cả các Game đang hoạt động.
+- `GET /games/:slug/` - Lấy chi tiết thông tin và cấu hình (attributes) của một Game.
 
----
-
-# 28. Naming Convention
-
-## RESTful APIs
-
-```text id="w2q7a2"
-GET     /accounts/
-GET     /accounts/:id/
-POST    /accounts/
-PUT     /accounts/:id/
-DELETE  /accounts/:id/
-```
+## 4.2. Accounts (Tài khoản bán)
+- `GET /accounts/` - Lấy danh sách Account (Hỗ trợ phân trang, lọc theo `game_id`, `status`, `price_min`, `price_max`).
+- `GET /accounts/:id/` - Lấy thông tin chi tiết của 1 Account cụ thể (Bao gồm bộ ảnh gallery và JSON attributes).
 
 ---
 
-# 29. Future APIs
+# 5. NHÓM API ĐƠN HÀNG (Order)
 
-Hỗ trợ mở rộng:
+- `POST /orders/create/` - Tạo đơn mua hàng (Thanh toán bằng số dư hoặc chuyển khoản).
+- `GET /orders/` - Lấy lịch sử mua hàng cá nhân.
+- `GET /orders/:id/` - Xem chi tiết đơn hàng (Giá tiền, trạng thái).
+- `GET /orders/:id/delivery/` - Nhận thông tin mật khẩu/tài khoản game (Chỉ có thể gọi khi đơn hàng đã thanh toán thành công).
 
-* vòng quay
-* random box
-* affiliate
-* livestream
-* mobile app
-* AI recommendation
+---
+
+# 6. NHÓM API TÀI CHÍNH (Payment & Transaction)
+
+- `GET /transactions/` - Lịch sử biến động số dư cá nhân (Nạp, Trừ tiền mua acc).
+- `POST /deposits/create/` - Tạo yêu cầu nạp tiền (Bank/Momo).
+- `GET /deposits/` - Lịch sử các yêu cầu nạp tiền.
+
+---
+
+# 7. NHÓM API DÀNH CHO ADMIN (Yêu cầu Role Admin)
+
+Nhóm API này nằm trong prefix `/admin/` và yêu cầu User phải có Role `ADMIN` hoặc `SUPER_ADMIN`.
+
+## 7.1. Admin Dashboard
+- `GET /admin/dashboard/statistics/` - Thống kê tổng số Users, Tổng doanh thu, Đơn hàng mới.
+
+## 7.2. Admin - Quản lý Games
+- `GET /admin/games/` - Danh sách toàn bộ Game.
+- `POST /admin/games/create/` - Thêm Game mới.
+- `PUT /admin/games/:id/` - Cập nhật Game.
+
+## 7.3. Admin - Quản lý Accounts
+- `GET /admin/accounts/` - Danh sách Account (Full quyền lọc).
+- `POST /admin/accounts/create/` - Đăng bán Account mới (Yêu cầu gửi kèm `account_data` chuẩn JSONB của Game tương ứng).
+- `PUT /admin/accounts/:id/` - Cập nhật thông tin Account.
+- `DELETE /admin/accounts/:id/` - Xóa/Ẩn Account.
+
+## 7.4. Admin - Quản lý Users
+- `GET /admin/users/` - Quản lý danh sách thành viên.
+- `POST /admin/users/:id/ban/` - Khóa/Mở khóa tài khoản.
+- `POST /admin/users/:id/adjust-balance/` - Cộng/Trừ tiền thủ công.
+
+## 7.5. Admin - Quản lý Đơn hàng & Nạp tiền
+- `GET /admin/orders/` - Xem toàn bộ đơn mua hàng.
+- `GET /admin/deposits/` - Xem các yêu cầu duyệt tiền.
+- `POST /admin/deposits/:id/approve/` - Duyệt cộng tiền cho user.
+- `POST /admin/deposits/:id/reject/` - Từ chối yêu cầu nạp.
+
+---
+
+# 8. MÃ TRẠNG THÁI HTTP (HTTP Status Codes)
+
+Hệ thống tuân thủ nghiêm ngặt các HTTP Status Codes sau để Frontend dễ dàng handle Error:
+
+| Code | Ý nghĩa (Meaning)     | Mô tả |
+| ---- | --------------------- | ----- |
+| 200  | Success               | Xử lý thành công. |
+| 201  | Created               | Đã tạo mới tài nguyên thành công. |
+| 400  | Bad Request           | Dữ liệu gửi lên không hợp lệ (Validation Error). |
+| 401  | Unauthorized          | Thiếu Access Token hoặc Token hết hạn. |
+| 403  | Forbidden             | Không có quyền truy cập (Sai Role). |
+| 404  | Not Found             | Tài nguyên (ID, Slug) không tồn tại. |
+| 500  | Internal Server Error | Lỗi hệ thống backend (Sẽ được log lại). |

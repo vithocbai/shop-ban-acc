@@ -107,3 +107,100 @@ class PasswordResetConfirmView(APIView):
                 return Response({"token": ["Mã xác nhận không hợp lệ hoặc đã hết hạn."]}, status=status.HTTP_400_BAD_REQUEST)
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             return Response({"error": "Dữ liệu không hợp lệ."}, status=status.HTTP_400_BAD_REQUEST)
+
+# --- Admin API Views ---
+from django.db.models import Q
+from django.db import transaction
+from common.pagination import StandardResultsSetPagination
+from apps.payment.models import Transaction
+from .serializers import AdminUserSerializer, UpdateBalanceSerializer
+import uuid
+
+class UserListAdminView(generics.ListAPIView):
+    """
+    API Lấy danh sách người dùng dành cho Admin (Có phân trang, lọc, tìm kiếm).
+    """
+    permission_classes = [permissions.IsAdminUser]
+    serializer_class = AdminUserSerializer
+    pagination_class = StandardResultsSetPagination
+
+    def get_queryset(self):
+        queryset = User.objects.all().order_by('-created_at')
+        
+        search = self.request.query_params.get('search')
+        if search:
+            queryset = queryset.filter(Q(email__icontains=search) | Q(username__icontains=search))
+            
+        role = self.request.query_params.get('role')
+        if role:
+            queryset = queryset.filter(role=role)
+            
+        status_param = self.request.query_params.get('status')
+        if status_param:
+            queryset = queryset.filter(status=status_param)
+            
+        return queryset
+
+
+class UserDetailAdminView(generics.RetrieveUpdateAPIView):
+    """
+    API Xem chi tiết và cập nhật người dùng (Role, Status) dành cho Admin.
+    """
+    permission_classes = [permissions.IsAdminUser]
+    serializer_class = AdminUserSerializer
+    queryset = User.objects.all()
+
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)
+        return Response({
+            "success": True,
+            "message": "Cập nhật thành công",
+            "data": response.data
+        })
+
+
+class UserBalanceUpdateView(APIView):
+    """
+    API Cộng/Trừ số dư thủ công dành cho Admin.
+    """
+    permission_classes = [permissions.IsAdminUser]
+    
+    def post(self, request, pk):
+        try:
+            user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response({"success": False, "message": "Không tìm thấy người dùng"}, status=status.HTTP_404_NOT_FOUND)
+            
+        serializer = UpdateBalanceSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        amount = serializer.validated_data['amount']
+        reason = serializer.validated_data['reason']
+        
+        with transaction.atomic():
+            user = User.objects.select_for_update().get(pk=pk)
+            balance_before = user.balance
+            
+            user.balance += amount
+            if user.balance < 0:
+                 return Response({"success": False, "message": "Số dư không đủ để trừ."}, status=status.HTTP_400_BAD_REQUEST)
+                 
+            user.save()
+            
+            trans_type = Transaction.Type.DEPOSIT if amount > 0 else Transaction.Type.WITHDRAW
+            Transaction.objects.create(
+                user=user,
+                transaction_code=f"MANUAL_{uuid.uuid4().hex[:8].upper()}",
+                type=trans_type,
+                amount=abs(amount),
+                balance_before=balance_before,
+                balance_after=user.balance,
+                status=Transaction.Status.SUCCESS,
+                note=f"Admin thao tác: {reason}"
+            )
+            
+        return Response({
+            "success": True,
+            "message": "Cập nhật số dư thành công",
+            "data": AdminUserSerializer(user).data
+        })

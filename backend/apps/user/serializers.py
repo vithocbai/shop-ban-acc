@@ -72,3 +72,29 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         if attrs['new_password'] != attrs['confirm_password']:
             raise serializers.ValidationError({"confirm_password": "Mật khẩu mới không khớp."})
         return attrs
+
+class AdminUserSerializer(serializers.ModelSerializer):
+    """
+    Serializer cho Admin quản lý người dùng.
+    Cho phép cập nhật role và status.
+    """
+    class Meta:
+        model = User
+        fields = [
+            'id', 'email', 'username', 'avatar', 
+            'phone', 'balance', 'role', 'status', 
+            'email_verified', 'date_joined'
+        ]
+        read_only_fields = ['id', 'email', 'username', 'avatar', 'phone', 'balance', 'email_verified', 'date_joined']
+
+class UpdateBalanceSerializer(serializers.Serializer):
+    """
+    Serializer cho chức năng cộng/trừ số dư thủ công.
+    """
+    amount = serializers.DecimalField(max_digits=18, decimal_places=2, required=True)
+    reason = serializers.CharField(max_length=255, required=True)
+
+    def validate_amount(self, value):
+        if value == 0:
+            raise serializers.ValidationError("Số tiền phải khác 0.")
+        return value

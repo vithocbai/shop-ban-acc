@@ -8,8 +8,8 @@ admin.site.site_header = "Game Market Admin"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # API Endpoints
     path('api/auth/', include('apps.user.urls')),
+    path('api/users/', include('apps.user.api_urls')),
     path('api/', include('apps.game.urls')),
     path('api/', include('apps.account.urls')),
     path('api/', include('apps.payment.urls')),

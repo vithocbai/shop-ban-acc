@@ -13,6 +13,7 @@ import { formatPrice } from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";
 import UserDetailModal from "./UserDetailModal";
+import UserEditModal from "./UserEditModal";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -50,6 +51,7 @@ const UserList: React.FC = () => {
     // Modal
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     // Debounce search
     useEffect(() => {
@@ -88,6 +90,11 @@ const UserList: React.FC = () => {
     const handleViewDetail = (user: User) => {
         setSelectedUser(user);
         setIsModalOpen(true);
+    };
+
+    const handleEditUser = (user: User) => {
+        setSelectedUser(user);
+        setIsEditModalOpen(true);
     };
 
     const handleModalClose = () => {
@@ -252,7 +259,7 @@ const UserList: React.FC = () => {
                                                         <Eye className="mr-3 h-4 w-4 text-text-secondary" />
                                                         <span className="text-text-main font-medium">Xem chi tiết</span>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem className="cursor-pointer hover:bg-gray-50 rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleViewDetail(user)}>
+                                                    <DropdownMenuItem className="cursor-pointer hover:bg-gray-50 rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleEditUser(user)}>
                                                         <Edit className="mr-3 h-4 w-4 text-text-secondary" />
                                                         <span className="text-text-main font-medium">Chỉnh sửa</span>
                                                     </DropdownMenuItem>
@@ -297,12 +304,21 @@ const UserList: React.FC = () => {
                 />
             </Card>
 
+            {/* Modals */}
             {isModalOpen && selectedUser && (
                 <UserDetailModal
                     isOpen={isModalOpen}
-                    onClose={handleModalClose}
+                    onClose={() => setIsModalOpen(false)}
                     user={selectedUser}
-                    onUserUpdated={handleUserUpdated}
+                    onUserUpdated={fetchUsers}
+                />
+            )}
+            {isEditModalOpen && selectedUser && (
+                <UserEditModal
+                    isOpen={isEditModalOpen}
+                    onClose={() => setIsEditModalOpen(false)}
+                    user={selectedUser}
+                    onUserUpdated={fetchUsers}
                 />
             )}
         </div>

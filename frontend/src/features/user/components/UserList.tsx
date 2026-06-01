@@ -4,7 +4,7 @@ import type { User, UserFilters } from "../types";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Search, Edit } from "lucide-react";
+import { Loader2, Search, Edit, EllipsisVertical, Eye, Lock, Shield, Trash2, Key } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import { toast } from "react-toastify";
@@ -13,6 +13,13 @@ import { formatPrice } from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";
 import UserDetailModal from "./UserDetailModal";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const ROLE_MAP: Record<string, { label: string; color: string }> = {
     USER: { label: "Người dùng", color: "bg-gray-200 text-black" },
@@ -152,13 +159,14 @@ const UserList: React.FC = () => {
                 <Table className="bg-white" containerClassName="flex-1 overflow-auto min-h-0">
                     <TableHeader className="sticky top-0 z-10 bg-bg-secondary">
                         <TableRow>
-                            <TableHead className="w-[18%]">Tài khoản</TableHead>
-                            <TableHead className="w-[15%] text-center">Số điện thoại</TableHead>
-                            <TableHead className="w-[15%] text-center">Quyền hạn</TableHead>
-                            <TableHead className="w-[15%] text-right">Số dư (VNĐ)</TableHead>
-                            <TableHead className="w-[22%] text-center">Trạng thái</TableHead>
-                            <TableHead className="w-[15%] text-center">Ngày tạo</TableHead>
-                            <TableHead className="w-[15%] text-right">Thao tác</TableHead>
+                            <TableHead className="w-[20%]">Người dùng</TableHead>
+                            <TableHead className="w-[15%]">Email</TableHead>
+                            <TableHead className="w-[12%] text-center">Số điện thoại</TableHead>
+                            <TableHead className="w-[10%] text-center">Quyền hạn</TableHead>
+                            <TableHead className="w-[12%] text-right">Số dư (VNĐ)</TableHead>
+                            <TableHead className="w-[10%] text-center">Trạng thái</TableHead>
+                            <TableHead className="w-[13%] text-center">Đăng nhập cuối</TableHead>
+                            <TableHead className="w-[8%] text-right">Thao tác</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -203,11 +211,14 @@ const UserList: React.FC = () => {
                                                 )}
                                                 <div>
                                                     <p className="font-bold text-sm text-text-main">
-                                                        {user.username || "Chưa cập nhật"}
+                                                        {user.username}
                                                     </p>
-                                                    <p className="text-xs text-text-secondary">{user.email}</p>
+                                                    <p className="text-xs text-text-secondary">{`${user.first_name} ${user.last_name}`.trim()}</p>
                                                 </div>
                                             </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            {user.email}
                                         </TableCell>
                                         <TableCell className="text-center">
                                             {user.phone || <span className="text-text-secondary">Chưa cập nhật</span>}
@@ -223,18 +234,47 @@ const UserList: React.FC = () => {
                                             <Badge className={statusConf.color}>{statusConf.label}</Badge>
                                         </TableCell>
                                         <TableCell className="text-center text-sm text-text-secondary">
-                                            {new Date(user.date_joined).toLocaleDateString("vi-VN")}
+                                            {user.last_login ? new Date(user.last_login).toLocaleDateString("vi-VN") : "Chưa đăng nhập"}
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="gap-1 h-8 px-2 border-border-color cursor-pointer"
-                                                onClick={() => handleViewDetail(user)}
-                                            >
-                                                <Edit size={14} />
-                                                Chi tiết
-                                            </Button>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 border border-border-color bg-white hover:bg-gray-50"
+                                                    >
+                                                        <EllipsisVertical size={16} className="text-text-secondary" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="w-48 bg-white border border-border-color p-1 rounded-lg shadow-md">
+                                                    <DropdownMenuItem className="cursor-pointer hover:bg-gray-50 rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleViewDetail(user)}>
+                                                        <Eye className="mr-3 h-4 w-4 text-text-secondary" />
+                                                        <span className="text-text-main font-medium">Xem chi tiết</span>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem className="cursor-pointer hover:bg-gray-50 rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleViewDetail(user)}>
+                                                        <Edit className="mr-3 h-4 w-4 text-text-secondary" />
+                                                        <span className="text-text-main font-medium">Chỉnh sửa</span>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem className="cursor-pointer hover:bg-gray-50 rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleViewDetail(user)}>
+                                                        <Key className="mr-3 h-4 w-4 text-text-secondary" />
+                                                        <span className="text-text-main font-medium">Đổi mật khẩu</span>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem className="cursor-pointer hover:bg-gray-50 rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleViewDetail(user)}>
+                                                        <Shield className="mr-3 h-4 w-4 text-text-secondary" />
+                                                        <span className="text-text-main font-medium">Phân quyền</span>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator className="my-1 bg-border-color h-[1px]" />
+                                                    <DropdownMenuItem className="cursor-pointer hover:bg-error/10 text-error focus:text-error rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleViewDetail(user)}>
+                                                        <Lock className="mr-3 h-4 w-4" />
+                                                        <span className="font-medium">Khóa tài khoản</span>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem className="cursor-pointer hover:bg-error/10 text-error focus:text-error rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleViewDetail(user)}>
+                                                        <Trash2 className="mr-3 h-4 w-4" />
+                                                        <span className="font-medium">Xóa tài khoản</span>
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                         </TableCell>
                                     </TableRow>
                                 );

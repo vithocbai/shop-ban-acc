@@ -10,11 +10,11 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id', 'email', 'username', 'avatar', 
+            'id', 'email', 'username', 'first_name', 'last_name', 'avatar', 
             'phone', 'balance', 'role', 'status', 
-            'email_verified', 'date_joined'
+            'email_verified', 'date_joined', 'last_login'
         ]
-        read_only_fields = ['id', 'balance', 'role', 'status', 'date_joined']
+        read_only_fields = ['id', 'balance', 'role', 'status', 'date_joined', 'last_login']
 
 class RegisterSerializer(serializers.ModelSerializer):
     """
@@ -81,11 +81,11 @@ class AdminUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id', 'email', 'username', 'avatar', 
+            'id', 'email', 'username', 'first_name', 'last_name', 'avatar', 
             'phone', 'balance', 'role', 'status', 
-            'email_verified', 'date_joined'
+            'email_verified', 'date_joined', 'last_login'
         ]
-        read_only_fields = ['id', 'email', 'username', 'avatar', 'phone', 'balance', 'email_verified', 'date_joined']
+        read_only_fields = ['id', 'email', 'username', 'first_name', 'last_name', 'avatar', 'phone', 'balance', 'email_verified', 'date_joined', 'last_login']
 
 class UpdateBalanceSerializer(serializers.Serializer):
     """

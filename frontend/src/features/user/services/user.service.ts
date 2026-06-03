@@ -26,6 +26,14 @@ export const userService = {
         return response.data as unknown as User;
     },
 
+    updateUser: async (id: number, data: Partial<User>): Promise<User> => {
+        const response = await api.patch<ApiResponse<User>>(`/users/${id}/`, data);
+        if (response.data && response.data.success && response.data.data) {
+            return response.data.data;
+        }
+        throw new Error(response.data?.message || "Cập nhật người dùng thất bại");
+    },
+
     updateUserStatus: async (id: number, status: string): Promise<User> => {
         const response = await api.patch<ApiResponse<User>>(`/users/${id}/`, { status });
         if (response.data && response.data.success && response.data.data) {

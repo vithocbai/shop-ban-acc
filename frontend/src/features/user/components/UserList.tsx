@@ -14,6 +14,7 @@ import { formatPrice } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import UserDetailModal from "./UserDetailModal";
 import UserEditModal from "./UserEditModal";
+import UserChangePasswordModal from "./UserChangePasswordModal";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -52,6 +53,7 @@ const UserList: React.FC = () => {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
 
     // Debounce search
     useEffect(() => {
@@ -95,6 +97,11 @@ const UserList: React.FC = () => {
     const handleEditUser = (user: User) => {
         setSelectedUser(user);
         setIsEditModalOpen(true);
+    };
+
+    const handleChangePassword = (user: User) => {
+        setSelectedUser(user);
+        setIsChangePasswordModalOpen(true);
     };
 
     const handleModalClose = () => {
@@ -263,7 +270,7 @@ const UserList: React.FC = () => {
                                                         <Edit className="mr-3 h-4 w-4 text-text-secondary" />
                                                         <span className="text-text-main font-medium">Chỉnh sửa</span>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem className="cursor-pointer hover:bg-gray-50 rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleViewDetail(user)}>
+                                                    <DropdownMenuItem className="cursor-pointer hover:bg-gray-50 rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleChangePassword(user)}>
                                                         <Key className="mr-3 h-4 w-4 text-text-secondary" />
                                                         <span className="text-text-main font-medium">Đổi mật khẩu</span>
                                                     </DropdownMenuItem>
@@ -319,6 +326,13 @@ const UserList: React.FC = () => {
                     onClose={() => setIsEditModalOpen(false)}
                     user={selectedUser}
                     onUserUpdated={fetchUsers}
+                />
+            )}
+            {isChangePasswordModalOpen && selectedUser && (
+                <UserChangePasswordModal
+                    isOpen={isChangePasswordModalOpen}
+                    onClose={() => setIsChangePasswordModalOpen(false)}
+                    user={selectedUser}
                 />
             )}
         </div>

@@ -232,7 +232,7 @@ const UserChangePasswordModal: React.FC<UserChangePasswordModalProps> = ({ isOpe
                     <hr className="border-border-color" />
 
                     {/* Password Requirements */}
-                    {/* <div className="space-y-3">
+                    <div className="space-y-3">
                         <Label className="font-bold text-text-main block">Yêu cầu mật khẩu:</Label>
                         <div className="space-y-2 text-sm">
                             <div className={cn("flex items-center gap-2", checkRequirement.length ? "text-success" : "text-text-secondary")}>
@@ -248,7 +248,7 @@ const UserChangePasswordModal: React.FC<UserChangePasswordModalProps> = ({ isOpe
                                 <CheckCircle2 size={16} /> Có ký tự đặc biệt
                             </div>
                         </div>
-                    </div> */}
+                    </div>
                 </form>
 
                 {/* Footer Buttons */}

@@ -91,3 +91,43 @@ class Deposit(TimestampedModel):
 
     def __str__(self):
         return f"Deposit {self.amount} - {self.user.email}"
+
+class Card(TimestampedModel):
+    """
+    Thẻ nạp / Voucher sinh ra cho người dùng nạp tiền.
+    """
+    class Status(models.TextChoices):
+        ACTIVE = 'ACTIVE', 'Hoạt động'
+        USED = 'USED', 'Đã dùng'
+        LOCKED = 'LOCKED', 'Đã khóa'
+
+    code = models.CharField(max_length=50, unique=True, verbose_name="Mã thẻ (Code)")
+    serial = models.CharField(max_length=50, unique=True, verbose_name="Số Serial")
+    amount = models.DecimalField(max_digits=18, decimal_places=2, verbose_name="Mệnh giá")
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.ACTIVE, verbose_name="Trạng thái")
+    
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='created_cards',
+        verbose_name="Người tạo"
+    )
+    
+    used_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='used_cards',
+        verbose_name="Người sử dụng"
+    )
+    used_at = models.DateTimeField(null=True, blank=True, verbose_name="Thời gian sử dụng")
+
+    class Meta:
+        verbose_name = "Thẻ nạp"
+        verbose_name_plural = "Danh sách thẻ nạp"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"[{self.amount}] {self.code} - {self.status}"

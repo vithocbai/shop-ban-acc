@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Transaction, Deposit
+from .models import Transaction, Deposit, Card
 
 class TransactionSerializer(serializers.ModelSerializer):
     """
@@ -30,3 +30,26 @@ class DepositSerializer(serializers.ModelSerializer):
         # Tự động gán user hiện tại
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
+
+class CardAdminSerializer(serializers.ModelSerializer):
+    """Serializer dành cho Admin quản lý thẻ nạp"""
+    class Meta:
+        model = Card
+        fields = ['id', 'code', 'serial', 'amount', 'status', 'created_at', 'used_at']
+
+class CardBatchCreateSerializer(serializers.Serializer):
+    """Serializer để validate payload tạo thẻ hàng loạt"""
+    quantity = serializers.IntegerField(min_value=1, max_value=1000)
+    amount = serializers.DecimalField(max_digits=18, decimal_places=2, min_value=10000)
+
+class ManualDepositSerializer(serializers.Serializer):
+    """Serializer cho việc Admin nạp tiền thủ công cho người dùng"""
+    user_id = serializers.IntegerField()
+    amount = serializers.DecimalField(max_digits=18, decimal_places=2, min_value=1000)
+    payment_method = serializers.CharField(max_length=50)
+    note = serializers.CharField(max_length=255, required=False, allow_blank=True)
+
+class CardRedeemSerializer(serializers.Serializer):
+    """Serializer để user nạp thẻ bằng mã và serial"""
+    code = serializers.CharField(max_length=50)
+    serial = serializers.CharField(max_length=50)

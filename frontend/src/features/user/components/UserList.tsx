@@ -95,11 +95,6 @@ const UserList: React.FC = () => {
         fetchUsers();
     }, [fetchUsers]);
 
-    const handleViewDetail = (user: User) => {
-        setSelectedUser(user);
-        setIsModalOpen(true);
-    };
-
     const handleEditUser = (user: User) => {
         setSelectedUser(user);
         setIsEditModalOpen(true);
@@ -130,15 +125,6 @@ const UserList: React.FC = () => {
             toast.error(error.message || "Xóa tài khoản thất bại");
             throw error; // Let the modal handle the loading state
         }
-    };
-
-    const handleModalClose = () => {
-        setIsModalOpen(false);
-        setSelectedUser(null);
-    };
-
-    const handleUserUpdated = () => {
-        fetchUsers();
     };
 
     return (
@@ -295,10 +281,6 @@ const UserList: React.FC = () => {
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-48 bg-white border border-border-color p-1 rounded-lg shadow-md">
-                                                    <DropdownMenuItem className="cursor-pointer hover:bg-gray-50 rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleViewDetail(user)}>
-                                                        <Eye className="mr-3 h-4 w-4 text-text-secondary" />
-                                                        <span className="text-text-main font-medium">Xem chi tiết</span>
-                                                    </DropdownMenuItem>
                                                     <DropdownMenuItem className="cursor-pointer hover:bg-gray-50 rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleEditUser(user)}>
                                                         <Edit className="mr-3 h-4 w-4 text-text-secondary" />
                                                         <span className="text-text-main font-medium">Chỉnh sửa</span>
@@ -312,10 +294,6 @@ const UserList: React.FC = () => {
                                                         <span className="text-text-main font-medium">Phân quyền</span>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator className="my-1 bg-border-color h-[1px]" />
-                                                    <DropdownMenuItem className="cursor-pointer hover:bg-error/10 text-error focus:text-error rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleViewDetail(user)}>
-                                                        <Lock className="mr-3 h-4 w-4" />
-                                                        <span className="font-medium">Khóa tài khoản</span>
-                                                    </DropdownMenuItem>
                                                     <DropdownMenuItem className="cursor-pointer hover:bg-error/10 text-error focus:text-error rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleDeleteUserConfirm(user)}>
                                                         <Trash2 className="mr-3 h-4 w-4" />
                                                         <span className="font-medium">Xóa tài khoản</span>

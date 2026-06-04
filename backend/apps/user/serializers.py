@@ -85,7 +85,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
             'phone', 'balance', 'role', 'status', 
             'email_verified', 'date_joined', 'last_login'
         ]
-        read_only_fields = ['id', 'email', 'username', 'first_name', 'last_name', 'avatar', 'phone', 'balance', 'email_verified', 'date_joined', 'last_login']
+        read_only_fields = ['id', 'balance', 'email_verified', 'date_joined', 'last_login']
 
 class UpdateBalanceSerializer(serializers.Serializer):
     """

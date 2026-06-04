@@ -32,6 +32,8 @@ Tài liệu này tổng hợp danh sách các công việc Backend, bám sát ki
 - [x] API Admin: Xóa tài khoản (Soft Delete) & Fix lỗi trùng Email/Username khi xóa.
 - [x] API Admin: Cộng/trừ số dư thủ công (kèm log Transaction).
 - [ ] Tích hợp Đăng nhập MXH (Google, Facebook).
+- [ ] **[Sắp ra mắt]** Quản lý Nhóm người dùng (User Group): Quản lý nhóm (Admin, Moderator, CSKH, Kế toán...).
+- [ ] **[Sắp ra mắt]** Phân quyền động (Dynamic Permissions): Thiết lập ma trận quyền (Xem, Thêm, Sửa, Xóa, Xuất dữ liệu) cho từng module chức năng.
 
 ## 3. Danh mục Game (Game)
 - [x] Model Game (Slug, Icon, Theme color).

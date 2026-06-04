@@ -128,10 +128,14 @@ Nhóm API này nằm trong prefix `/admin/` và yêu cầu User phải có Role 
 - `PUT /admin/accounts/:id/` - Cập nhật thông tin Account.
 - `DELETE /admin/accounts/:id/` - Xóa/Ẩn Account.
 
-## 7.4. Admin - Quản lý Users
-- `GET /admin/users/` - Quản lý danh sách thành viên.
-- `POST /admin/users/:id/ban/` - Khóa/Mở khóa tài khoản.
-- `POST /admin/users/:id/adjust-balance/` - Cộng/Trừ tiền thủ công.
+## 7.4. Admin - Quản lý Users (Prefix: `/api/users/`)
+- `GET /api/users/` - Danh sách User (Phân trang, bộ lọc đa năng).
+- `POST /api/users/` - Thêm người dùng mới (Thiết lập role, password, status, balance).
+- `GET /api/users/:id/` - Lấy thông tin chi tiết người dùng.
+- `PATCH /api/users/:id/` - Cập nhật phân quyền (Role) và trạng thái (Status).
+- `DELETE /api/users/:id/` - Xóa người dùng (Soft Delete an toàn).
+- `POST /api/users/:id/balance/` - Cộng/Trừ tiền thủ công (Có lưu Log giao dịch).
+- `POST /api/users/:id/password/` - Force reset mật khẩu người dùng (Không cần mật khẩu cũ).
 
 ## 7.5. Admin - Quản lý Đơn hàng & Nạp tiền
 - `GET /admin/orders/` - Xem toàn bộ đơn mua hàng.

@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import UserDetailModal from "./UserDetailModal";
 import UserEditModal from "./UserEditModal";
 import UserChangePasswordModal from "./UserChangePasswordModal";
+import UserRoleModal from "./UserRoleModal";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -54,6 +55,7 @@ const UserList: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
+    const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
 
     // Debounce search
     useEffect(() => {
@@ -102,6 +104,11 @@ const UserList: React.FC = () => {
     const handleChangePassword = (user: User) => {
         setSelectedUser(user);
         setIsChangePasswordModalOpen(true);
+    };
+
+    const handleAssignRole = (user: User) => {
+        setSelectedUser(user);
+        setIsRoleModalOpen(true);
     };
 
     const handleModalClose = () => {
@@ -274,7 +281,7 @@ const UserList: React.FC = () => {
                                                         <Key className="mr-3 h-4 w-4 text-text-secondary" />
                                                         <span className="text-text-main font-medium">Đổi mật khẩu</span>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem className="cursor-pointer hover:bg-gray-50 rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleViewDetail(user)}>
+                                                    <DropdownMenuItem className="cursor-pointer hover:bg-gray-50 rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleAssignRole(user)}>
                                                         <Shield className="mr-3 h-4 w-4 text-text-secondary" />
                                                         <span className="text-text-main font-medium">Phân quyền</span>
                                                     </DropdownMenuItem>
@@ -333,6 +340,14 @@ const UserList: React.FC = () => {
                     isOpen={isChangePasswordModalOpen}
                     onClose={() => setIsChangePasswordModalOpen(false)}
                     user={selectedUser}
+                />
+            )}
+            {isRoleModalOpen && selectedUser && (
+                <UserRoleModal
+                    isOpen={isRoleModalOpen}
+                    onClose={() => setIsRoleModalOpen(false)}
+                    user={selectedUser}
+                    onUserUpdated={fetchUsers}
                 />
             )}
         </div>

@@ -5,6 +5,8 @@ export interface User {
     id: number;
     email: string;
     username: string;
+    first_name: string;
+    last_name: string;
     avatar: string | null;
     phone: string | null;
     balance: string | number;
@@ -12,6 +14,7 @@ export interface User {
     status: UserStatus;
     email_verified: boolean;
     date_joined: string;
+    last_login: string | null;
     created_at: string;
     updated_at: string;
 }

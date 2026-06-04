@@ -113,16 +113,20 @@ from django.db.models import Q
 from django.db import transaction
 from common.pagination import StandardResultsSetPagination
 from apps.payment.models import Transaction
-from .serializers import AdminUserSerializer, UpdateBalanceSerializer
+from .serializers import AdminUserSerializer, AdminUserCreateSerializer, UpdateBalanceSerializer
 import uuid
 
-class UserListAdminView(generics.ListAPIView):
+class UserListAdminView(generics.ListCreateAPIView):
     """
-    API Lấy danh sách người dùng dành cho Admin (Có phân trang, lọc, tìm kiếm).
+    API Lấy danh sách người dùng và tạo người dùng mới dành cho Admin.
     """
     permission_classes = [permissions.IsAdminUser]
-    serializer_class = AdminUserSerializer
     pagination_class = StandardResultsSetPagination
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return AdminUserCreateSerializer
+        return AdminUserSerializer
 
     def get_queryset(self):
         queryset = User.objects.all().order_by('-created_at')
@@ -142,9 +146,9 @@ class UserListAdminView(generics.ListAPIView):
         return queryset
 
 
-class UserDetailAdminView(generics.RetrieveUpdateAPIView):
+class UserDetailAdminView(generics.RetrieveUpdateDestroyAPIView):
     """
-    API Xem chi tiết và cập nhật người dùng (Role, Status) dành cho Admin.
+    API Xem chi tiết, cập nhật (Role, Status) và Xóa người dùng dành cho Admin.
     """
     permission_classes = [permissions.IsAdminUser]
     serializer_class = AdminUserSerializer
@@ -157,6 +161,13 @@ class UserDetailAdminView(generics.RetrieveUpdateAPIView):
             "message": "Cập nhật thành công",
             "data": response.data
         })
+
+    def destroy(self, request, *args, **kwargs):
+        super().destroy(request, *args, **kwargs)
+        return Response({
+            "success": True,
+            "message": "Xóa người dùng thành công"
+        }, status=status.HTTP_200_OK)
 
 
 class UserBalanceUpdateView(APIView):
@@ -204,3 +215,26 @@ class UserBalanceUpdateView(APIView):
             "message": "Cập nhật số dư thành công",
             "data": AdminUserSerializer(user).data
         })
+
+class AdminResetUserPasswordView(APIView):
+    """
+    API để Admin đặt lại mật khẩu của bất kỳ User nào mà KHÔNG CẦN mật khẩu cũ.
+    """
+    permission_classes = [permissions.IsAdminUser]
+
+    def post(self, request, pk):
+        try:
+            target_user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response({"detail": "Người dùng không tồn tại"}, status=status.HTTP_404_NOT_FOUND)
+            
+        new_password = request.data.get("new_password")
+        if not new_password or len(new_password) < 8:
+            return Response({"new_password": ["Mật khẩu phải có ít nhất 8 ký tự."]}, status=status.HTTP_400_BAD_REQUEST)
+            
+        target_user.set_password(new_password)
+        target_user.save()
+        return Response({
+            "success": True,
+            "message": "Đặt lại mật khẩu thành công!"
+        }, status=status.HTTP_200_OK)

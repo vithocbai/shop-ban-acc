@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserListAdminView, UserDetailAdminView, UserBalanceUpdateView
+from .views import UserListAdminView, UserDetailAdminView, UserBalanceUpdateView, AdminResetUserPasswordView
 
 urlpatterns = [
     # Danh sách và tạo người dùng (Admin)
@@ -10,4 +10,7 @@ urlpatterns = [
     
     # Cập nhật số dư thủ công
     path('<int:pk>/balance/', UserBalanceUpdateView.as_view(), name='admin_user_balance_update'),
+
+    # Admin đặt lại mật khẩu người dùng
+    path('<int:pk>/password/', AdminResetUserPasswordView.as_view(), name='admin_user_password_reset'),
 ]

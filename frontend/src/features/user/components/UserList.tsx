@@ -4,7 +4,7 @@ import type { User, UserFilters } from "../types";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Search, Edit, EllipsisVertical, Eye, Lock, Shield, Trash2, Key } from "lucide-react";
+import { Loader2, Search, Edit, EllipsisVertical, Eye, Lock, Shield, Trash2, Key, Plus } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import { toast } from "react-toastify";
@@ -15,6 +15,9 @@ import { Badge } from "@/components/ui/badge";
 import UserDetailModal from "./UserDetailModal";
 import UserEditModal from "./UserEditModal";
 import UserChangePasswordModal from "./UserChangePasswordModal";
+import UserRoleModal from "./UserRoleModal";
+import UserCreateModal from "./UserCreateModal";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -54,6 +57,9 @@ const UserList: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
+    const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     // Debounce search
     useEffect(() => {
@@ -102,6 +108,28 @@ const UserList: React.FC = () => {
     const handleChangePassword = (user: User) => {
         setSelectedUser(user);
         setIsChangePasswordModalOpen(true);
+    };
+
+    const handleAssignRole = (user: User) => {
+        setSelectedUser(user);
+        setIsRoleModalOpen(true);
+    };
+
+    const handleDeleteUserConfirm = (user: User) => {
+        setSelectedUser(user);
+        setIsDeleteModalOpen(true);
+    };
+
+    const executeDeleteUser = async () => {
+        if (!selectedUser) return;
+        try {
+            await userService.deleteUser(selectedUser.id);
+            toast.success(`Đã xóa tài khoản ${selectedUser.username} thành công`);
+            fetchUsers();
+        } catch (error: any) {
+            toast.error(error.message || "Xóa tài khoản thất bại");
+            throw error; // Let the modal handle the loading state
+        }
     };
 
     const handleModalClose = () => {
@@ -165,6 +193,11 @@ const UserList: React.FC = () => {
                             <SelectItem value="PENDING">Chờ xác thực</SelectItem>
                         </SelectContent>
                     </Select>
+                </div>
+                <div>
+                    <Button onClick={() => setIsCreateModalOpen(true)} className="flex items-center gap-2">
+                        <Plus size={18} /> Thêm người dùng
+                    </Button>
                 </div>
             </div>
 
@@ -274,7 +307,7 @@ const UserList: React.FC = () => {
                                                         <Key className="mr-3 h-4 w-4 text-text-secondary" />
                                                         <span className="text-text-main font-medium">Đổi mật khẩu</span>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem className="cursor-pointer hover:bg-gray-50 rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleViewDetail(user)}>
+                                                    <DropdownMenuItem className="cursor-pointer hover:bg-gray-50 rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleAssignRole(user)}>
                                                         <Shield className="mr-3 h-4 w-4 text-text-secondary" />
                                                         <span className="text-text-main font-medium">Phân quyền</span>
                                                     </DropdownMenuItem>
@@ -283,7 +316,7 @@ const UserList: React.FC = () => {
                                                         <Lock className="mr-3 h-4 w-4" />
                                                         <span className="font-medium">Khóa tài khoản</span>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem className="cursor-pointer hover:bg-error/10 text-error focus:text-error rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleViewDetail(user)}>
+                                                    <DropdownMenuItem className="cursor-pointer hover:bg-error/10 text-error focus:text-error rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleDeleteUserConfirm(user)}>
                                                         <Trash2 className="mr-3 h-4 w-4" />
                                                         <span className="font-medium">Xóa tài khoản</span>
                                                     </DropdownMenuItem>
@@ -333,6 +366,34 @@ const UserList: React.FC = () => {
                     isOpen={isChangePasswordModalOpen}
                     onClose={() => setIsChangePasswordModalOpen(false)}
                     user={selectedUser}
+                />
+            )}
+            {isRoleModalOpen && selectedUser && (
+                <UserRoleModal
+                    isOpen={isRoleModalOpen}
+                    onClose={() => setIsRoleModalOpen(false)}
+                    user={selectedUser}
+                    onUserUpdated={fetchUsers}
+                />
+            )}
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={executeDeleteUser}
+                title="Xóa tài khoản"
+                description={
+                    <>
+                        Bạn có chắc chắn muốn xóa tài khoản <span className="font-bold text-text-main">{selectedUser?.username}</span> không? Hành động này sẽ xóa toàn bộ dữ liệu liên quan và không thể hoàn tác.
+                    </>
+                }
+                confirmText="Xóa tài khoản"
+                variant="danger"
+            />
+            {isCreateModalOpen && (
+                <UserCreateModal
+                    isOpen={isCreateModalOpen}
+                    onClose={() => setIsCreateModalOpen(false)}
+                    onUserCreated={fetchUsers}
                 />
             )}
         </div>

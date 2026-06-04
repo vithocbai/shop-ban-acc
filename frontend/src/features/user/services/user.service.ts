@@ -26,12 +26,25 @@ export const userService = {
         return response.data as unknown as User;
     },
 
+    createUser: async (data: any): Promise<User> => {
+        const response = await api.post(`/users/`, data);
+        if (response.data && response.data.email) {
+            return response.data;
+        }
+        return response.data.data || response.data;
+    },
+
     updateUser: async (id: number, data: Partial<User>): Promise<User> => {
         const response = await api.patch<ApiResponse<User>>(`/users/${id}/`, data);
         if (response.data && response.data.success && response.data.data) {
             return response.data.data;
         }
         throw new Error(response.data?.message || "Cập nhật người dùng thất bại");
+    },
+
+    deleteUser: async (id: number): Promise<void> => {
+        const response = await api.delete(`/users/${id}/`);
+        return response.data;
     },
 
     updateUserStatus: async (id: number, status: string): Promise<User> => {
@@ -56,5 +69,17 @@ export const userService = {
             return response.data.data;
         }
         throw new Error(response.data?.message || "Cập nhật số dư thất bại");
+    },
+
+    // API đổi mật khẩu (User tự đổi)
+    updateUserPassword: async (data: any): Promise<any> => {
+        const response = await api.post(`/auth/password/change/`, data);
+        return response.data;
+    },
+
+    // API Admin đặt lại mật khẩu người dùng
+    adminResetUserPassword: async (id: number, new_password: string): Promise<any> => {
+        const response = await api.post(`/users/${id}/password/`, { new_password });
+        return response.data;
     }
 };

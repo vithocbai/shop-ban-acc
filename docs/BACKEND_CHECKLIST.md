@@ -23,8 +23,14 @@ Tài liệu này tổng hợp danh sách các công việc Backend, bám sát ki
 ## 2. Người dùng & Phân quyền (User)
 - [x] Triển khai Custom User Model (Email làm định danh, Balance, Role, Status).
 - [x] API Đăng ký / Đăng nhập (JWT Authentication).
-- [x] API Quên mật khẩu / Đổi mật khẩu.
+- [x] API Quên mật khẩu / Đổi mật khẩu cá nhân.
 - [x] Cập nhật Profile (Avatar, Số điện thoại).
+- [x] API Admin: Lấy danh sách, tìm kiếm, lọc (Role, Status) và phân trang.
+- [x] API Admin: Thêm người dùng mới (Gán role, status, balance ngay từ đầu).
+- [x] API Admin: Cập nhật quyền hạn (Role) và trạng thái (Status).
+- [x] API Admin: Đặt lại mật khẩu cho User bất kỳ (Không cần mật khẩu cũ).
+- [x] API Admin: Xóa tài khoản (Soft Delete) & Fix lỗi trùng Email/Username khi xóa.
+- [x] API Admin: Cộng/trừ số dư thủ công (kèm log Transaction).
 - [ ] Tích hợp Đăng nhập MXH (Google, Facebook).
 
 ## 3. Danh mục Game (Game)

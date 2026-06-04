@@ -5,6 +5,7 @@ import GameManagementPage from "./pages/admin/GameManagement";
 import AccountManagementPage from "./pages/admin/AccountManagement";
 import OrderManagementPage from "./pages/admin/OrderManagement";
 import UserManagementPage from "./pages/admin/UserManagement";
+import ManualDepositPage from "./pages/admin/deposits/ManualDeposit";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -69,7 +70,8 @@ function App() {
                         <Route path="accounts" element={<AccountManagementPage />} />
                         <Route path="orders" element={<OrderManagementPage />} />
                         <Route path="users" element={<UserManagementPage />} />
-                        <Route path="deposits" element={<div>Quản lý Nạp tiền (Coming soon)</div>} />
+                        <Route path="deposits" element={<Navigate to="/admin/deposits/manual" replace />} />
+                        <Route path="deposits/manual" element={<ManualDepositPage />} />
                     </Route>
 
                     {/* Home Redirect / Landing Page */}

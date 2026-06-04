@@ -21,7 +21,20 @@ class TransactionViewSet(ResponseEnvelopeMixin, viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Transaction.objects.filter(user=self.request.user)
+        queryset = Transaction.objects.all()
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(user=self.request.user)
+            
+        # Thêm filter cơ bản
+        type_param = self.request.query_params.get('type')
+        if type_param:
+            queryset = queryset.filter(type=type_param)
+            
+        status_param = self.request.query_params.get('status')
+        if status_param:
+            queryset = queryset.filter(status=status_param)
+            
+        return queryset
 
 
 class DepositViewSet(ResponseEnvelopeMixin, viewsets.ModelViewSet):

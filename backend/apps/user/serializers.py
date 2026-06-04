@@ -87,6 +87,23 @@ class AdminUserSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'email', 'username', 'first_name', 'last_name', 'avatar', 'phone', 'balance', 'email_verified', 'date_joined', 'last_login']
 
+class AdminUserCreateSerializer(serializers.ModelSerializer):
+    """
+    Serializer cho Admin tạo người dùng mới.
+    """
+    password = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = User
+        fields = ['email', 'username', 'password', 'role', 'status', 'first_name', 'last_name', 'phone']
+
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
+
 class UpdateBalanceSerializer(serializers.Serializer):
     """
     Serializer cho chức năng cộng/trừ số dư thủ công.

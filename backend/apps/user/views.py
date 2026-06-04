@@ -215,3 +215,26 @@ class UserBalanceUpdateView(APIView):
             "message": "Cập nhật số dư thành công",
             "data": AdminUserSerializer(user).data
         })
+
+class AdminResetUserPasswordView(APIView):
+    """
+    API để Admin đặt lại mật khẩu của bất kỳ User nào mà KHÔNG CẦN mật khẩu cũ.
+    """
+    permission_classes = [permissions.IsAdminUser]
+
+    def post(self, request, pk):
+        try:
+            target_user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response({"detail": "Người dùng không tồn tại"}, status=status.HTTP_404_NOT_FOUND)
+            
+        new_password = request.data.get("new_password")
+        if not new_password or len(new_password) < 8:
+            return Response({"new_password": ["Mật khẩu phải có ít nhất 8 ký tự."]}, status=status.HTTP_400_BAD_REQUEST)
+            
+        target_user.set_password(new_password)
+        target_user.save()
+        return Response({
+            "success": True,
+            "message": "Đặt lại mật khẩu thành công!"
+        }, status=status.HTTP_200_OK)

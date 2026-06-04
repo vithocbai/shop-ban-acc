@@ -16,6 +16,12 @@ class CustomUserManager(UserManager):
 
         return self._create_user(username, email, password, **extra_fields)
 
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted_at__isnull=True)
+
+    def all_with_deleted(self):
+        return super().get_queryset()
+
 class User(AbstractUser, TimestampedModel, SoftDeleteModel):
     """
     Custom User Model theo yêu cầu trong DATA-SCHEMA.md.
@@ -64,3 +70,21 @@ class User(AbstractUser, TimestampedModel, SoftDeleteModel):
 
     def __str__(self):
         return f"{self.email} ({self.get_role_display()})"
+
+    def delete(self, using=None, keep_parents=False):
+        import uuid
+        # Append a short uuid to email and username to avoid unique constraint issues
+        suffix = f"_del_{uuid.uuid4().hex[:6]}"
+        
+        # Format email: abc@gmail.com -> abc_del_xxxxxx@gmail.com
+        if '@' in self.email:
+            parts = self.email.split('@')
+            self.email = f"{parts[0][:40]}{suffix}@{parts[1]}"
+        else:
+            self.email = f"{self.email[:40]}{suffix}"
+            
+        self.username = f"{self.username[:40]}{suffix}"
+        
+        # Dùng save thay vì update để không dính hook update_fields nếu không cẩn thận
+        self.save(update_fields=['email', 'username'])
+        super().delete(using=using, keep_parents=keep_parents)

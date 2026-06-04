@@ -34,8 +34,8 @@ Tài liệu này tổng hợp danh sách các công việc Backend, bám sát ki
 
 ## 3. Quản lý Nạp tiền (Deposit, Card, History)
 - [x] **Lịch sử nạp tiền (Deposit History)**: Lưu trữ các yêu cầu nạp tiền (Deposit).
-- [ ] **Nạp tiền thủ công (Manual Deposit)**: API cho phép Admin tra cứu và trực tiếp cộng tiền cho user (Mở rộng từ API cộng/trừ số dư).
-- [ ] **Thẻ nạp (Card Deposit)**: Model và API quản lý sinh mã thẻ cào (Voucher/Card), trạng thái (hoạt động/đã dùng/khóa) và logic xử lý khi user nhập mã.
+- [x] **Nạp tiền thủ công (Manual Deposit)**: API cho phép Admin tra cứu và trực tiếp cộng tiền cho user (Mở rộng từ API cộng/trừ số dư).
+- [x] **Thẻ nạp (Card Deposit)**: Model và API quản lý sinh mã thẻ cào (Voucher/Card), trạng thái (hoạt động/đã dùng/khóa) và logic xử lý khi user nhập mã.
 
 ## 4. Quản lý Tài khoản & Game (Account & Game Inventory)
 - [x] **Danh mục Game**: Model và API CRUD danh mục Game (Liên Quân, Ngọc Rồng...).

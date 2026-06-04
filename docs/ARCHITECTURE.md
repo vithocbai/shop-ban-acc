@@ -58,16 +58,18 @@ Mục tiêu:
 ```text
 SYSTEM
 │
-├── Frontend Website (Public & Auth)
-├── Admin Dashboard (Quản trị hệ thống)
+├── Frontend Website (Public User Interface)
+├── Admin Dashboard (Quản trị hệ thống - 7 Core Modules)
+│   ├── Analytics (Báo cáo thống kê)
+│   ├── Inventory Management (Tài khoản & Danh mục game)
+│   ├── Order System (Đơn hàng & Lịch sử mua)
+│   ├── User & RBAC System (Người dùng & Phân quyền)
+│   ├── Payment & Deposit (Quản lý nạp tiền & Thẻ nạp)
+│   ├── Content Management (Tin tức, Banner, Thông báo)
+│   └── System Configuration (Cài đặt & Nhật ký)
 ├── REST API (Backend Django)
-├── Authentication System
-├── Payment System (Nạp tiền, thanh toán)
-├── Account Inventory (Kho acc)
-├── Order & Cart System (Đơn hàng, Giỏ hàng)
-├── Notification System (Thông báo)
-├── Upload System (Quản lý file)
-└── Analytics System (Báo cáo thống kê)
+├── Database (PostgreSQL + JSONB)
+└── Upload & File System (Media Storage)
 ```
 
 ---
@@ -140,13 +142,31 @@ shop-game/ (web-builder/)
 - Tài khoản người dùng (Profile, Đổi mật khẩu, Lịch sử mua/nạp)
 - Đăng nhập / Đăng ký
 
-## Admin Dashboard
-- **Dashboard**: Thống kê doanh thu, số đơn, người dùng.
-- **Quản lý Game**: Thêm/sửa/xóa game, cấu hình category.
-- **Quản lý Tài khoản (Acc)**: Thêm acc, định giá, trạng thái.
-- **Quản lý Đơn hàng**: Theo dõi lịch sử mua hàng, xử lý khiếu nại.
-- **Quản lý Nạp tiền / Giao dịch**: Theo dõi nạp tiền, nạp thủ công.
-- **Quản lý Người dùng**: Phân quyền, khóa/mở tài khoản.
+## Admin Dashboard (7 Functional Modules)
+
+Kiến trúc phân hệ Admin được thiết kế bám sát theo luồng vận hành thực tế của hệ thống (menuItems), chia thành 7 nhóm chính:
+
+1. **Báo cáo thống kê (`/admin/dashboard`)**: Tổng quan doanh thu, đơn hàng, tài khoản, biểu đồ tăng trưởng và top khách hàng.
+2. **Quản lý tài khoản (`/admin/accounts`, `/admin/games`)**:
+   - Quản lý kho tài khoản (Accounts): Thêm, sửa giá, gỡ kho, lưu dữ liệu động JSONB.
+   - Quản lý danh mục game (Games): Tạo game mới, thiết lập icon/banner, thuộc tính đặc trưng.
+3. **Quản lý đơn hàng (`/admin/orders`, `/admin/transactions`)**:
+   - Quản lý đơn hàng: Giám sát toàn bộ trạng thái mua acc, tự động giao hàng (auto delivery).
+   - Lịch sử giao dịch: Lưu vết mọi biến động số dư (mua bán, hoàn tiền).
+4. **Quản lý người dùng (`/admin/users`, `/admin/roles`, `/admin/user-groups`)**:
+   - Quản lý danh sách thành viên: Khóa/mở, sửa thông tin, xem số dư.
+   - Quản lý Nhóm & Phân quyền (RBAC): Tạo các nhóm nhân sự (CSKH, Editor, Kế toán) và cấp quyền tới từng nút bấm (Xem, Thêm, Sửa, Xóa).
+5. **Quản lý nạp tiền (`/admin/deposits/*`)**:
+   - Nạp tiền thủ công: Admin tự tay tra cứu tài khoản và cộng tiền kèm ghi chú.
+   - Thẻ nạp (Voucher/Card): Tạo hàng loạt mã nạp, quản lý trạng thái thẻ chưa nạp/đã nạp.
+   - Lịch sử nạp tiền: Bảng đối soát chi tiết dòng tiền nạp vào hệ thống.
+6. **Quản lý nội dung (CMS) (`/admin/news`, `/admin/banners`, `/admin/notifications`)**:
+   - Tin tức: Quản lý bài viết SEO, hướng dẫn sử dụng.
+   - Banner: Thiết lập slideshow ảnh ngoài trang chủ.
+   - Thông báo hệ thống: Gửi thông báo đẩy (push notifications) cho từng user hoặc toàn hệ thống.
+7. **Cấu hình hệ thống (`/admin/settings/*`)**:
+   - Tùy chỉnh web: Logo, Hotline, Meta SEO, Thông tin ngân hàng.
+   - Nhật ký hệ thống (System Logs): Theo dõi lịch sử thao tác của các Admin/Nhân sự để tránh gian lận.
 
 ---
 

@@ -20,62 +20,52 @@ Tài liệu này tổng hợp danh sách các công việc Backend, bám sát ki
 - [x] Viết Script Seed Data (Dữ liệu mẫu cho Game, Account, Admin).
 - [x] Chuẩn hóa Phân trang (Pagination) & Response Envelope cho toàn bộ API (`ResponseEnvelopeMixin`).
 
-## 2. Người dùng & Phân quyền (User)
+## 2. Quản lý Người dùng (User, Group, Role)
 - [x] Triển khai Custom User Model (Email làm định danh, Balance, Role, Status).
 - [x] API Đăng ký / Đăng nhập (JWT Authentication).
 - [x] API Quên mật khẩu / Đổi mật khẩu cá nhân.
 - [x] Cập nhật Profile (Avatar, Số điện thoại).
-- [x] API Admin: Lấy danh sách, tìm kiếm, lọc (Role, Status) và phân trang.
-- [x] API Admin: Thêm người dùng mới (Gán role, status, balance ngay từ đầu).
-- [x] API Admin: Cập nhật quyền hạn (Role) và trạng thái (Status).
-- [x] API Admin: Đặt lại mật khẩu cho User bất kỳ (Không cần mật khẩu cũ).
-- [x] API Admin: Xóa tài khoản (Soft Delete) & Fix lỗi trùng Email/Username khi xóa.
+- [x] API Admin: Lấy danh sách, tìm kiếm, lọc và phân trang.
+- [x] API Admin: Thêm/Sửa/Xóa người dùng (Soft Delete an toàn).
 - [x] API Admin: Cộng/trừ số dư thủ công (kèm log Transaction).
+- [ ] **[Sắp ra mắt]** Nhóm người dùng: API CRUD các nhóm nhân sự (Admin, CSKH...).
+- [ ] **[Sắp ra mắt]** Phân quyền động (RBAC): Thiết lập ma trận quyền hạn cho nhóm.
 - [ ] Tích hợp Đăng nhập MXH (Google, Facebook).
-- [ ] **[Sắp ra mắt]** Quản lý Nhóm người dùng (User Group): Quản lý nhóm (Admin, Moderator, CSKH, Kế toán...).
-- [ ] **[Sắp ra mắt]** Phân quyền động (Dynamic Permissions): Thiết lập ma trận quyền (Xem, Thêm, Sửa, Xóa, Xuất dữ liệu) cho từng module chức năng.
 
-## 3. Danh mục Game (Game)
-- [x] Model Game (Slug, Icon, Theme color).
-- [x] API Public: Xem danh sách Game đang hoạt động.
-- [x] API Admin: CRUD danh mục Game.
+## 3. Quản lý Nạp tiền (Deposit, Card, History)
+- [x] **Lịch sử nạp tiền (Deposit History)**: Lưu trữ các yêu cầu nạp tiền (Deposit).
+- [ ] **Nạp tiền thủ công (Manual Deposit)**: API cho phép Admin tra cứu và trực tiếp cộng tiền cho user (Mở rộng từ API cộng/trừ số dư).
+- [ ] **Thẻ nạp (Card Deposit)**: Model và API quản lý sinh mã thẻ cào (Voucher/Card), trạng thái (hoạt động/đã dùng/khóa) và logic xử lý khi user nhập mã.
 
-## 4. Quản lý Tài khoản (Account)
-- [x] Model Account (Sử dụng JSONB cho dữ liệu động: Rank, Skin...).
-- [x] Model AccountImage (Gallery ảnh chi tiết).
-- [x] API Public: Danh sách tài khoản kèm bộ lọc nâng cao.
-- [x] API Public: Xem chi tiết tài khoản.
-- [x] API Admin: Đăng bán tài khoản, cập nhật trạng thái.
+## 4. Quản lý Tài khoản & Game (Account & Game Inventory)
+- [x] **Danh mục Game**: Model và API CRUD danh mục Game (Liên Quân, Ngọc Rồng...).
+- [x] **Quản lý Tài khoản**: Model Account sử dụng JSONB lưu trữ dữ liệu động (Rank, Skin...).
+- [x] Hình ảnh chi tiết (Gallery AccountImage).
+- [x] API Public: Xem danh sách tài khoản, chi tiết tài khoản.
+- [x] API Admin: Quản lý kho, đăng bán, sửa giá.
 
-## 5. Thanh toán & Giao dịch (Payment/Transaction)
-- [x] Model Transaction: Ghi log biến động số dư.
-- [x] Service `update_user_balance`: Xử lý tiền an toàn (Atomic).
-- [x] Model Deposit: Quản lý nạp tiền (Bank, Momo).
-- [x] API Admin: Duyệt/Từ chối nạp tiền.
-- [x] API User: Xem lịch sử giao dịch.
+## 5. Quản lý Đơn hàng & Giao dịch (Order & Transaction)
+- [x] **Lịch sử Giao dịch**: Ghi vết biến động số dư (Transaction).
+- [x] Service `update_user_balance`: Xử lý giao dịch an toàn (Atomic).
+- [x] **Quản lý Đơn hàng**: Model Order & OrderItem.
+- [x] Service `purchase_account`: Logic mua tài khoản và trừ tiền tự động.
+- [x] API Checkout mua hàng (Tự động chuyển thông tin tài khoản cho khách).
 
-## 6. Đơn hàng & Giỏ hàng (Order/Cart)
-- [x] Model Order & OrderItem.
-- [x] Service `purchase_account`: Logic mua hàng nguyên tử.
-- [x] API Checkout: Mua hàng nhanh.
-- [ ] API Cart: Giỏ hàng (Optional cho shop bán lẻ).
+## 6. Quản lý Nội dung (CMS - News, Banner, Notification)
+- [x] **Thông báo**: Model và API Notification (Gửi thông báo nạp/mua thành công).
+- [ ] **Tin tức (News)**: API quản lý bài viết blog/hướng dẫn.
+- [ ] **Banner**: API quản lý slideshow quảng cáo trang chủ.
 
-## 7. Thông báo & Nội dung (Notification/News/Banner)
-- [x] Model Notification: Thông báo in-app.
-- [x] API/Service Notifier: Gửi thông báo tự động khi nạp/mua.
-- [ ] **News**: API tin tức hệ thống.
-- [ ] **Banner**: API quản lý slide trang chủ.
+## 7. Báo cáo thống kê (Analytics)
+- [ ] **Dashboard**: API tổng hợp doanh thu (ngày/tuần/tháng), tổng đơn, người dùng.
+- [ ] **Biểu đồ & Top**: Dữ liệu biểu đồ doanh thu, tỷ trọng game bán chạy, top khách hàng VIP.
 
-## 8. Hệ thống bổ trợ (Tasks còn lại)
-- [ ] **Withdraw**: API yêu cầu rút tiền.
-- [ ] **Analytics**: API thống kê báo cáo (Revenue, Users).
-- [ ] **Upload**: Tối ưu hóa hệ thống lưu trữ ảnh (S3/Cloudinary).
-- [ ] **System Config**: Cấu hình shop linh hoạt qua DB.
-
-## 9. DevOps & Testing
-- [ ] Dockerize ứng dụng.
-- [ ] Cấu hình CI/CD.
+## 8. Cấu hình hệ thống & DevOps (System Settings)
+- [ ] **Cài đặt chung**: API cấu hình thông tin web (Logo, Hotline, Meta).
+- [ ] **Cài đặt thanh toán**: API thiết lập tài khoản ngân hàng nhận tiền.
+- [ ] **Nhật ký hệ thống (System Logs)**: API truy xuất `django_admin_log`.
 - [x] Viết Unit Test cho Core Logic.
+- [ ] Dockerize ứng dụng và cấu hình CI/CD.
 
 ---
-*Cập nhật lần cuối: 26/05/2026*
+*Cập nhật lần cuối: 30/05/2026 - Đồng bộ hoàn toàn với kiến trúc 7 Modules*

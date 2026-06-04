@@ -12,7 +12,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { formatPrice } from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";
-import UserDetailModal from "./UserDetailModal";
 import UserEditModal from "./UserEditModal";
 import UserChangePasswordModal from "./UserChangePasswordModal";
 import UserRoleModal from "./UserRoleModal";
@@ -323,14 +322,6 @@ const UserList: React.FC = () => {
             </Card>
 
             {/* Modals */}
-            {isModalOpen && selectedUser && (
-                <UserDetailModal
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    user={selectedUser}
-                    onUserUpdated={fetchUsers}
-                />
-            )}
             {isEditModalOpen && selectedUser && (
                 <UserEditModal
                     isOpen={isEditModalOpen}

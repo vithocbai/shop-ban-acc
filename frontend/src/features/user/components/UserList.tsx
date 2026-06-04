@@ -16,6 +16,7 @@ import UserDetailModal from "./UserDetailModal";
 import UserEditModal from "./UserEditModal";
 import UserChangePasswordModal from "./UserChangePasswordModal";
 import UserRoleModal from "./UserRoleModal";
+import UserCreateModal from "./UserCreateModal";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import {
     DropdownMenu,
@@ -58,6 +59,7 @@ const UserList: React.FC = () => {
     const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
     const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     // Debounce search
     useEffect(() => {
@@ -191,6 +193,11 @@ const UserList: React.FC = () => {
                             <SelectItem value="PENDING">Chờ xác thực</SelectItem>
                         </SelectContent>
                     </Select>
+                </div>
+                <div>
+                    <Button onClick={() => setIsCreateModalOpen(true)} className="flex items-center gap-2">
+                        <Plus size={18} /> Thêm người dùng
+                    </Button>
                 </div>
             </div>
 
@@ -382,6 +389,13 @@ const UserList: React.FC = () => {
                 confirmText="Xóa tài khoản"
                 variant="danger"
             />
+            {isCreateModalOpen && (
+                <UserCreateModal
+                    isOpen={isCreateModalOpen}
+                    onClose={() => setIsCreateModalOpen(false)}
+                    onUserCreated={fetchUsers}
+                />
+            )}
         </div>
     );
 };

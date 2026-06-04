@@ -56,5 +56,11 @@ export const userService = {
             return response.data.data;
         }
         throw new Error(response.data?.message || "Cập nhật số dư thất bại");
+    },
+
+    // API đổi  mật khẩu
+    updateUserPassword: async (data: any): Promise<any> => {
+        const response = await api.post(`/auth/password/change/`, data);
+        return response.data;
     }
 };

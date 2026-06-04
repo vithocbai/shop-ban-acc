@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "react-toastify";
 import type { User } from "../types";
 import { cn } from "@/lib/utils";
+import { userService } from "../services/user.service";
 
 interface UserChangePasswordModalProps {
     isOpen: boolean;
@@ -95,11 +96,31 @@ const UserChangePasswordModal: React.FC<UserChangePasswordModalProps> = ({ isOpe
         }
 
         try {
-            // Placeholder cho API đổi mật khẩu
-            toast.info("Tính năng Đổi mật khẩu đang được phát triển ở Backend.");
+            await userService.updateUserPassword({
+                old_password: formData.currentPassword,
+                new_password: formData.newPassword,
+                confirm_password: formData.confirmPassword
+            });
+            toast.success("Đổi mật khẩu thành công!");
             onClose();
         } catch (err: any) {
-            toast.error(err.response?.data?.message || err.message || "Đổi mật khẩu thất bại.");
+            if (err.response?.status === 400 && typeof err.response?.data === "object") {
+                const data = err.response.data;
+                const parsedErrors: Record<string, string> = {};
+                
+                if (data.old_password) parsedErrors.currentPassword = Array.isArray(data.old_password) ? data.old_password.join(" ") : String(data.old_password);
+                if (data.new_password) parsedErrors.newPassword = Array.isArray(data.new_password) ? data.new_password.join(" ") : String(data.new_password);
+                if (data.confirm_password) parsedErrors.confirmPassword = Array.isArray(data.confirm_password) ? data.confirm_password.join(" ") : String(data.confirm_password);
+                
+                if (Object.keys(parsedErrors).length > 0) {
+                    setFieldErrors(parsedErrors);
+                    toast.error("Vui lòng kiểm tra lại thông tin đã nhập.");
+                } else {
+                    toast.error(data.message || data.detail || "Đổi mật khẩu thất bại.");
+                }
+            } else {
+                toast.error(err.response?.data?.message || err.message || "Đổi mật khẩu thất bại.");
+            }
         } finally {
             setIsLoading(false);
         }
@@ -211,7 +232,7 @@ const UserChangePasswordModal: React.FC<UserChangePasswordModalProps> = ({ isOpe
                     <hr className="border-border-color" />
 
                     {/* Password Requirements */}
-                    <div className="space-y-3">
+                    {/* <div className="space-y-3">
                         <Label className="font-bold text-text-main block">Yêu cầu mật khẩu:</Label>
                         <div className="space-y-2 text-sm">
                             <div className={cn("flex items-center gap-2", checkRequirement.length ? "text-success" : "text-text-secondary")}>
@@ -227,7 +248,7 @@ const UserChangePasswordModal: React.FC<UserChangePasswordModalProps> = ({ isOpe
                                 <CheckCircle2 size={16} /> Có ký tự đặc biệt
                             </div>
                         </div>
-                    </div>
+                    </div> */}
                 </form>
 
                 {/* Footer Buttons */}

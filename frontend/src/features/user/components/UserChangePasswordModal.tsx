@@ -18,12 +18,10 @@ interface UserChangePasswordModalProps {
 const UserChangePasswordModal: React.FC<UserChangePasswordModalProps> = ({ isOpen, onClose, user }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     
     const [formData, setFormData] = useState({
-        currentPassword: "",
         newPassword: "",
         confirmPassword: ""
     });
@@ -81,7 +79,6 @@ const UserChangePasswordModal: React.FC<UserChangePasswordModalProps> = ({ isOpe
         setFieldErrors({});
 
         const errors: Record<string, string> = {};
-        if (!formData.currentPassword) errors.currentPassword = "Vui lòng nhập mật khẩu hiện tại.";
         if (!formData.newPassword) errors.newPassword = "Vui lòng nhập mật khẩu mới.";
         if (formData.newPassword && formData.newPassword.length < 8) errors.newPassword = "Mật khẩu mới phải có ít nhất 8 ký tự.";
         if (!formData.confirmPassword) errors.confirmPassword = "Vui lòng xác nhận mật khẩu mới.";
@@ -96,11 +93,7 @@ const UserChangePasswordModal: React.FC<UserChangePasswordModalProps> = ({ isOpe
         }
 
         try {
-            await userService.updateUserPassword({
-                old_password: formData.currentPassword,
-                new_password: formData.newPassword,
-                confirm_password: formData.confirmPassword
-            });
+            await userService.adminResetUserPassword(user.id, formData.newPassword);
             toast.success("Đổi mật khẩu thành công!");
             onClose();
         } catch (err: any) {
@@ -108,7 +101,6 @@ const UserChangePasswordModal: React.FC<UserChangePasswordModalProps> = ({ isOpe
                 const data = err.response.data;
                 const parsedErrors: Record<string, string> = {};
                 
-                if (data.old_password) parsedErrors.currentPassword = Array.isArray(data.old_password) ? data.old_password.join(" ") : String(data.old_password);
                 if (data.new_password) parsedErrors.newPassword = Array.isArray(data.new_password) ? data.new_password.join(" ") : String(data.new_password);
                 if (data.confirm_password) parsedErrors.confirmPassword = Array.isArray(data.confirm_password) ? data.confirm_password.join(" ") : String(data.confirm_password);
                 
@@ -157,25 +149,6 @@ const UserChangePasswordModal: React.FC<UserChangePasswordModalProps> = ({ isOpe
 
                     {/* Inputs */}
                     <div className="space-y-4">
-                        <div className="space-y-1.5">
-                            <Label className="font-bold text-text-main">Mật khẩu hiện tại <span className="text-error">*</span></Label>
-                            <div className="relative">
-                                <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
-                                <Input 
-                                    name="currentPassword"
-                                    type={showCurrentPassword ? "text" : "password"} 
-                                    value={formData.currentPassword}
-                                    onChange={handleInputChange}
-                                    placeholder="Nhập mật khẩu hiện tại" 
-                                    className={cn("pl-10 pr-10", fieldErrors.currentPassword && "border-error focus-visible:ring-error")}
-                                />
-                                <button type="button" onClick={() => setShowCurrentPassword(!showCurrentPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-main cursor-pointer">
-                                    {showCurrentPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                </button>
-                            </div>
-                            {fieldErrors.currentPassword && <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.currentPassword}</p>}
-                        </div>
-
                         <div className="space-y-1.5">
                             <Label className="font-bold text-text-main">Mật khẩu mới <span className="text-error">*</span></Label>
                             <div className="relative">

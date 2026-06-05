@@ -130,6 +130,7 @@ class CardAdminViewSet(ResponseEnvelopeMixin, viewsets.ModelViewSet):
         cards = generate_cards(quantity, amount, request.user)
         
         return Response({
+            "success": True,  # Thêm field này để frontend phân biệt thành công/thất bại
             "message": f"Tạo thành công {len(cards)} thẻ nạp mệnh giá {amount:,.0f}đ.",
         })
 
@@ -143,6 +144,25 @@ class CardAdminViewSet(ResponseEnvelopeMixin, viewsets.ModelViewSet):
         card.status = Card.Status.LOCKED
         card.save()
         return Response({"message": "Đã khóa thẻ thành công."})
+
+    @action(detail=False, methods=['get'])
+    def stats(self, request):
+        """
+        API trả về số liệu thống kê thẻ theo từng trạng thái.
+        Tại sao cần endpoint riêng? Vì nếu frontend cần đếm tổng, đếm theo status,
+        không thể dựa vào danh sách đã phân trang → sẽ sai.
+        Dùng annotate + values trực tiếp trên DB: chỉ 1 query, không tải toàn bộ objects.
+        """
+        from django.db.models import Count
+        counts = Card.objects.values('status').annotate(count=Count('id'))
+        result = {"total": 0, "active": 0, "used": 0, "locked": 0}
+        for row in counts:
+            count = row['count']
+            result['total'] += count
+            status_key = row['status'].lower()
+            if status_key in result:
+                result[status_key] = count
+        return Response({"success": True, "data": result})
 
 
 from rest_framework.views import APIView

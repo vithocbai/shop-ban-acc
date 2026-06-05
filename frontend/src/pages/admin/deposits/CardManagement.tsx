@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 import { Loader2, Plus, Search, CheckCircle2, XCircle, Lock } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { PaginationControls } from "@/components/shared/PaginationControls";
+import CopyButton from "@/components/ui/copy-button";
 
 const STATUS_MAP: Record<string, { label: string; color: string; icon: any }> = {
     ACTIVE: { label: "Hoạt động", color: "bg-green-100 text-green-800", icon: CheckCircle2 },
@@ -310,9 +311,15 @@ export default function CardManagement() {
                                 
                                 return (
                                     <TableRow key={card.id}>
-                                        <TableCell className="font-mono">{card.code}</TableCell>
-                                        <TableCell className="font-mono text-muted-foreground">{card.serial}</TableCell>
-                                        <TableCell className="font-medium text-green-600 text-right">
+                                        <TableCell className="font-medium whitespace-nowrap">
+                                            <span>{card.code}</span>
+                                            <CopyButton value={card.code} />
+                                        </TableCell>
+                                        <TableCell className="font-medium whitespace-nowrap">
+                                            <span>{card.serial}</span>
+                                            <CopyButton value={card.serial} />
+                                        </TableCell>
+                                        <TableCell className="font-medium text-green-600 text-right whitespace-nowrap">
                                             {new Intl.NumberFormat('vi-VN').format(Number(card.amount))} đ
                                         </TableCell>
                                         <TableCell className="text-center">

@@ -8,6 +8,22 @@ export interface ManualDepositData {
     note?: string;
 }
 
+export interface Card {
+    id: number;
+    code: string;
+    serial: string;
+    amount: number;
+    status: "ACTIVE" | "USED" | "LOCKED";
+    created_at: string;
+    used_at: string | null;
+}
+
+export interface CardFilters {
+    status?: string;
+    page?: number;
+    page_size?: number;
+}
+
 export const paymentService = {
     manualDeposit: async (data: ManualDepositData): Promise<any> => {
         const response = await api.post<ApiResponse<any>>("/manual-deposit/", data);
@@ -15,5 +31,36 @@ export const paymentService = {
             return response.data;
         }
         throw new Error(response.data?.message || "Nạp tiền thất bại");
+    },
+
+    getCards: async (filters: CardFilters = {}): Promise<any> => {
+        const params: Record<string, any> = {};
+        Object.entries(filters).forEach(([key, value]) => {
+            if (value !== "" && value !== undefined && value !== null) {
+                params[key] = value;
+            }
+        });
+
+        const response = await api.get<ApiResponse<any>>("/cards/", { params });
+        if (response.data && response.data.success) {
+            return response.data.data; // should be paginated { items: Card[], total... }
+        }
+        return { items: [], total: 0, page: 1, page_size: 10 };
+    },
+
+    createCardsBatch: async (amount: number, quantity: number): Promise<any> => {
+        const response = await api.post<ApiResponse<any>>("/cards/batch_generate/", { amount, quantity });
+        if (response.data && response.data.success) {
+            return response.data;
+        }
+        throw new Error(response.data?.message || "Tạo thẻ thất bại");
+    },
+
+    updateCardStatus: async (id: number, status: string): Promise<any> => {
+        const response = await api.patch<ApiResponse<any>>(`/cards/${id}/`, { status });
+        if (response.data && response.data.success) {
+            return response.data.data;
+        }
+        throw new Error(response.data?.message || "Cập nhật thẻ thất bại");
     }
 };

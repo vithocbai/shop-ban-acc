@@ -6,6 +6,7 @@ import AccountManagementPage from "./pages/admin/AccountManagement";
 import OrderManagementPage from "./pages/admin/OrderManagement";
 import UserManagementPage from "./pages/admin/UserManagement";
 import ManualDepositPage from "./pages/admin/deposits/ManualDeposit";
+import CardManagementPage from "./pages/admin/deposits/CardManagement";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -72,6 +73,7 @@ function App() {
                         <Route path="users" element={<UserManagementPage />} />
                         <Route path="deposits" element={<Navigate to="/admin/deposits/manual" replace />} />
                         <Route path="deposits/manual" element={<ManualDepositPage />} />
+                        <Route path="deposits/cards" element={<CardManagementPage />} />
                     </Route>
 
                     {/* Home Redirect / Landing Page */}

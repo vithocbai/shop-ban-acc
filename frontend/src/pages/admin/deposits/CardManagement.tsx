@@ -264,12 +264,12 @@ export default function CardManagement() {
                 <Table className="bg-white" containerClassName="flex-1 overflow-auto min-h-0">
                     <TableHeader className="sticky top-0 z-10 bg-bg-secondary">
                         <TableRow>
-                            <TableHead className="w-[15%]">Mã thẻ</TableHead>
-                            <TableHead className="w-[20%]">Số Serial</TableHead>
+                            <TableHead className="w-[18%]">Mã thẻ</TableHead>
+                            <TableHead className="w-[15%]">Số Serial</TableHead>
                             <TableHead className="w-[15%] text-right">Mệnh giá</TableHead>
-                            <TableHead className="w-[15%] text-center">Trạng thái</TableHead>
+                            <TableHead className="w-[18%] text-center">Trạng thái</TableHead>
                             <TableHead className="w-[15%] text-center">Ngày tạo</TableHead>
-                            <TableHead className="w-[20%] text-right">Thao tác</TableHead>
+                            <TableHead className="w-[15%] text-right">Thao tác</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -305,9 +305,9 @@ export default function CardManagement() {
                                         </TableCell>
                                         <TableCell className="text-center">
                                             {new Date(card.created_at).toLocaleDateString('vi-VN')}
-                                            <div className="text-xs text-muted-foreground">
+                                            <span className="ml-2">
                                                 {new Date(card.created_at).toLocaleTimeString('vi-VN')}
-                                            </div>
+                                            </span>
                                         </TableCell>
                                         <TableCell className="text-right">
                                             {card.status !== "USED" && (

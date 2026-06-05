@@ -68,6 +68,28 @@ features/account/
 2. **React Query Dependency**: Bắt buộc đưa `page`, `pageSize`, `search`, `filters` vào Query Key để tự reload data.
 3. **Quy Tắc Reset**: BẤT CỨ KHI NÀO người dùng thay đổi bộ lọc (Search, Filter) hoặc thay đổi số lượng dòng (`pageSize`), **BẮT BUỘC phải reset `page` về 1**.
 
+## 2.8. Quy tắc Viết Comment Code
+- Bắt buộc phải **viết comment ngắn gọn bằng tiếng việt** cho các đoạn code xử lý logic, tính toán, hoặc khi áp dụng một mẹo (trick) UI nào đó.
+- Tập trung giải thích **TẠI SAO** (Why) lại viết đoạn code đó thay vì chỉ giải thích là code làm gì (What).
+
+## 2.9. Quy tắc Layout & Cấu trúc Trang (Admin Pages)
+- Khi xây dựng các trang Admin (Ví dụ: Trang quản lý, danh sách), **bắt buộc** phải đồng nhất cấu trúc HTML và `className`. Tham khảo `OrderManagement.tsx` và `UserList.tsx`.
+- **Phần Header của trang (Ví dụ nằm trong `OrderManagement.tsx`):**
+  ```tsx
+  <div className="flex items-center gap-3 shrink-0 pb-2 border-b border-border-color">
+      <div>
+          <h1 className="text-2xl font-bold text-text-main leading-tight">Tiêu đề</h1>
+          <p className="text-sm text-text-secondary mt-1">Mô tả ngắn.</p>
+      </div>
+  </div>
+  ```
+- **Bên trong Component Danh sách (Ví dụ: `UserList.tsx`):**
+  - Wrapper ngoài cùng: `<div className="flex-1 flex flex-col min-h-0 space-y-2">`
+  - Thanh công cụ (Toolbar): `<div className="pb-2 px-[1px] flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 mb-0">`
+  - Khối chứa Bảng: `<Card className="overflow-hidden flex-1 flex flex-col min-h-0">`
+  - Thẻ Bảng: `<Table className="bg-white" containerClassName="flex-1 overflow-auto min-h-0">`
+  Việc tuân thủ chính xác các class `flex-1 flex flex-col min-h-0` cho khối nội dung và `shrink-0` cho Header/Toolbar là rất quan trọng để giao diện tự có thanh cuộn thay vì bị tràn xuống dưới màn hình.
+
 ---
 
 # 3. BACKEND RULES (Django REST Framework)

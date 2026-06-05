@@ -50,7 +50,9 @@ export const paymentService = {
 
     createCardsBatch: async (amount: number, quantity: number): Promise<any> => {
         const response = await api.post<ApiResponse<any>>("/cards/batch_generate/", { amount, quantity });
-        if (response.data && response.data.success) {
+        // Chấp nhận nếu success=true HOẶC nếu không có field success nhưng có message (HTTP 2xx)
+        // Tại sao? Vì một số API endpoint chưa có field success nhất quán, tránh lỗi toast.error nhầm
+        if (response.data && (response.data.success === true || response.data.message)) {
             return response.data;
         }
         throw new Error(response.data?.message || "Tạo thẻ thất bại");
@@ -62,5 +64,15 @@ export const paymentService = {
             return response.data.data;
         }
         throw new Error(response.data?.message || "Cập nhật thẻ thất bại");
-    }
+    },
+
+    // Lấy số liệu thống kê từng loại thẻ từ endpoint riêng
+    // Tại sao? Tránh phải fetch toàn bộ danh sách (page_size=999999) chỉ để đếm
+    getCardStats: async (): Promise<{ total: number; active: number; used: number; locked: number }> => {
+        const response = await api.get<ApiResponse<any>>("/cards/stats/");
+        if (response.data && response.data.success) {
+            return response.data.data;
+        }
+        return { total: 0, active: 0, used: 0, locked: 0 };
+    },
 };

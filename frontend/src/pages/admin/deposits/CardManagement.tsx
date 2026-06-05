@@ -43,6 +43,9 @@ export default function CardManagement() {
     const [createAmount, setCreateAmount] = useState<string>("50000");
     const [createQuantity, setCreateQuantity] = useState<string>("10");
     const [isCreating, setIsCreating] = useState(false);
+    
+    // refreshKey tăng lên khi cần buộc tải lại data (tránh gọi API 2 lần do setPage + fetchCards)
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const fetchCards = async () => {
         setLoading(true);
@@ -73,15 +76,8 @@ export default function CardManagement() {
                 setTotalPages(1);
             }
 
-            // Simple stats calculation for current page (or we can just fetch without pagination for stats if needed)
-            // But since this is an admin dashboard, a proper summary API is better.
-            // For now, we will just calculate based on the current page to avoid crash,
-            // or if `response` has summary, use it.
-            const active = results.filter((c: any) => c.status === "ACTIVE").length;
-            const used = results.filter((c: any) => c.status === "USED").length;
-            const locked = results.filter((c: any) => c.status === "LOCKED").length;
-            setStats({ total: results.length, active, used, locked });
-
+            // LƯU Ý: Frontend tạm thời không dùng list hiện tại để đếm vì bị sai khi phân trang
+            // Hàm fetchStats ở dưới sẽ chịu trách nhiệm lấy số liệu tổng chính xác
         } catch (error) {
             console.error("Lỗi lấy danh sách thẻ", error);
             toast.error("Không thể lấy danh sách thẻ nạp");
@@ -90,9 +86,28 @@ export default function CardManagement() {
         }
     };
 
+    const fetchStats = async () => {
+        try {
+            // Gọi /cards/stats/ thay vì fetch tất cả thẻ với page_size=999999
+            // Tại sao? Backend chỉ chạy 1 DB query GROUP BY status → nhanh, không tốn băng thông
+            const data = await paymentService.getCardStats();
+            setStats(data);
+        } catch (error) {
+            console.error("Lỗi lấy số liệu thống kê", error);
+        }
+    };
+
+    // Gọi fetchCards mỗi khi page, pageSize, filter, hoặc refreshKey thay đổi
+    // refreshKey cho phép force reload mà không cần gọi fetchCards() thủ công 2 lần
     useEffect(() => {
         fetchCards();
-    }, [page, pageSize, statusFilter]);
+    }, [page, pageSize, statusFilter, refreshKey]);
+
+    useEffect(() => {
+        // Chỉ cần gọi thống kê 1 lần khi load trang (hoặc khi cần thiết), 
+        // không bị phụ thuộc vào page hiện tại
+        fetchStats();
+    }, [refreshKey]);
 
     const handleCreateBatch = async () => {
         const qty = parseInt(createQuantity);
@@ -108,8 +123,10 @@ export default function CardManagement() {
             const res = await paymentService.createCardsBatch(amt, qty);
             toast.success(res.message || `Đã tạo ${qty} thẻ thành công!`);
             setIsCreateOpen(false);
+            // Dùng refreshKey thay vì gọi fetchCards() + setPage(1) riêng lẻ
+            // Tại sao? Tránh 3 API call đồng thời: setPage(1)->useEffect + fetchCards() + fetchStats()
             setPage(1);
-            fetchCards();
+            setRefreshKey(k => k + 1); // 1 key thay đổi → trigger 2 useEffect cùng lúc
         } catch (error: any) {
             toast.error(error.message || "Tạo thẻ thất bại");
         } finally {
@@ -122,7 +139,8 @@ export default function CardManagement() {
         try {
             await paymentService.updateCardStatus(card.id, newStatus);
             toast.success(`Đã đổi trạng thái thẻ thành ${newStatus}`);
-            fetchCards();
+            // 1 refreshKey trigger cả fetchCards lẫn fetchStats thay vì gọi 2 hàm
+            setRefreshKey(k => k + 1);
         } catch (error: any) {
             toast.error(error.message || "Không thể cập nhật trạng thái");
         }

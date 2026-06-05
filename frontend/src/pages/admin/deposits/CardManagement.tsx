@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle,
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,10 +12,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { paymentService, type Card as CardType } from "@/features/payment/services/payment.service";
 import { toast } from "react-toastify";
-import { Loader2, Plus, Search, CheckCircle2, XCircle, Lock } from "lucide-react";
+import { Loader2, Plus, Search, CheckCircle2, XCircle, Lock, EllipsisVertical, LockKeyhole, CircleCheckBig, Trash2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import CopyButton from "@/components/ui/copy-button";
+import { DropdownMenuTrigger, DropdownMenu, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 const STATUS_MAP: Record<string, { label: string; color: string; icon: any }> = {
     ACTIVE: { label: "Hoạt động", color: "bg-green-100 text-green-800", icon: CheckCircle2 },
@@ -335,16 +336,31 @@ export default function CardManagement() {
                                             </span>
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            {card.status !== "USED" && (
-                                                <Button 
-                                                    variant="ghost" 
-                                                    size="sm"
-                                                    className={card.status === "ACTIVE" ? "text-red-600 hover:text-red-700 hover:bg-red-50" : "text-green-600 hover:text-green-700 hover:bg-green-50"}
-                                                    onClick={() => handleToggleStatus(card)}
-                                                >
-                                                    {card.status === "ACTIVE" ? "Khóa thẻ" : "Mở khóa"}
-                                                </Button>
-                                            )}
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-10 w-10 cursor-pointer hover:bg-gray-50"
+                                                    >
+                                                        <EllipsisVertical size={20} className="text-text-secondary" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="w-48 bg-white border border-border-color p-1 rounded-lg shadow-md">
+                                                    <DropdownMenuItem className="cursor-pointer hover:bg-error/10 text-error focus:text-error rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleDeleteUserConfirm(user)}>
+                                                        <LockKeyhole className="mr-3 h-4 w-4" />
+                                                        <span className="font-medium ">Khóa thẻ</span>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem className="cursor-pointer hover:bg-success/10 text-success focus:text-success rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleEditUser(user)}>
+                                                        <CircleCheckBig className="mr-3 h-4 w-4" />
+                                                        <span className="font-medium">Kích hoạt thẻ</span>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem className="cursor-pointer hover:bg-error/10 text-error focus:text-error rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleDeleteUserConfirm(user)}>
+                                                        <Trash2 className="mr-3 h-4 w-4" />
+                                                        <span className="font-medium">Xóa thẻ</span>
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                         </TableCell>
                                     </TableRow>
                                 );
@@ -352,7 +368,7 @@ export default function CardManagement() {
                         )}
                     </TableBody>
                 </Table>
-                
+
                 <PaginationControls
                     page={page}
                     pageSize={pageSize}

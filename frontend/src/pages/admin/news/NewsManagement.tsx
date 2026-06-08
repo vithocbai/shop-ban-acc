@@ -6,11 +6,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "react-toastify";
-import { Loader2, Search, Plus, Eye, Edit, Trash2 } from "lucide-react";
+import { Loader2, Search, Plus, Eye, Edit, Trash2, Layers } from "lucide-react";
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { newsService, type Article, type Category } from "@/features/news/services/news.service";
 import { useNavigate } from "react-router-dom";
+import CategoryManagementModal from "./CategoryManagementModal";
 
 export default function NewsManagement() {
     const navigate = useNavigate();
@@ -30,19 +31,21 @@ export default function NewsManagement() {
 
     // Actions
     const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+    const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
     // Initial Load Categories
+    const fetchCategories = async () => {
+        try {
+            const cats = await newsService.getCategories();
+            setCategories(cats);
+        } catch (error) {
+            console.error("Lỗi tải danh mục:", error);
+        }
+    };
+
     useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const cats = await newsService.getCategories();
-                setCategories(cats);
-            } catch (error) {
-                console.error("Lỗi tải danh mục:", error);
-            }
-        };
         fetchCategories();
     }, []);
 
@@ -151,10 +154,16 @@ export default function NewsManagement() {
                         </SelectContent>
                     </Select>
                 </div>
-                <Button onClick={() => navigate("/admin/news/create")} className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Thêm bài viết
-                </Button>
+                <div className="flex items-center gap-3">
+                    <Button variant="outline" onClick={() => setIsCategoryModalOpen(true)} className="gap-2">
+                        <Layers className="h-4 w-4" />
+                        Quản lý danh mục
+                    </Button>
+                    <Button onClick={() => navigate("/admin/news/create")} className="gap-2 bg-blue-600 hover:bg-blue-700 text-white">
+                        <Plus className="h-4 w-4" />
+                        Thêm bài viết
+                    </Button>
+                </div>
             </div>
 
             {/* Bảng danh sách */}
@@ -289,6 +298,12 @@ export default function NewsManagement() {
                 cancelText="Hủy"
                 variant="danger"
                 isLoading={isDeleting}
+            />
+
+            <CategoryManagementModal 
+                isOpen={isCategoryModalOpen}
+                onClose={() => setIsCategoryModalOpen(false)}
+                onCategoryChanged={fetchCategories}
             />
         </div>
     );

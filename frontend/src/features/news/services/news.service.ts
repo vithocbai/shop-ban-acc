@@ -42,6 +42,18 @@ export const newsService = {
         const response = await api.get("/news/categories/");
         return response.data?.data?.items || response.data?.results || response.data || [];
     },
+    createCategory: async (data: Partial<Category>) => {
+        const response = await api.post("/news/categories/", data);
+        return response.data?.data || response.data;
+    },
+    updateCategory: async (id: number, data: Partial<Category>) => {
+        const response = await api.patch(`/news/categories/${id}/`, data);
+        return response.data?.data || response.data;
+    },
+    deleteCategory: async (id: number) => {
+        const response = await api.delete(`/news/categories/${id}/`);
+        return response.data;
+    },
 
     // Articles
     getArticles: async (params?: Record<string, any>) => {

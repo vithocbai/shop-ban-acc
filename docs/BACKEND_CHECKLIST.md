@@ -53,7 +53,7 @@ Tài liệu này tổng hợp danh sách các công việc Backend, bám sát ki
 
 ## 6. Quản lý Nội dung (CMS - News, Banner, Notification)
 - [x] **Thông báo**: Model và API Notification (Gửi thông báo nạp/mua thành công).
-- [ ] **Tin tức (News)**: API quản lý bài viết blog/hướng dẫn.
+- [x] **Tin tức (News)**: API quản lý bài viết blog/hướng dẫn.
 - [ ] **Banner**: API quản lý slideshow quảng cáo trang chủ.
 
 ## 7. Báo cáo thống kê (Analytics)

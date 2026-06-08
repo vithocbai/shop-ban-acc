@@ -35,6 +35,7 @@ export default function CardManagement() {
 
     // Filters
     const [statusFilter, setStatusFilter] = useState<string>("all");
+    const [search, setSearch] = useState<string>("");
 
     // Pagination (mock implementation if api supports page/pageSize)
     const [page, setPage] = useState(1);
@@ -61,6 +62,7 @@ export default function CardManagement() {
         try {
             const params: any = { page, page_size: pageSize };
             if (statusFilter !== "all") params.status = statusFilter;
+            if (search.trim()) params.search = search.trim();
 
             // Wait, does the API return paginated data?
             // In typical Django REST framework `PageNumberPagination`:
@@ -110,7 +112,7 @@ export default function CardManagement() {
     // refreshKey cho phép force reload mà không cần gọi fetchCards() thủ công 2 lần
     useEffect(() => {
         fetchCards();
-    }, [page, pageSize, statusFilter, refreshKey]);
+    }, [page, pageSize, statusFilter, search, refreshKey]);
 
     useEffect(() => {
         // Chỉ cần gọi thống kê 1 lần khi load trang (hoặc khi cần thiết),
@@ -306,7 +308,12 @@ export default function CardManagement() {
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-secondary z-10">
                             <Search size={18} />
                         </div>
-                        <Input placeholder="Tìm theo mã hoặc serial..." className="pl-10" />
+                        <Input 
+                            placeholder="Tìm theo mã hoặc serial..." 
+                            className="pl-10" 
+                            value={search}
+                            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                        />
                     </div>
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
                         <SelectTrigger className="w-[180px] border-border-color">

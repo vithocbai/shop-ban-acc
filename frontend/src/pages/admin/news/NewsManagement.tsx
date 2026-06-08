@@ -162,9 +162,9 @@ export default function NewsManagement() {
                 <Table className="bg-white" containerClassName="flex-1 overflow-auto min-h-0">
                     <TableHeader className="sticky top-0 z-10 bg-bg-secondary">
                         <TableRow>
-                            <TableHead className="w-[30%]">Bài viết</TableHead>
-                            <TableHead className="w-[15%]">Chuyên mục</TableHead>
-                            <TableHead className="w-[15%]">Tác giả</TableHead>
+                            <TableHead className="w-[35%]">Bài viết</TableHead>
+                            <TableHead className="w-[15%]">Danh mục</TableHead>
+                            <TableHead className="w-[10%]">Tác giả</TableHead>
                             <TableHead className="w-[10%] text-center">Lượt xem</TableHead>
                             <TableHead className="w-[10%] text-center">Trạng thái</TableHead>
                             <TableHead className="w-[15%] text-center">Ngày đăng</TableHead>
@@ -193,14 +193,14 @@ export default function NewsManagement() {
                                         <TableCell>
                                             <div className="flex items-center gap-3">
                                                 {article.thumbnail ? (
-                                                    <img src={article.thumbnail} alt={article.title} className="w-12 h-12 rounded object-cover flex-shrink-0" />
+                                                    <img src={article.thumbnail} alt={article.title} className="w-16 h-16 rounded-md object-cover flex-shrink-0" />
                                                 ) : (
-                                                    <div className="w-12 h-12 rounded bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                                    <div className="w-16 h-16 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
                                                         <span className="text-gray-400 text-xs">No img</span>
                                                     </div>
                                                 )}
                                                 <div>
-                                                    <p className="font-bold text-sm text-text-main line-clamp-1" title={article.title}>
+                                                    <p className="font-bold text-sm text-text-main line-clamp-2" title={article.title}>
                                                         {article.title}
                                                     </p>
                                                     <p className="text-xs text-text-secondary line-clamp-1" title={article.slug}>
@@ -211,17 +211,17 @@ export default function NewsManagement() {
                                         </TableCell>
                                         <TableCell>
                                             <span className="text-sm text-text-secondary">
-                                                {article.category?.title || "—"}
+                                                {article.category?.title || ""}
                                             </span>
                                         </TableCell>
                                         <TableCell>
                                             <span className="text-sm font-medium">
-                                                {article.author?.fullName || "—"}
+                                                {article.author?.fullName || ""}
                                             </span>
                                         </TableCell>
                                         <TableCell className="text-center">
                                             <Badge variant="secondary" className="flex items-center gap-1 mx-auto w-fit">
-                                                <Eye className="w-3 h-3" />
+                                                <Eye className="w-4 h-4" />
                                                 {article.view_count}
                                             </Badge>
                                         </TableCell>

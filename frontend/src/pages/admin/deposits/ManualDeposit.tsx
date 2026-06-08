@@ -103,9 +103,9 @@ export default function ManualDeposit() {
     };
 
     return (
-        <div className="container mx-auto p-4 space-y-6">
+        <div className="container mx-auto space-y-4">
             <div>
-                <h2 className="text-3xl font-bold tracking-tight">Nạp tiền thủ công</h2>
+                <h2 className="text-2xl font-bold tracking-tight">Nạp tiền thủ công</h2>
                 <p className="text-muted-foreground">Admin cộng trực tiếp số dư cho người dùng.</p>
             </div>
 

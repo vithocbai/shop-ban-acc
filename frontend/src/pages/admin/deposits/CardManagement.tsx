@@ -1,10 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -12,11 +7,27 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { paymentService, type Card as CardType } from "@/features/payment/services/payment.service";
 import { toast } from "react-toastify";
-import { Loader2, Plus, Search, CheckCircle2, XCircle, Lock, EllipsisVertical, LockKeyhole, CircleCheckBig, Trash2 } from "lucide-react";
+import {
+    Loader2,
+    Plus,
+    Search,
+    CheckCircle2,
+    XCircle,
+    Lock,
+    EllipsisVertical,
+    LockKeyhole,
+    CircleCheckBig,
+    Trash2,
+} from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import CopyButton from "@/components/ui/copy-button";
-import { DropdownMenuTrigger, DropdownMenu, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import {
+    DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 const STATUS_MAP: Record<string, { label: string; color: string; icon: any }> = {
@@ -28,10 +39,10 @@ const STATUS_MAP: Record<string, { label: string; color: string; icon: any }> = 
 export default function CardManagement() {
     const [cards, setCards] = useState<CardType[]>([]);
     const [loading, setLoading] = useState(false);
-    
+
     // Filters
     const [statusFilter, setStatusFilter] = useState<string>("all");
-    
+
     // Pagination (mock implementation if api supports page/pageSize)
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(20);
@@ -57,22 +68,22 @@ export default function CardManagement() {
         try {
             const params: any = { page, page_size: pageSize };
             if (statusFilter !== "all") params.status = statusFilter;
-            
-            // Wait, does the API return paginated data? 
+
+            // Wait, does the API return paginated data?
             // In typical Django REST framework `PageNumberPagination`:
             // response.data = { count, next, previous, results }
             // Let's assume it returns `items` and `total` via our Envelope.
             const response = await paymentService.getCards(params);
-            
+
             // If the envelope is not unwrapped properly, we handle it:
             let results = response.items || response.results || [];
             if (!response.items && Array.isArray(response)) results = response;
-            
+
             setCards(results);
-            
+
             if (response.total) {
                 setTotalCards(response.total);
-                setTotalPages(Math.ceil(response.total / pageSize)); 
+                setTotalPages(Math.ceil(response.total / pageSize));
             } else if (response.count) {
                 setTotalCards(response.count);
                 setTotalPages(Math.ceil(response.count / pageSize));
@@ -109,7 +120,7 @@ export default function CardManagement() {
     }, [page, pageSize, statusFilter, refreshKey]);
 
     useEffect(() => {
-        // Chỉ cần gọi thống kê 1 lần khi load trang (hoặc khi cần thiết), 
+        // Chỉ cần gọi thống kê 1 lần khi load trang (hoặc khi cần thiết),
         // không bị phụ thuộc vào page hiện tại
         fetchStats();
     }, [refreshKey]);
@@ -118,12 +129,12 @@ export default function CardManagement() {
     const handleCreateBatch = async () => {
         const qty = parseInt(createQuantity);
         const amt = parseInt(createAmount);
-        
+
         if (qty < 1 || qty > 1000) {
             toast.error("Số lượng phải từ 1 đến 1000");
             return;
         }
-        
+
         setIsCreating(true);
         try {
             const res = await paymentService.createCardsBatch(amt, qty);
@@ -132,7 +143,7 @@ export default function CardManagement() {
             // Dùng refreshKey thay vì gọi fetchCards() + setPage(1) riêng lẻ
             // Tại sao? Tránh 3 API call đồng thời: setPage(1)->useEffect + fetchCards() + fetchStats()
             setPage(1);
-            setRefreshKey(k => k + 1); // 1 key thay đổi → trigger 2 useEffect cùng lúc
+            setRefreshKey((k) => k + 1); // 1 key thay đổi → trigger 2 useEffect cùng lúc
         } catch (error: any) {
             toast.error(error.message || "Tạo thẻ thất bại");
         } finally {
@@ -153,7 +164,7 @@ export default function CardManagement() {
         try {
             await paymentService.updateCardStatus(card.id, newStatus);
             toast.success(`Đã ${actionLabel} thẻ thành công`);
-            setRefreshKey(k => k + 1); // Trigger cả fetchCards lẫn fetchStats cùng lúc
+            setRefreshKey((k) => k + 1); // Trigger cả fetchCards lẫn fetchStats cùng lúc
         } catch (error: any) {
             toast.error(error.message || `Không thể ${actionLabel} thẻ`);
         }
@@ -172,7 +183,7 @@ export default function CardManagement() {
             await paymentService.deleteCard(selectedCard.id);
             toast.success("Đã xóa thẻ thành công");
             // Dùng refreshKey để đồng thời cập nhật cả danh sách và stats
-            setRefreshKey(k => k + 1);
+            setRefreshKey((k) => k + 1);
         } catch (error: any) {
             toast.error(error.message || "Không thể xóa thẻ");
         }
@@ -185,22 +196,31 @@ export default function CardManagement() {
                     <h2 className="text-2xl font-bold tracking-tight">Quản lý Thẻ nạp</h2>
                     <p className="text-muted-foreground">Tạo và quản lý danh sách thẻ cào/voucher.</p>
                 </div>
-                 
+
                 {isCreateOpen && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
                         <div className="bg-white rounded-md shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200 border border-border-color">
                             <div className="px-6 py-4 border-b border-border-color flex items-center justify-between">
                                 <h3 className="text-lg font-bold text-text-main">Tạo thẻ nạp hàng loạt</h3>
-                                <Button variant="ghost" size="icon" className="h-9 w-9 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer" onClick={() => setIsCreateOpen(false)}>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-9 w-9 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer"
+                                    onClick={() => setIsCreateOpen(false)}
+                                >
                                     <XCircle className="h-5 w-5" />
                                 </Button>
                             </div>
-                            
+
                             <div className="p-6 flex-1 overflow-auto space-y-4">
-                                <p className="text-sm text-text-secondary mb-4">Hệ thống sẽ sinh mã thẻ và serial ngẫu nhiên, sẵn sàng sử dụng.</p>
-                                
+                                <p className="text-sm text-text-secondary mb-4">
+                                    Hệ thống sẽ sinh mã thẻ và serial ngẫu nhiên, sẵn sàng sử dụng.
+                                </p>
+
                                 <div className="space-y-2">
-                                    <Label className="font-bold text-text-main">Mệnh giá <span className="text-error">*</span></Label>
+                                    <Label className="font-bold text-text-main">
+                                        Mệnh giá <span className="text-error">*</span>
+                                    </Label>
                                     <Select value={createAmount} onValueChange={setCreateAmount}>
                                         <SelectTrigger className="w-full bg-bg-secondary border-border-color">
                                             <SelectValue placeholder="Chọn mệnh giá" />
@@ -216,21 +236,30 @@ export default function CardManagement() {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                
+
                                 <div className="space-y-2">
-                                    <Label className="font-bold text-text-main">Số lượng <span className="text-error">*</span></Label>
-                                    <Input 
-                                        type="number" 
-                                        className="w-full bg-bg-secondary border-border-color" 
+                                    <Label className="font-bold text-text-main">
+                                        Số lượng <span className="text-error">*</span>
+                                    </Label>
+                                    <Input
+                                        type="number"
+                                        className="w-full bg-bg-secondary border-border-color"
                                         value={createQuantity}
                                         onChange={(e) => setCreateQuantity(e.target.value)}
-                                        min="1" max="1000"
+                                        min="1"
+                                        max="1000"
                                     />
                                 </div>
                             </div>
-                            
+
                             <div className="px-6 py-4 border-t border-border-color flex items-center justify-end gap-3 bg-bg-secondary/50">
-                                <Button variant="outline" className="font-bold px-5" onClick={() => setIsCreateOpen(false)}>Hủy</Button>
+                                <Button
+                                    variant="outline"
+                                    className="font-bold px-5"
+                                    onClick={() => setIsCreateOpen(false)}
+                                >
+                                    Hủy
+                                </Button>
                                 <Button className="font-bold px-8" onClick={handleCreateBatch} disabled={isCreating}>
                                     {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                     Tiến hành tạo
@@ -284,10 +313,7 @@ export default function CardManagement() {
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-secondary z-10">
                             <Search size={18} />
                         </div>
-                        <Input 
-                            placeholder="Tìm theo mã hoặc serial..." 
-                            className="pl-10"
-                        />
+                        <Input placeholder="Tìm theo mã hoặc serial..." className="pl-10" />
                     </div>
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
                         <SelectTrigger className="w-[180px] border-border-color">
@@ -339,7 +365,7 @@ export default function CardManagement() {
                             cards.map((card) => {
                                 const statusConfig = STATUS_MAP[card.status] || STATUS_MAP.ACTIVE;
                                 const StatusIcon = statusConfig.icon;
-                                
+
                                 return (
                                     <TableRow key={card.id}>
                                         <TableCell className="font-medium whitespace-nowrap">
@@ -351,46 +377,75 @@ export default function CardManagement() {
                                             <CopyButton value={card.serial} />
                                         </TableCell>
                                         <TableCell className="font-medium text-green-600 text-right whitespace-nowrap">
-                                            {new Intl.NumberFormat('vi-VN').format(Number(card.amount))} đ
+                                            {new Intl.NumberFormat("vi-VN").format(Number(card.amount))} đ
                                         </TableCell>
                                         <TableCell className="text-center">
-                                            <Badge variant="outline" className={`${statusConfig.color} border-0 inline-flex items-center justify-center gap-1`}>
+                                            <Badge
+                                                variant="outline"
+                                                className={`${statusConfig.color} border-0 inline-flex items-center justify-center gap-1 text-sm`}
+                                            >
                                                 <StatusIcon className="h-3 w-3" />
                                                 {statusConfig.label}
                                             </Badge>
                                         </TableCell>
                                         <TableCell className="text-center">
-                                            {new Date(card.created_at).toLocaleDateString('vi-VN')}
+                                            {new Date(card.created_at).toLocaleDateString("vi-VN")}
                                             <span className="ml-2">
-                                                {new Date(card.created_at).toLocaleTimeString('vi-VN')}
+                                                {new Date(card.created_at).toLocaleTimeString("vi-VN")}
                                             </span>
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-10 w-10 cursor-pointer hover:bg-gray-50"
-                                                    >
-                                                        <EllipsisVertical size={20} className="text-text-secondary" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-48 bg-white border border-border-color p-1 rounded-lg shadow-md">
-                                                    <DropdownMenuItem className="cursor-pointer hover:bg-error/10 text-error focus:text-error rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleDeleteUserConfirm(user)}>
-                                                        <LockKeyhole className="mr-1 h-4 w-4" />
-                                                        <span className="font-medium ">Khóa thẻ</span>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem className="cursor-pointer hover:bg-success/10 text-success focus:text-success rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleToggleStatus(card)}>
-                                                        <CircleCheckBig className="mr-1 h-4 w-4" />
-                                                        <span className="font-medium">Kích hoạt thẻ</span>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem className="cursor-pointer hover:bg-error/10 text-error focus:text-error rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleDeleteCardConfirm(card)}>
-                                                        <Trash2 className="mr-1 h-4 w-4" />
-                                                        <span className="font-medium">Xóa thẻ</span>
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                            {/* Hiển thị thao tác phù hợp với từng trạng thái thẻ */}
+                                            <div className="flex items-center justify-end gap-1.5">
+                                                {card.status === "ACTIVE" && (
+                                                    <>
+                                                        {/* Thẻ đang hoạt động: chỉ cho phép Khóa hoặc Xóa */}
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="cursor-pointer px-2 text-xs font-medium text-amber-600 hover:text-amber-700 hover:bg-amber-50 gap-1"
+                                                            onClick={() => handleToggleStatus(card)}
+                                                        >
+                                                            <LockKeyhole size={18} />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="cursor-pointer px-2 text-xs font-medium text-error hover:text-error hover:bg-error/10 gap-1"
+                                                            onClick={() => handleDeleteCardConfirm(card)}
+                                                        >
+                                                            <Trash2 size={18} />
+                                                        </Button>
+                                                    </>
+                                                )}
+                                                {card.status === "LOCKED" && (
+                                                    <>
+                                                        {/* Thẻ bị khóa: chỉ cho phép Kích hoạt hoặc Xóa */}
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="cursor-pointer px-2 text-xs font-medium text-green-600 hover:text-green-700 hover:bg-green-50 gap-1"
+                                                            onClick={() => handleToggleStatus(card)}
+                                                        >
+                                                            <CircleCheckBig size={18} />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="cursor-pointer px-2 text-xs font-medium text-error hover:text-error hover:bg-error/10 gap-1"
+                                                            onClick={() => handleDeleteCardConfirm(card)}
+                                                        >
+                                                            <Trash2 size={18} />
+                                                        </Button>
+                                                    </>
+                                                )}
+                                                {card.status === "USED" && (
+                                                    /* Thẻ đã dùng: không cho phép thao tác, chỉ hiển thị nhãn */
+                                                    <span className="text-xs text-text-secondary italic px-2">
+                                                        Không thể thao tác
+                                                    </span>
+                                                )}
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 );
@@ -420,7 +475,9 @@ export default function CardManagement() {
                     title="Xóa thẻ"
                     description={
                         <>
-                            Bạn có chắc chắn muốn xóa thẻ <span className="font-bold text-text-main">{selectedCard?.code}</span> không? Hành động này sẽ xóa toàn bộ dữ liệu liên quan và không thể hoàn tác.
+                            Bạn có chắc chắn muốn xóa thẻ{" "}
+                            <span className="font-bold text-text-main">{selectedCard?.code}</span> không? Hành động này
+                            sẽ xóa toàn bộ dữ liệu liên quan và không thể hoàn tác.
                         </>
                     }
                     confirmText="Xóa thẻ"

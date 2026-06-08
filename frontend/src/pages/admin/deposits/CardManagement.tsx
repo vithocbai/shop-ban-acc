@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import CopyButton from "@/components/ui/copy-button";
 import { DropdownMenuTrigger, DropdownMenu, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 const STATUS_MAP: Record<string, { label: string; color: string; icon: any }> = {
     ACTIVE: { label: "Hoạt động", color: "bg-green-100 text-green-800", icon: CheckCircle2 },
@@ -45,7 +46,9 @@ export default function CardManagement() {
     const [createAmount, setCreateAmount] = useState<string>("50000");
     const [createQuantity, setCreateQuantity] = useState<string>("10");
     const [isCreating, setIsCreating] = useState(false);
-    
+    const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
     // refreshKey tăng lên khi cần buộc tải lại data (tránh gọi API 2 lần do setPage + fetchCards)
     const [refreshKey, setRefreshKey] = useState(0);
 
@@ -147,6 +150,23 @@ export default function CardManagement() {
             toast.error(error.message || "Không thể cập nhật trạng thái");
         }
     };
+
+    const handleDeleteCardConfirm = (card: CardType) => {
+        setSelectedCard(card);
+        setIsDeleteModalOpen(true);
+    };
+
+    const executeDeleteCard = async () => {
+        if(!selectedCard) return;
+        try {
+            await paymentService.deleteCard(selectedCard.id);
+            toast.success("Đã xóa thẻ thành công");
+            fetchCards(); // Cập nhật lại danh sách sau khi xóa
+        }
+        catch (error: any) {
+            toast.error(error.message || "Không thể xóa thẻ");
+        }
+    }
 
     return (
         <div className="flex-1 flex flex-col min-h-0 space-y-4">
@@ -348,15 +368,15 @@ export default function CardManagement() {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-48 bg-white border border-border-color p-1 rounded-lg shadow-md">
                                                     <DropdownMenuItem className="cursor-pointer hover:bg-error/10 text-error focus:text-error rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleDeleteUserConfirm(user)}>
-                                                        <LockKeyhole className="mr-3 h-4 w-4" />
+                                                        <LockKeyhole className="mr-1 h-4 w-4" />
                                                         <span className="font-medium ">Khóa thẻ</span>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem className="cursor-pointer hover:bg-success/10 text-success focus:text-success rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleEditUser(user)}>
-                                                        <CircleCheckBig className="mr-3 h-4 w-4" />
+                                                        <CircleCheckBig className="mr-1 h-4 w-4" />
                                                         <span className="font-medium">Kích hoạt thẻ</span>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem className="cursor-pointer hover:bg-error/10 text-error focus:text-error rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleDeleteUserConfirm(user)}>
-                                                        <Trash2 className="mr-3 h-4 w-4" />
+                                                    <DropdownMenuItem className="cursor-pointer hover:bg-error/10 text-error focus:text-error rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleDeleteCardConfirm(card)}>
+                                                        <Trash2 className="mr-1 h-4 w-4" />
                                                         <span className="font-medium">Xóa thẻ</span>
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
@@ -380,6 +400,21 @@ export default function CardManagement() {
                         setPage(1);
                     }}
                     pageSizeOptions={[10, 20, 50, 100]}
+                />
+
+                {/* Model */}
+                <ConfirmModal
+                    isOpen={isDeleteModalOpen}
+                    onClose={() => setIsDeleteModalOpen(false)}
+                    onConfirm={executeDeleteCard}
+                    title="Xóa thẻ"
+                    description={
+                        <>
+                            Bạn có chắc chắn muốn xóa thẻ <span className="font-bold text-text-main">{selectedCard?.code}</span> không? Hành động này sẽ xóa toàn bộ dữ liệu liên quan và không thể hoàn tác.
+                        </>
+                    }
+                    confirmText="Xóa thẻ"
+                    variant="danger"
                 />
             </Card>
         </div>

@@ -75,4 +75,14 @@ export const paymentService = {
         }
         return { total: 0, active: 0, used: 0, locked: 0 };
     },
+
+    // Xóa thẻ nạp (chỉ xóa được thẻ chưa sử dụng, backend sẽ validate)
+    deleteCard: async (id: number): Promise<void> => {
+        const response = await api.delete<ApiResponse<any>>(`/cards/${id}/`);
+        // DELETE thành công trả về 204 No Content hoặc 200 với message
+        if (response.status === 204 || (response.data && response.data.success !== false)) {
+            return;
+        }
+        throw new Error(response.data?.message || "Xóa thẻ thất bại");
+    },
 };

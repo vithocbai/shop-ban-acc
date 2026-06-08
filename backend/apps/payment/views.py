@@ -48,8 +48,30 @@ class DepositViewSet(ResponseEnvelopeMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.request.user.is_staff:
-            return Deposit.objects.all()
-        return Deposit.objects.filter(user=self.request.user)
+            queryset = Deposit.objects.all()
+        else:
+            queryset = Deposit.objects.filter(user=self.request.user)
+            
+        # Các tham số filter từ FE
+        status_param = self.request.query_params.get('status')
+        method_param = self.request.query_params.get('method')
+        search_param = self.request.query_params.get('search')
+        
+        if status_param:
+            queryset = queryset.filter(status=status_param)
+            
+        if method_param:
+            queryset = queryset.filter(method=method_param)
+            
+        if search_param:
+            from django.db.models import Q
+            # Tìm kiếm theo username hoặc email của người dùng
+            queryset = queryset.filter(
+                Q(user__username__icontains=search_param) | 
+                Q(user__email__icontains=search_param)
+            )
+            
+        return queryset
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def approve(self, request, pk=None):
@@ -113,8 +135,19 @@ class CardAdminViewSet(ResponseEnvelopeMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Card.objects.all()
         status_param = self.request.query_params.get('status')
+        search_param = self.request.query_params.get('search')
+        
         if status_param:
             queryset = queryset.filter(status=status_param)
+            
+        if search_param:
+            from django.db.models import Q
+            # Tìm kiếm theo mã thẻ hoặc serial (không phân biệt hoa thường)
+            queryset = queryset.filter(
+                Q(code__icontains=search_param) | 
+                Q(serial__icontains=search_param)
+            )
+            
         return queryset
 
     @action(detail=False, methods=['post'])

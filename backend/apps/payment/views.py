@@ -218,14 +218,29 @@ class ManualDepositAdminView(APIView):
             user = User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return Response({"success": False, "message": "Người dùng không tồn tại."}, status=status.HTTP_404_NOT_FOUND)
+        
+        with transaction.atomic():
+            # Tạo Deposit record trước để lưu lịch sử nạp tiền trong /api/deposits/
+            # Tại sao? ManualDepositAdminView trước đây chỉ gọi update_user_balance (tạo Transaction)
+            # nhưng không tạo Deposit → lịch sử nạp tiền ở trang admin không có dữ liệu.
+            deposit = Deposit.objects.create(
+                user=user,
+                amount=amount,
+                method=payment_method,
+                note=note,
+                admin_note=f"Nạp thủ công bởi {request.user.username}",
+                status=Deposit.Status.APPROVED,
+                approved_by=request.user,
+                approved_at=timezone.now(),
+            )
             
-        update_user_balance(
-            user=user,
-            amount=amount,
-            transaction_type=Transaction.Type.DEPOSIT,
-            note=f"Nạp thủ công: {note}",
-            metadata={"admin_id": request.user.id, "payment_method": payment_method}
-        )
+            update_user_balance(
+                user=user,
+                amount=amount,
+                transaction_type=Transaction.Type.DEPOSIT,
+                note=f"Nạp thủ công: {note}",
+                metadata={"admin_id": request.user.id, "payment_method": payment_method, "deposit_id": deposit.id}
+            )
         
         notify_user(
             user=user,

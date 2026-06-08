@@ -148,12 +148,28 @@ class CardAdminViewSet(ResponseEnvelopeMixin, viewsets.ModelViewSet):
         card.delete()
         return Response({"success": True, "message": "Đã xóa thẻ thành công."}, status=status.HTTP_200_OK)
 
+    def partial_update(self, request, *args, **kwargs):
+        """
+        Cập nhật một phần thông tin thẻ (thường dùng để đổi status).
+        Tại sao override? Để chặn kích hoạt lại (ACTIVE/LOCKED) thẻ đã USED —
+        tránh tình trạng thẻ đã dùng bị dùng lại.
+        """
+        card = self.get_object()
+        new_status = request.data.get('status')
+        
+        if new_status and card.status == Card.Status.USED:
+            return Response(
+                {"success": False, "message": "Không thể thay đổi trạng thái thẻ đã sử dụng."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return super().partial_update(request, *args, **kwargs)
+
     @action(detail=True, methods=['post'])
     def lock(self, request, pk=None):
         """API Khóa thẻ (không cho nạp)"""
         card = self.get_object()
         if card.status == Card.Status.USED:
-            return Response({"error": "Không thể khóa thẻ đã sử dụng."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"success": True, "message": "Đã khóa thẻ thành công."}, status=status.HTTP_200_OK)
             
         card.status = Card.Status.LOCKED
         card.save()

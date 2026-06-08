@@ -114,6 +114,7 @@ export default function CardManagement() {
         fetchStats();
     }, [refreshKey]);
 
+    // Hàm xử lý tạo thẻ hàng loạt
     const handleCreateBatch = async () => {
         const qty = parseInt(createQuantity);
         const amt = parseInt(createAmount);
@@ -151,11 +152,13 @@ export default function CardManagement() {
         }
     };
 
+    // Mở modal confirm trước khi xóa thẻ
     const handleDeleteCardConfirm = (card: CardType) => {
         setSelectedCard(card);
         setIsDeleteModalOpen(true);
     };
 
+    // Thực thi xóa thẻ sau khi đã confirm
     const executeDeleteCard = async () => {
         if(!selectedCard) return;
         try {
@@ -165,6 +168,18 @@ export default function CardManagement() {
         }
         catch (error: any) {
             toast.error(error.message || "Không thể xóa thẻ");
+        }
+    }
+
+    // Kích hoạt thẻ (chỉ thẻ LOCKED mới có thể kích hoạt lại thành ACTIVE)
+    const activeCardSatus = async (card: any) => {
+        if(!card || !card.id) return;
+        try {
+            await paymentService.updateCardStatus(card.id, "ACTIVE");
+            toast.success("Đã kích hoạt thẻ thành công");
+            fetchCards(); // Cập nhật lại danh sách sau khi kích hoạt
+        } catch (error: any) {
+            toast.error(error.message || "Không thể kích hoạt thẻ");
         }
     }
 
@@ -371,7 +386,7 @@ export default function CardManagement() {
                                                         <LockKeyhole className="mr-1 h-4 w-4" />
                                                         <span className="font-medium ">Khóa thẻ</span>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem className="cursor-pointer hover:bg-success/10 text-success focus:text-success rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleEditUser(user)}>
+                                                    <DropdownMenuItem className="cursor-pointer hover:bg-success/10 text-success focus:text-success rounded-md py-2 px-3 flex items-center text-sm" onClick={() => activeCardSatus(card)}>
                                                         <CircleCheckBig className="mr-1 h-4 w-4" />
                                                         <span className="font-medium">Kích hoạt thẻ</span>
                                                     </DropdownMenuItem>

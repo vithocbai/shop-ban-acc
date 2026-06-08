@@ -82,4 +82,9 @@ class ArticleViewSet(ResponseEnvelopeMixin, viewsets.ModelViewSet):
         instance.save(update_fields=['view_count'])
         
         serializer = self.get_serializer(instance)
-        return self.get_paginated_response(serializer.data) if hasattr(self, 'get_paginated_response') else self.get_response(serializer.data)
+        from rest_framework.response import Response
+        return Response({
+            "success": True,
+            "message": "Lấy thông tin bài viết thành công",
+            "data": serializer.data
+        })

@@ -134,6 +134,20 @@ class CardAdminViewSet(ResponseEnvelopeMixin, viewsets.ModelViewSet):
             "message": f"Tạo thành công {len(cards)} thẻ nạp mệnh giá {amount:,.0f}đ.",
         })
 
+    def destroy(self, request, *args, **kwargs):
+        """
+        Xóa thẻ nạp.
+        Tại sao override? Để chặn xóa thẻ đã dùng (USED) — tránh mất dữ liệu lịch sử giao dịch.
+        """
+        card = self.get_object()
+        if card.status == Card.Status.USED:
+            return Response(
+                {"success": False, "message": "Không thể xóa thẻ đã được sử dụng."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        card.delete()
+        return Response({"success": True, "message": "Đã xóa thẻ thành công."}, status=status.HTTP_200_OK)
+
     @action(detail=True, methods=['post'])
     def lock(self, request, pk=None):
         """API Khóa thẻ (không cho nạp)"""

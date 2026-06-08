@@ -12,22 +12,15 @@ import {
     Plus,
     Search,
     CheckCircle2,
-    XCircle,
     Lock,
-    EllipsisVertical,
     LockKeyhole,
     CircleCheckBig,
     Trash2,
+    X,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import CopyButton from "@/components/ui/copy-button";
-import {
-    DropdownMenuTrigger,
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 const STATUS_MAP: Record<string, { label: string; color: string; icon: any }> = {
@@ -205,10 +198,10 @@ export default function CardManagement() {
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-9 w-9 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer"
                                     onClick={() => setIsCreateOpen(false)}
+                                    className="h-9 w-9 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer"
                                 >
-                                    <XCircle className="h-5 w-5" />
+                                    <X size={20} />
                                 </Button>
                             </div>
 

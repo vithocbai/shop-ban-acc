@@ -140,15 +140,22 @@ export default function CardManagement() {
         }
     };
 
+    // Toggle khóa/kích hoạt thẻ: ACTIVE ↔ LOCKED
+    // Tại sao gộp 2 chiều vào 1 hàm? Tránh tồn tại 2 hàm riêng lẻ gây nhầm lẫn khi bảo trì
     const handleToggleStatus = async (card: CardType) => {
+        if (card.status === "USED") {
+            toast.error("Không thể thay đổi trạng thái thẻ đã sử dụng");
+            return;
+        }
+        // LOCKED → kích hoạt ACTIVE, ACTIVE → khóa LOCKED
         const newStatus = card.status === "LOCKED" ? "ACTIVE" : "LOCKED";
+        const actionLabel = newStatus === "ACTIVE" ? "kích hoạt" : "khóa";
         try {
             await paymentService.updateCardStatus(card.id, newStatus);
-            toast.success(`Đã đổi trạng thái thẻ thành ${newStatus}`);
-            // 1 refreshKey trigger cả fetchCards lẫn fetchStats thay vì gọi 2 hàm
-            setRefreshKey(k => k + 1);
+            toast.success(`Đã ${actionLabel} thẻ thành công`);
+            setRefreshKey(k => k + 1); // Trigger cả fetchCards lẫn fetchStats cùng lúc
         } catch (error: any) {
-            toast.error(error.message || "Không thể cập nhật trạng thái");
+            toast.error(error.message || `Không thể ${actionLabel} thẻ`);
         }
     };
 
@@ -160,28 +167,16 @@ export default function CardManagement() {
 
     // Thực thi xóa thẻ sau khi đã confirm
     const executeDeleteCard = async () => {
-        if(!selectedCard) return;
+        if (!selectedCard) return;
         try {
             await paymentService.deleteCard(selectedCard.id);
             toast.success("Đã xóa thẻ thành công");
-            fetchCards(); // Cập nhật lại danh sách sau khi xóa
-        }
-        catch (error: any) {
+            // Dùng refreshKey để đồng thời cập nhật cả danh sách và stats
+            setRefreshKey(k => k + 1);
+        } catch (error: any) {
             toast.error(error.message || "Không thể xóa thẻ");
         }
-    }
-
-    // Kích hoạt thẻ (chỉ thẻ LOCKED mới có thể kích hoạt lại thành ACTIVE)
-    const activeCardSatus = async (card: any) => {
-        if(!card || !card.id) return;
-        try {
-            await paymentService.updateCardStatus(card.id, "ACTIVE");
-            toast.success("Đã kích hoạt thẻ thành công");
-            fetchCards(); // Cập nhật lại danh sách sau khi kích hoạt
-        } catch (error: any) {
-            toast.error(error.message || "Không thể kích hoạt thẻ");
-        }
-    }
+    };
 
     return (
         <div className="flex-1 flex flex-col min-h-0 space-y-4">
@@ -386,7 +381,7 @@ export default function CardManagement() {
                                                         <LockKeyhole className="mr-1 h-4 w-4" />
                                                         <span className="font-medium ">Khóa thẻ</span>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem className="cursor-pointer hover:bg-success/10 text-success focus:text-success rounded-md py-2 px-3 flex items-center text-sm" onClick={() => activeCardSatus(card)}>
+                                                    <DropdownMenuItem className="cursor-pointer hover:bg-success/10 text-success focus:text-success rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleToggleStatus(card)}>
                                                         <CircleCheckBig className="mr-1 h-4 w-4" />
                                                         <span className="font-medium">Kích hoạt thẻ</span>
                                                     </DropdownMenuItem>

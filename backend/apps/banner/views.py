@@ -12,8 +12,9 @@ class BannerViewSet(ResponseEnvelopeMixin, viewsets.ModelViewSet):
     """
     queryset = Banner.objects.all()
     serializer_class = BannerSerializer
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['is_active', 'position', 'show_in_home']
+    search_fields = ['title', 'description', 'link_url']
     ordering_fields = ['sort_order', 'created_at']
 
     def get_permissions(self):

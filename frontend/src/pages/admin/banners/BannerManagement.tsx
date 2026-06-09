@@ -76,7 +76,7 @@ export default function BannerManagement() {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-64px)] gap-6 bg-bg-secondary">
+        <div className="flex-1 flex flex-col min-h-0 gap-4 bg-bg-secondary">
             {/* Header */}
             <div className="flex items-center justify-between shrink-0">
                 <div className="flex items-center justify-between">

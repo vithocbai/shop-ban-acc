@@ -4,10 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "react-toastify";
-import { Loader2, Plus, Edit, Trash2 } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2, Search } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { bannerService, type Banner } from "@/features/banner/services/banner.service";
 import BannerModal from "./BannerModal";
+import { Input } from "@/components/ui/input";
+import { Select } from "@radix-ui/react-select";
+import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function BannerManagement() {
     const [banners, setBanners] = useState<Banner[]>([]);
@@ -18,6 +21,11 @@ export default function BannerManagement() {
     const [selectedBanner, setSelectedBanner] = useState<Banner | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+
+    // Filters
+    const [search, setSearch] = useState("");
+    const [categoryFilter, setCategoryFilter] = useState("all");
+    const [statusFilter, setStatusFilter] = useState("all");
 
     const getPositionLabel = (position: string) => {
         switch (position) {
@@ -32,7 +40,12 @@ export default function BannerManagement() {
     const fetchBanners = async () => {
         setLoading(true);
         try {
-            const data = await bannerService.getBanners();
+            const params: Record<string, any> = {};
+            if (search.trim()) params.search = search.trim();
+            if (categoryFilter !== "all") params.position = categoryFilter;
+            if (statusFilter !== "all") params.is_active = statusFilter === "true";
+
+            const data = await bannerService.getBanners(params);
             setBanners(data?.items || data || []);
         } catch (error) {
             toast.error("Lỗi khi tải danh sách Banner");
@@ -43,7 +56,7 @@ export default function BannerManagement() {
 
     useEffect(() => {
         fetchBanners();
-    }, []);
+    }, [statusFilter, categoryFilter, search]);
 
     const handleAdd = () => {
         setSelectedBanner(null);
@@ -85,10 +98,66 @@ export default function BannerManagement() {
                         <p className="text-sm text-gray-500 mt-1">Thêm, sửa, xóa banner và slider</p>
                     </div>
                 </div>
-                <Button onClick={handleAdd} className="flex items-center gap-2">
-                    <Plus size={18} />
-                    Thêm banner
-                </Button>
+            </div>
+
+            {/* Thanh công cụ tìm kiếm và lọc */}
+            <div className="pb-2 px-[1px] flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 mb-0">
+                <div className="flex flex-1 items-center gap-3">
+                    <div className="relative flex-1 max-w-sm">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-secondary z-10">
+                            <Search size={18} />
+                        </div>
+                        <Input
+                            placeholder="Tìm theo tiêu đề mô tả hoặc link url"
+                            className="pl-10"
+                            value={search}
+                            onChange={(e) => {
+                                setSearch(e.target.value);
+                                // setPage(1);
+                            }}
+                        />
+                    </div>
+                    <Select
+                        value={categoryFilter}
+                        onValueChange={(v) => {
+                            setCategoryFilter(v);
+                            // setPage(1);
+                        }}
+                    >
+                        <SelectTrigger className="w-[180px] border-border-color">
+                            <SelectValue placeholder="Vị trí" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Tất cả vị trí</SelectItem>
+                            <SelectItem value="HOME_TOP">Trang chủ - Top</SelectItem>
+                            <SelectItem value="HOME_MIDDLE">Trang chủ - Giữa</SelectItem>
+                            <SelectItem value="HOME_BOTTOM">Trang chủ - Dưới</SelectItem>
+                            <SelectItem value="SIDEBAR">Sidebar</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Select
+                        value={statusFilter}
+                        onValueChange={(v) => {
+                            setStatusFilter(v);
+                            // setPage(1);
+                        }}
+                    >
+                        <SelectTrigger className="w-[180px] border-border-color">
+                            <SelectValue placeholder="Tất cả trạng thái" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                            <SelectItem value="true">Đang hiển thị</SelectItem>
+                            <SelectItem value="false">Đang ẩn</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="flex items-center gap-3">
+                    <Button onClick={handleAdd} className="flex items-center gap-2">
+                        <Plus size={18} />
+                        Thêm banner
+                    </Button>
+                </div>
             </div>
 
             {/* Danh sách */}
@@ -124,23 +193,31 @@ export default function BannerManagement() {
                                 <TableRow key={item.id}>
                                     <TableCell>
                                         {item.image_url ? (
-                                            <img src={item.image_url} alt={item.title} className="w-16 h-16 object-cover rounded-md border" />
+                                            <img
+                                                src={item.image_url}
+                                                alt={item.title}
+                                                className="w-16 h-16 object-cover rounded-md border"
+                                            />
                                         ) : (
-                                            <div className="w-24 h-12 bg-gray-100 rounded-md flex items-center justify-center text-xs text-gray-400">No Image</div>
+                                            <div className="w-24 h-12 bg-gray-100 rounded-md flex items-center justify-center text-xs text-gray-400">
+                                                No Image
+                                            </div>
                                         )}
                                     </TableCell>
                                     <TableCell className="font-medium text-text-main">
                                         <div className="line-clamp-2">{item.title}</div>
                                     </TableCell>
-                                    <TableCell className="font-medium text-text-main">{getPositionLabel(item.position)}</TableCell>
+                                    <TableCell className="font-medium text-text-main">
+                                        {getPositionLabel(item.position)}
+                                    </TableCell>
                                     <TableCell className="text-center font-medium">{item.sort_order}</TableCell>
                                     <TableCell className="text-center">
-                                        <Badge variant={item.is_active ? "success" : "secondary" as any}>
-                                           {item.is_active ? "Hiển thị" : "Ẩn"}
+                                        <Badge variant={item.is_active ? "success" : ("secondary" as any)}>
+                                            {item.is_active ? "Hiển thị" : "Ẩn"}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-center font-medium text-text-main">
-                                        {new Date(item.created_at).toLocaleDateString('vi-VN')}
+                                        {new Date(item.created_at).toLocaleDateString("vi-VN")}
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex justify-center">
@@ -183,7 +260,8 @@ export default function BannerManagement() {
                 title="Xác nhận xóa Banner"
                 description={
                     <>
-                        Bạn có chắc chắn muốn xóa Banner <strong>{selectedBanner?.title}</strong>? Hành động này không thể hoàn tác.
+                        Bạn có chắc chắn muốn xóa Banner <strong>{selectedBanner?.title}</strong>? Hành động này không
+                        thể hoàn tác.
                     </>
                 }
                 confirmText="Xóa"

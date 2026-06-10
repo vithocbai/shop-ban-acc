@@ -11,6 +11,7 @@ import BannerModal from "./BannerModal";
 import { Input } from "@/components/ui/input";
 import { Select } from "@radix-ui/react-select";
 import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PaginationControls } from "@/components/shared/PaginationControls";
 
 export default function BannerManagement() {
     const [banners, setBanners] = useState<Banner[]>([]);
@@ -27,6 +28,12 @@ export default function BannerManagement() {
     const [categoryFilter, setCategoryFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");
 
+    // Pagination
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(20);
+    const [total, setTotal] = useState(0);
+
+
     const getPositionLabel = (position: string) => {
         switch (position) {
             case 'HOME_TOP': return 'Trang chủ - Top';
@@ -40,13 +47,14 @@ export default function BannerManagement() {
     const fetchBanners = async () => {
         setLoading(true);
         try {
-            const params: Record<string, any> = {};
+            const params: Record<string, any> = { page, page_size: pageSize };
             if (search.trim()) params.search = search.trim();
             if (categoryFilter !== "all") params.position = categoryFilter;
             if (statusFilter !== "all") params.is_active = statusFilter === "true";
 
             const data = await bannerService.getBanners(params);
             setBanners(data?.items || data || []);
+            setTotal(data?.total || 0);
         } catch (error) {
             toast.error("Lỗi khi tải danh sách Banner");
         } finally {
@@ -56,7 +64,7 @@ export default function BannerManagement() {
 
     useEffect(() => {
         fetchBanners();
-    }, [statusFilter, categoryFilter, search]);
+    }, [page, pageSize, statusFilter, categoryFilter, search]);
 
     const handleAdd = () => {
         setSelectedBanner(null);
@@ -113,7 +121,7 @@ export default function BannerManagement() {
                             value={search}
                             onChange={(e) => {
                                 setSearch(e.target.value);
-                                // setPage(1);
+                                setPage(1);
                             }}
                         />
                     </div>
@@ -121,7 +129,7 @@ export default function BannerManagement() {
                         value={categoryFilter}
                         onValueChange={(v) => {
                             setCategoryFilter(v);
-                            // setPage(1);
+                            setPage(1);
                         }}
                     >
                         <SelectTrigger className="w-[180px] border-border-color">
@@ -139,7 +147,7 @@ export default function BannerManagement() {
                         value={statusFilter}
                         onValueChange={(v) => {
                             setStatusFilter(v);
-                            // setPage(1);
+                            setPage(1);
                         }}
                     >
                         <SelectTrigger className="w-[180px] border-border-color">
@@ -147,8 +155,8 @@ export default function BannerManagement() {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">Tất cả trạng thái</SelectItem>
-                            <SelectItem value="true">Đang hiển thị</SelectItem>
-                            <SelectItem value="false">Đang ẩn</SelectItem>
+                            <SelectItem value="true">Hiển thị</SelectItem>
+                            <SelectItem value="false">Không hiển thị</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -196,7 +204,7 @@ export default function BannerManagement() {
                                             <img
                                                 src={item.image_url}
                                                 alt={item.title}
-                                                className="w-16 h-16 object-cover rounded-md border"
+                                                className="w-16 h-16 object-cover rounded-md  border border-gray-200"
                                             />
                                         ) : (
                                             <div className="w-24 h-12 bg-gray-100 rounded-md flex items-center justify-center text-xs text-gray-400">
@@ -213,7 +221,7 @@ export default function BannerManagement() {
                                     <TableCell className="text-center font-medium">{item.sort_order}</TableCell>
                                     <TableCell className="text-center">
                                         <Badge variant={item.is_active ? "success" : ("secondary" as any)}>
-                                            {item.is_active ? "Hiển thị" : "Ẩn"}
+                                            {item.is_active ? "Hiển thị" : "Không hiển thị"}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-center font-medium text-text-main">
@@ -244,6 +252,16 @@ export default function BannerManagement() {
                         )}
                     </TableBody>
                 </Table>
+
+                <PaginationControls
+                    page={page}
+                    pageSize={pageSize}
+                    total={total}
+                    itemsLength={banners.length}
+                    onPageChange={setPage}
+                    onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+                    pageSizeOptions={[10, 20, 50, 100]}
+                />
             </Card>
 
             {/* Modals */}

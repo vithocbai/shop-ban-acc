@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Trash2, Plus, Loader2, X, Edit } from "lucide-react";
 import { toast } from "react-toastify";
 import { newsService, type Category } from "@/features/news/services/news.service";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 interface CategoryManagementModalProps {
     isOpen: boolean;
@@ -16,12 +17,15 @@ interface CategoryManagementModalProps {
 export default function CategoryManagementModal({ isOpen, onClose, onCategoryChanged }: CategoryManagementModalProps) {
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
-    
     // Form state
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [formData, setFormData] = useState({ title: "", description: "" });
     const [saving, setSaving] = useState(false);
+
+    // Action
+    const [selectedCategoryId, setSelectedCategoryId] = useState<Category | null>(null);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -54,11 +58,15 @@ export default function CategoryManagementModal({ isOpen, onClose, onCategoryCha
         setFormData({ title: cat.title, description: cat.description || "" });
     };
 
-    const handleDelete = async (id: number) => {
-        if (!window.confirm("Bạn có chắc chắn muốn xóa danh mục này?")) return;
-        
+    const handleDeleteClick = (categories: Category) => {
+        setSelectedCategoryId(categories);
+        setIsDeleteModalOpen(true);
+    }
+
+    const confirmDelete = async () => {
+        if(!selectedCategoryId) return;
         try {
-            await newsService.deleteCategory(id);
+            await newsService.deleteCategory(selectedCategoryId.id);
             toast.success("Xóa danh mục thành công");
             fetchCategories();
             if (onCategoryChanged) onCategoryChanged();
@@ -66,6 +74,7 @@ export default function CategoryManagementModal({ isOpen, onClose, onCategoryCha
             toast.error(error.response?.data?.message || "Không thể xóa danh mục");
         }
     };
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -187,7 +196,7 @@ export default function CategoryManagementModal({ isOpen, onClose, onCategoryCha
                                                             variant="ghost"
                                                             size="icon"
                                                             className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
-                                                            onClick={() => handleDelete(cat.id)}
+                                                            onClick={() => handleDeleteClick(cat)}
                                                         >
                                                             <Trash2 className="w-4 h-4" />
                                                         </Button>
@@ -202,6 +211,19 @@ export default function CategoryManagementModal({ isOpen, onClose, onCategoryCha
                     </div>
                 </div>
             </div>
+
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={confirmDelete}
+                title="Xóa danh mục"
+                description={<>Bạn có chắc chắn muốn xóa danh mục <span className="font-medium text-text-main">"{selectedCategoryId?.title}"</span> Hành động này không thể hoàn tác.</>}
+                confirmText="Xóa danh mục"
+                cancelText="Hủy"
+                variant="danger"
+            />
         </div>
     );
+
+    
 }

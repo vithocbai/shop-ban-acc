@@ -219,7 +219,7 @@ export default function NewsManagement() {
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <span className="text-sm text-text-secondary">
+                                            <span className="text-sm text-text-main font-medium">
                                                 {article.category?.title || ""}
                                             </span>
                                         </TableCell>
@@ -236,16 +236,16 @@ export default function NewsManagement() {
                                         </TableCell>
                                         <TableCell className="text-center">
                                             {isPublished ? (
-                                                <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-0">
+                                                <Badge variant="success" className="border-0">
                                                     Đã đăng
                                                 </Badge>
                                             ) : (
-                                                <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-100 border-0">
+                                                <Badge variant="destructive" className="border-0">
                                                     Bản nháp / Ẩn
                                                 </Badge>
                                             )}
                                         </TableCell>
-                                        <TableCell className="text-center text-sm text-text-secondary">
+                                        <TableCell className="text-center text-sm font-medium text-text-main">
                                             {formatDate(article.published_at)}
                                         </TableCell>
                                         <TableCell className="text-center">
@@ -297,7 +297,6 @@ export default function NewsManagement() {
                 confirmText="Xóa bài viết"
                 cancelText="Hủy"
                 variant="danger"
-                isLoading={isDeleting}
             />
 
             <CategoryManagementModal 

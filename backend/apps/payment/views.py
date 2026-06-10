@@ -48,8 +48,30 @@ class DepositViewSet(ResponseEnvelopeMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.request.user.is_staff:
-            return Deposit.objects.all()
-        return Deposit.objects.filter(user=self.request.user)
+            queryset = Deposit.objects.all()
+        else:
+            queryset = Deposit.objects.filter(user=self.request.user)
+            
+        # Các tham số filter từ FE
+        status_param = self.request.query_params.get('status')
+        method_param = self.request.query_params.get('method')
+        search_param = self.request.query_params.get('search')
+        
+        if status_param:
+            queryset = queryset.filter(status=status_param)
+            
+        if method_param:
+            queryset = queryset.filter(method=method_param)
+            
+        if search_param:
+            from django.db.models import Q
+            # Tìm kiếm theo username hoặc email của người dùng
+            queryset = queryset.filter(
+                Q(user__username__icontains=search_param) | 
+                Q(user__email__icontains=search_param)
+            )
+            
+        return queryset
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def approve(self, request, pk=None):
@@ -113,8 +135,19 @@ class CardAdminViewSet(ResponseEnvelopeMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Card.objects.all()
         status_param = self.request.query_params.get('status')
+        search_param = self.request.query_params.get('search')
+        
         if status_param:
             queryset = queryset.filter(status=status_param)
+            
+        if search_param:
+            from django.db.models import Q
+            # Tìm kiếm theo mã thẻ hoặc serial (không phân biệt hoa thường)
+            queryset = queryset.filter(
+                Q(code__icontains=search_param) | 
+                Q(serial__icontains=search_param)
+            )
+            
         return queryset
 
     @action(detail=False, methods=['post'])
@@ -218,14 +251,29 @@ class ManualDepositAdminView(APIView):
             user = User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return Response({"success": False, "message": "Người dùng không tồn tại."}, status=status.HTTP_404_NOT_FOUND)
+        
+        with transaction.atomic():
+            # Tạo Deposit record trước để lưu lịch sử nạp tiền trong /api/deposits/
+            # Tại sao? ManualDepositAdminView trước đây chỉ gọi update_user_balance (tạo Transaction)
+            # nhưng không tạo Deposit → lịch sử nạp tiền ở trang admin không có dữ liệu.
+            deposit = Deposit.objects.create(
+                user=user,
+                amount=amount,
+                method=payment_method,
+                note=note,
+                admin_note=f"Nạp thủ công bởi {request.user.username}",
+                status=Deposit.Status.APPROVED,
+                approved_by=request.user,
+                approved_at=timezone.now(),
+            )
             
-        update_user_balance(
-            user=user,
-            amount=amount,
-            transaction_type=Transaction.Type.DEPOSIT,
-            note=f"Nạp thủ công: {note}",
-            metadata={"admin_id": request.user.id, "payment_method": payment_method}
-        )
+            update_user_balance(
+                user=user,
+                amount=amount,
+                transaction_type=Transaction.Type.DEPOSIT,
+                note=f"Nạp thủ công: {note}",
+                metadata={"admin_id": request.user.id, "payment_method": payment_method, "deposit_id": deposit.id}
+            )
         
         notify_user(
             user=user,

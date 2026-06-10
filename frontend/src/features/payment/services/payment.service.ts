@@ -60,8 +60,10 @@ export const paymentService = {
 
     updateCardStatus: async (id: number, status: string): Promise<any> => {
         const response = await api.patch<ApiResponse<any>>(`/cards/${id}/`, { status });
-        if (response.data && response.data.success) {
-            return response.data.data;
+        // Chấp nhận nếu success=true HOẶC không có field success nhưng không phải false (HTTP 2xx)
+        // Tại sao? PATCH qua ModelViewSet trả về serialized object, không nhất thiết có field success
+        if (response.data && response.data.success !== false) {
+            return response.data.data ?? response.data;
         }
         throw new Error(response.data?.message || "Cập nhật thẻ thất bại");
     },

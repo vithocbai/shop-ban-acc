@@ -159,7 +159,7 @@ export default function NewsManagement() {
                         <Layers className="h-4 w-4" />
                         Quản lý danh mục
                     </Button>
-                    <Button onClick={() => navigate("/admin/news/create")} className="gap-2 text-white">
+                    <Button className="gap-2 text-white">
                         <Plus className="h-4 w-4" />
                         Thêm bài viết
                     </Button>

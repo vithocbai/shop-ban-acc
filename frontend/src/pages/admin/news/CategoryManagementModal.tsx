@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Edit2, Trash2, Plus, Loader2, X } from "lucide-react";
+import { Trash2, Plus, Loader2, X, Edit } from "lucide-react";
 import { toast } from "react-toastify";
 import { newsService, type Category } from "@/features/news/services/news.service";
 
@@ -99,7 +99,7 @@ export default function CategoryManagementModal({ isOpen, onClose, onCategoryCha
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
             <div className="bg-white rounded-md shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200 border border-border-color">
                 <div className="px-6 py-4 border-b border-border-color flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-text-main">Quản lý Danh mục Tin tức</h3>
+                    <h3 className="text-xl font-medium text-text-main">Quản lý Danh mục Tin tức</h3>
                     <Button variant="ghost" size="icon" className="h-9 w-9 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer" onClick={onClose}>
                         <X size={20} />
                     </Button>
@@ -109,12 +109,12 @@ export default function CategoryManagementModal({ isOpen, onClose, onCategoryCha
                     {/* Left: Form */}
                     <div className="w-full md:w-1/3 shrink-0">
                         <div className="bg-bg-secondary p-4 rounded-md border border-border-color">
-                            <h3 className="font-bold text-text-main mb-4">
+                            <h3 className="font-medium text-text-main mb-4">
                                 {isEditing ? "Chỉnh sửa danh mục" : "Thêm danh mục mới"}
                             </h3>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label className="font-bold text-text-main">Tên danh mục <span className="text-error">*</span></Label>
+                                    <Label className="font-medium text-text-main">Tên danh mục <span className="text-error">*</span></Label>
                                     <Input 
                                         value={formData.title}
                                         onChange={(e) => setFormData({...formData, title: e.target.value})}
@@ -122,7 +122,7 @@ export default function CategoryManagementModal({ isOpen, onClose, onCategoryCha
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="font-bold text-text-main">Mô tả (tuỳ chọn)</Label>
+                                    <Label className="font-medium text-text-main">Mô tả (tuỳ chọn)</Label>
                                     <Input 
                                         value={formData.description}
                                         onChange={(e) => setFormData({...formData, description: e.target.value})}
@@ -174,14 +174,14 @@ export default function CategoryManagementModal({ isOpen, onClose, onCategoryCha
                                                 <TableCell className="font-medium text-text-main">{cat.title}</TableCell>
                                                 <TableCell className="text-text-secondary text-sm">{cat.slug}</TableCell>
                                                 <TableCell className="text-right">
-                                                    <div className="flex justify-end gap-2">
+                                                    <div className="flex justify-end">
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
                                                             className="h-8 w-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
                                                             onClick={() => handleEdit(cat)}
                                                         >
-                                                            <Edit2 className="w-4 h-4" />
+                                                            <Edit className="w-4 h-4" />
                                                         </Button>
                                                         <Button
                                                             variant="ghost"

@@ -240,8 +240,8 @@ export default function NewsManagement() {
                                                     Đã đăng
                                                 </Badge>
                                             ) : (
-                                                <Badge variant="destructive" className="border-0">
-                                                    Bản nháp / Ẩn
+                                                <Badge variant="secondary" className="border-0">
+                                                    Lưu nháp
                                                 </Badge>
                                             )}
                                         </TableCell>

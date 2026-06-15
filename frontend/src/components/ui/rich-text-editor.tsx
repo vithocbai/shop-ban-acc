@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import ImageResize from "tiptap-extension-resize-image";
+import { CustomResizableImage } from "./resizable-image";
 import Underline from "@tiptap/extension-underline";
 import LinkExtension from "@tiptap/extension-link";
 import TextAlign from "@tiptap/extension-text-align";
@@ -61,8 +61,8 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
             StarterKit,
             TextStyle,
             FontFamily,
-            ImageResize.configure({
-                inline: true,
+            CustomResizableImage.configure({
+                inline: false,
                 allowBase64: true,
             }),
             Underline,
@@ -70,7 +70,7 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
                 openOnClick: false,
             }),
             TextAlign.configure({
-                types: ["heading", "paragraph"],
+                types: ["heading", "paragraph", "image"],
                 alignments: ["left", "center", "right", "justify"],
             }),
             TaskList,

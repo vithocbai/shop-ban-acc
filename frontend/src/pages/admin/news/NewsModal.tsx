@@ -43,7 +43,7 @@ export default function NewsModal({ isOpen, onClose, onSuccess, article, categor
             if (article) {
                 setFormData({
                     title: article.title || "",
-                    category_id: article.category?.id?.toString() || article.category_id?.toString() || "",
+                    category_id: (article.category !== null && typeof article.category === 'object' ? article.category.id?.toString() : article.category?.toString()) || article.category_id?.toString() || "",
                     short_description: article.short_description || "",
                     thumbnail: article.thumbnail || "",
                     content: article.content || "",

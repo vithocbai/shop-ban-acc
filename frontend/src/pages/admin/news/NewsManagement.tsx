@@ -12,6 +12,7 @@ import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { newsService, type Article, type Category } from "@/features/news/services/news.service";
 import { useNavigate } from "react-router-dom";
 import CategoryManagementModal from "./CategoryManagementModal";
+import NewsModal from "./NewsModal";
 
 export default function NewsManagement() {
     const navigate = useNavigate();
@@ -32,6 +33,7 @@ export default function NewsManagement() {
     // Actions
     const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
     const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+    const [isNewsModalOpen, setIsNewsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
@@ -159,7 +161,7 @@ export default function NewsManagement() {
                         <Layers className="h-4 w-4" />
                         Quản lý danh mục
                     </Button>
-                    <Button className="gap-2 text-white">
+                    <Button className="gap-2 text-white" onClick={() => { setSelectedArticle(null); setIsNewsModalOpen(true); }}>
                         <Plus className="h-4 w-4" />
                         Thêm bài viết
                     </Button>
@@ -253,7 +255,7 @@ export default function NewsManagement() {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    onClick={() => navigate(`/admin/news/edit/${article.id}`)}
+                                                    onClick={() => { setSelectedArticle(article); setIsNewsModalOpen(true); }}
                                                     className="h-8 w-8 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
                                                     title="Chỉnh sửa"
                                                 >
@@ -303,6 +305,17 @@ export default function NewsManagement() {
                 isOpen={isCategoryModalOpen}
                 onClose={() => setIsCategoryModalOpen(false)}
                 onCategoryChanged={fetchCategories}
+            />
+
+            <NewsModal
+                isOpen={isNewsModalOpen}
+                onClose={() => {
+                    setIsNewsModalOpen(false);
+                    setSelectedArticle(null);
+                }}
+                onSuccess={fetchArticles}
+                article={selectedArticle}
+                categories={categories}
             />
         </div>
     );

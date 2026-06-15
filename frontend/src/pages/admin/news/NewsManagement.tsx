@@ -13,6 +13,7 @@ import { newsService, type Article, type Category } from "@/features/news/servic
 import { useNavigate } from "react-router-dom";
 import CategoryManagementModal from "./CategoryManagementModal";
 import NewsModal from "./NewsModal";
+import { formatDate } from "@/lib/utils";
 
 export default function NewsManagement() {
     const navigate = useNavigate();
@@ -103,12 +104,6 @@ export default function NewsManagement() {
             setIsDeleting(false);
             setSelectedArticle(null);
         }
-    };
-
-    const formatDate = (dateStr?: string | null) => {
-        if (!dateStr) return "—";
-        const d = new Date(dateStr);
-        return `${d.toLocaleDateString("vi-VN")} ${d.toLocaleTimeString("vi-VN")}`;
     };
 
     return (
@@ -251,7 +246,7 @@ export default function NewsManagement() {
                                             {formatDate(article.published_at)}
                                         </TableCell>
                                         <TableCell className="text-center">
-                                            <div className="flex items-center justify-center gap-2">
+                                            <div className="flex items-center justify-center">
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"

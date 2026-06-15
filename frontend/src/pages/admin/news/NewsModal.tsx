@@ -114,7 +114,7 @@ export default function NewsModal({ isOpen, onClose, onSuccess, article, categor
                 is_visible: formData.status === "PUBLISHED",
                 published_at: formData.schedule_type === "SCHEDULE" && formData.published_at 
                     ? new Date(formData.published_at).toISOString() 
-                    : null,
+                    : new Date().toISOString(),
                 display_until: formData.display_until 
                     ? new Date(formData.display_until).toISOString() 
                     : null,
@@ -329,7 +329,7 @@ export default function NewsModal({ isOpen, onClose, onSuccess, article, categor
                                         <input
                                             type="radio"
                                             checked={formData.schedule_type === "NOW"}
-                                            onChange={() => setFormData({ ...formData, schedule_type: "NOW" })}
+                                            onChange={() => setFormData({ ...formData, schedule_type: "NOW", published_at: new Date().toISOString() })}
                                             className="w-4 h-4 text-primary cursor-pointer accent-primary"
                                         />
                                         <span className="text-sm font-medium text-text-main select-none">Đăng ngay</span>
@@ -341,7 +341,7 @@ export default function NewsModal({ isOpen, onClose, onSuccess, article, categor
                                             onChange={() => setFormData({ ...formData, schedule_type: "SCHEDULE" })}
                                             className="w-4 h-4 text-primary cursor-pointer accent-primary"
                                         />
-                                        <span className="text-sm font-medium text-text-main select-none">Đặt lịch đăng</span>
+                                        <span className="text-sm font-medium text-text-main select-none">Tùy chọn thời gian</span>
                                     </label>
                                 </div>
 

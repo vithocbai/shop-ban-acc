@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { X, UploadCloud, Loader2, Save } from "lucide-react";
+import { X, UploadCloud, Loader2, Save, ChevronDown } from "lucide-react";
 import { toast } from "react-toastify";
 import api from "@/services/api";
 import { cn } from "@/lib/utils";
@@ -40,10 +40,13 @@ export default function NewsModal({ isOpen, onClose, onSuccess, article, categor
     useEffect(() => {
         if (isOpen) {
             setFieldErrors({});
+            
             if (article) {
+                const computedCategoryId = (article.category && typeof article.category === 'object' && 'id' in article.category ? String(article.category.id) : (article.category ? String(article.category) : "")) || (article.category_id ? String(article.category_id) : "") || "";
+                
                 setFormData({
                     title: article.title || "",
-                    category_id: (article.category !== null && typeof article.category === 'object' ? article.category.id?.toString() : article.category?.toString()) || article.category_id?.toString() || "",
+                    category_id: computedCategoryId,
                     short_description: article.short_description || "",
                     thumbnail: article.thumbnail || "",
                     content: article.content || "",
@@ -178,22 +181,25 @@ export default function NewsModal({ isOpen, onClose, onSuccess, article, categor
 
                                     <div className="space-y-2">
                                         <Label className="font-medium text-text-main">Danh mục <span className="text-error">*</span></Label>
-                                        <Select
-                                            value={formData.category_id}
-                                            onValueChange={value => {
-                                                setFormData({ ...formData, category_id: value });
-                                                if (fieldErrors.category_id) setFieldErrors({ ...fieldErrors, category_id: "" });
-                                            }}
-                                        >
-                                            <SelectTrigger className={cn("w-full bg-white h-[42px]", fieldErrors.category_id ? "border-error focus:ring-error" : "border-border-color")}>
-                                                <SelectValue placeholder="Chọn danh mục" />
-                                            </SelectTrigger>
-                                            <SelectContent>
+                                        <div className="relative w-full">
+                                            <select
+                                                value={formData.category_id}
+                                                onChange={e => {
+                                                    setFormData({ ...formData, category_id: e.target.value });
+                                                    if (fieldErrors.category_id) setFieldErrors({ ...fieldErrors, category_id: "" });
+                                                }}
+                                                className={cn(
+                                                    "appearance-none flex h-[42px] w-full items-center justify-between rounded-md border bg-white pl-3 pr-10 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary",
+                                                    fieldErrors.category_id ? "border-error focus:ring-error" : "border-border-color"
+                                                )}
+                                            >
+                                                <option value="" disabled hidden>Chọn danh mục</option>
                                                 {categories.map(cat => (
-                                                    <SelectItem key={cat.id} value={cat.id.toString()}>{cat.title}</SelectItem>
+                                                    <option key={cat.id} value={cat.id.toString()}>{cat.title}</option>
                                                 ))}
-                                            </SelectContent>
-                                        </Select>
+                                            </select>
+                                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50 pointer-events-none text-text-main" />
+                                        </div>
                                         {fieldErrors.category_id && <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.category_id}</p>}
                                     </div>
                                 </div>

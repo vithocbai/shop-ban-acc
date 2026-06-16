@@ -29,6 +29,55 @@
     body {
         @apply bg-bg-main text-text-main font-roboto;
     }
+
+    /* Tiptap Editor Styles */
+    .ProseMirror {
+        @apply outline-none min-h-[300px];
+    }
+
+    .ProseMirror p.is-editor-empty:first-child::before {
+        content: attr(data-placeholder);
+        @apply text-gray-400 float-left h-0 pointer-events-none;
+    }
+
+    .ProseMirror table {
+        @apply border-collapse border border-gray-300 w-full table-fixed my-4;
+    }
+    .ProseMirror td,
+    .ProseMirror th {
+        @apply border border-gray-300 p-2 relative text-left align-top min-w-[1em];
+    }
+    .ProseMirror th {
+        @apply bg-gray-50 font-bold;
+    }
+    .ProseMirror .selectedCell:after {
+        @apply absolute inset-0 bg-primary/10 content-[''] pointer-events-none z-10;
+    }
+    .ProseMirror .column-resize-handle {
+        @apply absolute right-[-2px] top-0 bottom-[-2px] w-1 bg-primary pointer-events-none z-20;
+    }
+    .ProseMirror img {
+        @apply max-w-full h-auto rounded-md border border-border-color shadow-sm my-4;
+    }
+    .ProseMirror blockquote {
+        @apply border-l-4 border-gray-300 pl-4 py-1 italic bg-gray-50 text-gray-600 my-4;
+    }
+    
+    .ProseMirror h1 {
+        @apply text-4xl font-bold my-4;
+    }
+
+    .ProseMirror h2 {
+        @apply text-3xl font-bold my-3;
+    }
+
+    .ProseMirror h3 {
+        @apply text-2xl font-semibold my-2;
+    }
+
+    .ProseMirror p {
+        @apply text-base font-normal my-2;
+    }
 }
 
 @layer components {

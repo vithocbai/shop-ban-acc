@@ -12,6 +12,8 @@ import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { newsService, type Article, type Category } from "@/features/news/services/news.service";
 import { useNavigate } from "react-router-dom";
 import CategoryManagementModal from "./CategoryManagementModal";
+import NewsModal from "./NewsModal";
+import { formatDate } from "@/lib/utils";
 
 export default function NewsManagement() {
     const navigate = useNavigate();
@@ -32,6 +34,7 @@ export default function NewsManagement() {
     // Actions
     const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
     const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+    const [isNewsModalOpen, setIsNewsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
@@ -103,12 +106,6 @@ export default function NewsManagement() {
         }
     };
 
-    const formatDate = (dateStr?: string | null) => {
-        if (!dateStr) return "—";
-        const d = new Date(dateStr);
-        return `${d.toLocaleDateString("vi-VN")} ${d.toLocaleTimeString("vi-VN")}`;
-    };
-
     return (
         <div className="flex-1 flex flex-col min-h-0 space-y-4">
             <div className="flex items-center justify-between">
@@ -159,7 +156,7 @@ export default function NewsManagement() {
                         <Layers className="h-4 w-4" />
                         Quản lý danh mục
                     </Button>
-                    <Button onClick={() => navigate("/admin/news/create")} className="gap-2 bg-blue-600 hover:bg-blue-700 text-white">
+                    <Button className="gap-2 text-white" onClick={() => { setSelectedArticle(null); setIsNewsModalOpen(true); }}>
                         <Plus className="h-4 w-4" />
                         Thêm bài viết
                     </Button>
@@ -219,7 +216,7 @@ export default function NewsManagement() {
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <span className="text-sm text-text-secondary">
+                                            <span className="text-sm text-text-main font-medium">
                                                 {article.category?.title || ""}
                                             </span>
                                         </TableCell>
@@ -236,24 +233,24 @@ export default function NewsManagement() {
                                         </TableCell>
                                         <TableCell className="text-center">
                                             {isPublished ? (
-                                                <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-0">
+                                                <Badge variant="success" className="border-0">
                                                     Đã đăng
                                                 </Badge>
                                             ) : (
-                                                <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-100 border-0">
-                                                    Bản nháp / Ẩn
+                                                <Badge variant="secondary" className="border-0">
+                                                    Lưu nháp
                                                 </Badge>
                                             )}
                                         </TableCell>
-                                        <TableCell className="text-center text-sm text-text-secondary">
+                                        <TableCell className="text-center text-sm font-medium text-text-main">
                                             {formatDate(article.published_at)}
                                         </TableCell>
                                         <TableCell className="text-center">
-                                            <div className="flex items-center justify-center gap-2">
+                                            <div className="flex items-center justify-center">
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    onClick={() => navigate(`/admin/news/edit/${article.id}`)}
+                                                    onClick={() => { setSelectedArticle(article); setIsNewsModalOpen(true); }}
                                                     className="h-8 w-8 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
                                                     title="Chỉnh sửa"
                                                 >
@@ -297,13 +294,23 @@ export default function NewsManagement() {
                 confirmText="Xóa bài viết"
                 cancelText="Hủy"
                 variant="danger"
-                isLoading={isDeleting}
             />
 
             <CategoryManagementModal 
                 isOpen={isCategoryModalOpen}
                 onClose={() => setIsCategoryModalOpen(false)}
                 onCategoryChanged={fetchCategories}
+            />
+
+            <NewsModal
+                isOpen={isNewsModalOpen}
+                onClose={() => {
+                    setIsNewsModalOpen(false);
+                    setSelectedArticle(null);
+                }}
+                onSuccess={fetchArticles}
+                article={selectedArticle}
+                categories={categories}
             />
         </div>
     );

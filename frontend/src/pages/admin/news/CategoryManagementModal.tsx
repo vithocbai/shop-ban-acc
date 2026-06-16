@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Edit2, Trash2, Plus, Loader2, X } from "lucide-react";
+import { Trash2, Plus, Loader2, X, Edit } from "lucide-react";
 import { toast } from "react-toastify";
 import { newsService, type Category } from "@/features/news/services/news.service";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 interface CategoryManagementModalProps {
     isOpen: boolean;
@@ -16,12 +17,15 @@ interface CategoryManagementModalProps {
 export default function CategoryManagementModal({ isOpen, onClose, onCategoryChanged }: CategoryManagementModalProps) {
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
-    
     // Form state
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [formData, setFormData] = useState({ title: "", description: "" });
     const [saving, setSaving] = useState(false);
+
+    // Action
+    const [selectedCategoryId, setSelectedCategoryId] = useState<Category | null>(null);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -54,11 +58,15 @@ export default function CategoryManagementModal({ isOpen, onClose, onCategoryCha
         setFormData({ title: cat.title, description: cat.description || "" });
     };
 
-    const handleDelete = async (id: number) => {
-        if (!window.confirm("Bạn có chắc chắn muốn xóa danh mục này?")) return;
-        
+    const handleDeleteClick = (categories: Category) => {
+        setSelectedCategoryId(categories);
+        setIsDeleteModalOpen(true);
+    }
+
+    const confirmDelete = async () => {
+        if(!selectedCategoryId) return;
         try {
-            await newsService.deleteCategory(id);
+            await newsService.deleteCategory(selectedCategoryId.id);
             toast.success("Xóa danh mục thành công");
             fetchCategories();
             if (onCategoryChanged) onCategoryChanged();
@@ -66,6 +74,7 @@ export default function CategoryManagementModal({ isOpen, onClose, onCategoryCha
             toast.error(error.response?.data?.message || "Không thể xóa danh mục");
         }
     };
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -99,7 +108,7 @@ export default function CategoryManagementModal({ isOpen, onClose, onCategoryCha
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
             <div className="bg-white rounded-md shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200 border border-border-color">
                 <div className="px-6 py-4 border-b border-border-color flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-text-main">Quản lý Danh mục Tin tức</h3>
+                    <h3 className="text-xl font-medium text-text-main">Quản lý Danh mục Tin tức</h3>
                     <Button variant="ghost" size="icon" className="h-9 w-9 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer" onClick={onClose}>
                         <X size={20} />
                     </Button>
@@ -109,12 +118,12 @@ export default function CategoryManagementModal({ isOpen, onClose, onCategoryCha
                     {/* Left: Form */}
                     <div className="w-full md:w-1/3 shrink-0">
                         <div className="bg-bg-secondary p-4 rounded-md border border-border-color">
-                            <h3 className="font-bold text-text-main mb-4">
+                            <h3 className="font-medium text-text-main mb-4">
                                 {isEditing ? "Chỉnh sửa danh mục" : "Thêm danh mục mới"}
                             </h3>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label className="font-bold text-text-main">Tên danh mục <span className="text-error">*</span></Label>
+                                    <Label className="font-medium text-text-main">Tên danh mục <span className="text-error">*</span></Label>
                                     <Input 
                                         value={formData.title}
                                         onChange={(e) => setFormData({...formData, title: e.target.value})}
@@ -122,7 +131,7 @@ export default function CategoryManagementModal({ isOpen, onClose, onCategoryCha
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="font-bold text-text-main">Mô tả (tuỳ chọn)</Label>
+                                    <Label className="font-medium text-text-main">Mô tả (tuỳ chọn)</Label>
                                     <Input 
                                         value={formData.description}
                                         onChange={(e) => setFormData({...formData, description: e.target.value})}
@@ -174,20 +183,20 @@ export default function CategoryManagementModal({ isOpen, onClose, onCategoryCha
                                                 <TableCell className="font-medium text-text-main">{cat.title}</TableCell>
                                                 <TableCell className="text-text-secondary text-sm">{cat.slug}</TableCell>
                                                 <TableCell className="text-right">
-                                                    <div className="flex justify-end gap-2">
+                                                    <div className="flex justify-end">
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
                                                             className="h-8 w-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
                                                             onClick={() => handleEdit(cat)}
                                                         >
-                                                            <Edit2 className="w-4 h-4" />
+                                                            <Edit className="w-4 h-4" />
                                                         </Button>
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
                                                             className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
-                                                            onClick={() => handleDelete(cat.id)}
+                                                            onClick={() => handleDeleteClick(cat)}
                                                         >
                                                             <Trash2 className="w-4 h-4" />
                                                         </Button>
@@ -202,6 +211,19 @@ export default function CategoryManagementModal({ isOpen, onClose, onCategoryCha
                     </div>
                 </div>
             </div>
+
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={confirmDelete}
+                title="Xóa danh mục"
+                description={<>Bạn có chắc chắn muốn xóa danh mục <span className="font-medium text-text-main">"{selectedCategoryId?.title}"</span> Hành động này không thể hoàn tác.</>}
+                confirmText="Xóa danh mục"
+                cancelText="Hủy"
+                variant="danger"
+            />
         </div>
     );
+
+    
 }

@@ -6,7 +6,6 @@ import { X, UploadCloud, Loader2, Save, ChevronDown } from "lucide-react";
 import { toast } from "react-toastify";
 import api from "@/services/api";
 import { cn } from "@/lib/utils";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { newsService, type Article, type Category } from "@/features/news/services/news.service";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
@@ -22,6 +21,7 @@ interface NewsModalProps {
 export default function NewsModal({ isOpen, onClose, onSuccess, article, categories }: NewsModalProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
+    const [isFetchingDetails, setIsFetchingDetails] = useState(false);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
     const [formData, setFormData] = useState({
@@ -56,6 +56,25 @@ export default function NewsModal({ isOpen, onClose, onSuccess, article, categor
                     published_at: article.published_at || "",
                     display_until: article.display_until || "",
                 });
+
+                // Tải thêm dữ liệu content từ Detail API vì List API không trả về content
+                const fetchDetails = async () => {
+                    setIsFetchingDetails(true);
+                    try {
+                        const fullArticle = await newsService.getArticleById(article.id);
+                        if (fullArticle) {
+                            setFormData(prev => ({
+                                ...prev,
+                                content: fullArticle.content || "",
+                            }));
+                        }
+                    } catch (error) {
+                        console.error("Error fetching article details:", error);
+                    } finally {
+                        setIsFetchingDetails(false);
+                    }
+                };
+                fetchDetails();
             } else {
                 setFormData({
                     title: "",
@@ -271,15 +290,22 @@ export default function NewsModal({ isOpen, onClose, onSuccess, article, categor
 
                             <div className="space-y-2">
                                 <Label className="font-medium text-text-main">Nội dung chi tiết <span className="text-error">*</span></Label>
-                                <div className={cn(fieldErrors.content && "border border-error rounded-md")}>
-                                    <RichTextEditor 
-                                        content={formData.content} 
-                                        onChange={(html) => {
-                                            setFormData({ ...formData, content: html });
-                                            if (fieldErrors.content) setFieldErrors({ ...fieldErrors, content: "" });
-                                        }} 
-                                    />
-                                </div>
+                                {isFetchingDetails ? (
+                                    <div className="min-h-[300px] flex flex-col items-center justify-center border border-border-color rounded-md bg-white gap-3">
+                                        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                                        <p className="text-sm text-text-secondary">Đang tải nội dung...</p>
+                                    </div>
+                                ) : (
+                                    <div className={cn(fieldErrors.content && "border border-error rounded-md")}>
+                                        <RichTextEditor 
+                                            content={formData.content} 
+                                            onChange={(html) => {
+                                                setFormData({ ...formData, content: html });
+                                                if (fieldErrors.content) setFieldErrors({ ...fieldErrors, content: "" });
+                                            }} 
+                                        />
+                                    </div>
+                                )}
                                 {fieldErrors.content && <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.content}</p>}
                             </div>
                         </div>
@@ -378,10 +404,10 @@ export default function NewsModal({ isOpen, onClose, onSuccess, article, categor
 
                 {/* Footer */}
                 <div className="px-6 py-4 border-t border-border-color flex items-center justify-end gap-3 bg-bg-secondary/50">
-                    <Button variant="outline" onClick={onClose} className="font-medium px-5" disabled={isLoading}>
+                    <Button variant="outline" onClick={onClose} className="font-medium px-5" disabled={isLoading || isFetchingDetails}>
                         Hủy
                     </Button>
-                    <Button type="submit" form="news-form" className="font-medium px-8 text-white gap-2" disabled={isLoading}>
+                    <Button type="submit" form="news-form" className="font-medium px-8 text-white gap-2" disabled={isLoading || isFetchingDetails}>
                         {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                         Lưu tin tức
                     </Button>

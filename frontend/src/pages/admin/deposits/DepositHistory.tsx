@@ -20,11 +20,13 @@ import {
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import api from "@/services/api";
 
+type BadgeVariant = "default" | "secondary" | "destructive" | "outline" | "ghost" | "link" | "success";
+
 // Mapping trạng thái giao dịch nạp tiền sang label và màu sắc hiển thị
-const STATUS_MAP: Record<string, { label: string; color: string; icon: any }> = {
-    PENDING:  { label: "Đang chờ",    color: "bg-yellow-100 text-yellow-800", icon: Clock },
-    APPROVED: { label: "Thành công",  color: "bg-green-100 text-green-800",  icon: CheckCircle2 },
-    REJECTED: { label: "Thất bại",    color: "bg-red-100 text-red-800",      icon: XCircle },
+const STATUS_MAP: Record<string, { label: string; variant: BadgeVariant; icon: any }> = {
+    PENDING:  { label: "Đang chờ", variant: "default", icon: Clock },
+    APPROVED: { label: "Thành công", variant: "success", icon: CheckCircle2 },
+    REJECTED: { label: "Thất bại", variant: "destructive", icon: XCircle },
 };
 
 // Mapping phương thức nạp tiền sang label hiển thị thân thiện
@@ -306,7 +308,7 @@ export default function DepositHistory() {
                                                 {METHOD_MAP[deposit.method] ?? deposit.method}
                                             </span>
                                         </TableCell>
-                                        <TableCell className="text-right font-medium text-green-600 whitespace-nowrap">
+                                        <TableCell className="text-right font-medium success whitespace-nowrap">
                                             {formatCurrency(deposit.amount)}
                                         </TableCell>
                                         {/* Phí giao dịch — hiện = 0, sẵn sàng hiển thị khi backend có phí */}
@@ -319,8 +321,8 @@ export default function DepositHistory() {
                                         </TableCell>
                                         <TableCell className="text-center">
                                             <Badge
-                                                variant="outline"
-                                                className={`${statusConf.color} border-0 inline-flex items-center gap-1 text-sm`}
+                                                variant={statusConf.variant}
+                                                className={`${statusConf.variant} border-0 inline-flex items-center gap-1 text-sm`}
                                             >
                                                 {statusConf.label}
                                             </Badge>

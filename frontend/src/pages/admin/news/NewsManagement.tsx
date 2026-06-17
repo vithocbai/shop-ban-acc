@@ -108,13 +108,6 @@ export default function NewsManagement() {
 
     return (
         <div className="flex-1 flex flex-col min-h-0 space-y-4">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-gray-900">Quản lý Tin tức</h1>
-                    <p className="text-sm text-gray-500 mt-1">Thêm, sửa, xóa bài viết và hướng dẫn</p>
-                </div>
-            </div>
-
             {/* Thanh công cụ tìm kiếm và lọc */}
             <div className="pb-2 px-[1px] flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 mb-0">
                 <div className="flex flex-1 items-center gap-3">

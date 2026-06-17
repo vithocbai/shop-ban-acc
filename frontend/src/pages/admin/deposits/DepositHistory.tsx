@@ -304,7 +304,7 @@ export default function DepositHistory() {
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-center">
-                                            <span className="text-sm">
+                                            <span className="text-sm  ont-medium">
                                                 {METHOD_MAP[deposit.method] ?? deposit.method}
                                             </span>
                                         </TableCell>
@@ -312,7 +312,7 @@ export default function DepositHistory() {
                                             {formatCurrency(deposit.amount)}
                                         </TableCell>
                                         {/* Phí giao dịch — hiện = 0, sẵn sàng hiển thị khi backend có phí */}
-                                        <TableCell className="text-right text-sm whitespace-nowrap">
+                                        <TableCell className="text-right text-sm whitespace-nowrap font-medium">
                                             {deposit.fee > 0 ? formatCurrency(deposit.fee) : <span className="">Miễn phí</span>}
                                         </TableCell>
                                         {/* Thực nhận = amount - fee, backend tính sẵn */}
@@ -327,12 +327,12 @@ export default function DepositHistory() {
                                                 {statusConf.label}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell className="text-center text-sm whitespace-nowrap">
+                                        <TableCell className="text-center text-sm whitespace-nowrap text-text-main font-medium">
                                             {formatDate(deposit.created_at)}
                                         </TableCell>
                                         <TableCell className="text-sm">
                                             {deposit.admin_note && (
-                                                <p className="text-sm" title={deposit.admin_note}>
+                                                <p className="text-sm font-medium" title={deposit.admin_note}>
                                                     {deposit.admin_note}
                                                 </p>
                                             )}

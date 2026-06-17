@@ -5,9 +5,9 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "react-toastify";
-import type { User } from "../types";
 import { cn } from "@/lib/utils";
-import { userService } from "../services/user.service";
+import { userService } from "@/features/user/services/user.service";
+import type { User } from "@/features/user/types";
 
 interface UserRoleModalProps {
     isOpen: boolean;

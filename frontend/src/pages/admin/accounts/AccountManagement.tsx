@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import {
     Plus, Search, Edit2, Trash2, Star, Eye, EyeOff,
-    Loader2, Filter, ShieldCheck, Lock, ShoppingBag, EyeIcon
+    Loader2, Filter, ShieldCheck, Lock, ShoppingBag, EyeIcon,
+    Edit
 } from "lucide-react";
-import { accountService } from "../services/account.service";
-import { gameService } from "../../game/services/game.service";
-import type { Account, AccountStatus } from "../types";
-import type { Game } from "../../game/types";
+import { accountService } from "@/features/account/services/account.service";
+import { gameService } from "@/features/game/services/game.service";
+import type { Account, AccountStatus } from "@/features/account/types";
+import type { Game } from "@/features/game/types";
 import AccountModal from "./AccountModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,7 +52,7 @@ export const STATUS_CONFIG: Record<AccountStatus, { label: string; className: st
     },
 };
 
-const AccountList: React.FC = () => {
+const AccountManagement: React.FC = () => {
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
@@ -166,9 +167,9 @@ const AccountList: React.FC = () => {
     }
 
     return (
-        <div className="flex-1 flex flex-col min-h-0 space-y-4">
+        <div className="flex-1 flex flex-col min-h-0 gap-2 space-y-4">
             {/* Toolbar */}
-            <div className="py-2 px-[1px] flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 mb-0">
+            <div className="pb-2 px-[1px] flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 mb-0">
                 <div className="flex flex-1 items-center gap-3">
                     {/* Search */}
                     <div className="relative flex-1 max-w-sm">
@@ -331,24 +332,22 @@ const AccountList: React.FC = () => {
                                         <TableCell className="text-right">
                                             <div className="flex items-center justify-end gap-1">
                                                 <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() => handleEdit(account)}
-                                                    title="Chỉnh sửa"
-                                                    className="h-8 w-8 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer"
-                                                >
-                                                    <Edit2 size={16} />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() => handleDelete(account.id)}
-                                                    disabled={isDeleting === account.id}
-                                                    title="Xóa"
-                                                    className="h-8 w-8 text-text-secondary hover:text-error hover:bg-error/10 cursor-pointer disabled:opacity-50"
-                                                >
-                                                    {isDeleting === account.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
-                                                </Button>
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                                                 onClick={() => handleEdit(account)}
+                                            >
+                                                <Edit className="w-4 h-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                onClick={() => handleDelete(account.id)}
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+
                                             </div>
                                         </TableCell>
                                     </TableRow>
@@ -394,4 +393,4 @@ const AccountList: React.FC = () => {
     );
 };
 
-export default AccountList;
+export default AccountManagement;

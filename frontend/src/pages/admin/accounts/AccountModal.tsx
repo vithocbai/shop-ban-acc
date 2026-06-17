@@ -10,10 +10,10 @@ import {
     Gamepad2,
     RefreshCw,
 } from "lucide-react";
-import type { Account, AccountCreateInput, AccountStatus } from "../types";
-import { INITIAL_ACCOUNT_FORM } from "../types";
-import type { Game } from "../../game/types";
-import { accountService } from "../services/account.service";
+import type { Account, AccountCreateInput, AccountStatus } from "@/features/account/types";
+import { INITIAL_ACCOUNT_FORM } from "@/features/account/types";
+import type { Game } from "@/features/game/types";
+import { accountService } from "@/features/account/services/account.service";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -27,7 +27,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { STATUS_CONFIG } from "./AccountList";
+import { STATUS_CONFIG } from "./AccountManagement";
+
 
 interface AccountModalProps {
     isOpen: boolean;
@@ -318,7 +319,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
             <div className="bg-white rounded-md shadow-2xl w-full max-w-[1200px] max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200 border border-border-color">
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-border-color flex items-center justify-between bg-white z-10">
-                    <h3 className="text-lg font-bold text-text-main">
+                    <h3 className="text-lg font-medium text-text-main">
                         {account ? "Chỉnh sửa Tài khoản" : "Thêm Tài khoản mới"}
                     </h3>
                     <Button
@@ -929,11 +930,11 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, onSuccess,
                 </div>
 
                 {/* Footer Buttons */}
-                <div className="px-6 py-4 border-t border-border-color flex items-center justify-end gap-3 bg-white z-10">
-                    <Button type="button" variant="outline" onClick={onClose} className="font-bold px-5">
+                <div className="px-6 py-4 border-t border-border-color flex items-center justify-end gap-3 bg-bg-secondary/50">
+                    <Button type="button" variant="outline" onClick={onClose} className="font-medium px-5">
                         Hủy bỏ
                     </Button>
-                    <Button type="submit" form="account-form" disabled={isLoading} className="font-bold px-8">
+                    <Button type="submit" form="account-form" disabled={isLoading} className="font-medium px-8">
                         {isLoading ? (
                             <Loader2 className="animate-spin" size={18} />
                         ) : (

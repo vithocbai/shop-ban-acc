@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Save, Loader2 } from "lucide-react";
-import type { Game, GameCreateInput } from "../types";
-import { gameService } from "../services/game.service";
+import type { Game, GameCreateInput } from "@/features/game/types";
+import { gameService } from "@/features/game/services/game.service";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -47,7 +47,9 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
     useEffect(() => {
-        setFieldErrors({});
+        if (isOpen) {
+            setFieldErrors({});
+        }
         if (game) {
             setFormData({
                 name: game.name,
@@ -245,7 +247,7 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                 <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-5">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-1.5">
-                            <Label className="font-bold text-text-main">
+                            <Label className="font-medium text-text-main">
                                 Tên Game <span className="text-error">*</span>
                             </Label>
                             <Input
@@ -261,7 +263,7 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                             )}
                         </div>
                         <div className="space-y-1.5">
-                            <Label className="font-bold text-text-main">
+                            <Label className="font-medium text-text-main">
                                 Slug (Đường dẫn) <span className="text-error">*</span>
                             </Label>
                             <Input
@@ -279,7 +281,7 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                     </div>
 
                     <div className="space-y-1.5">
-                        <Label className="font-bold text-text-main">Mô tả</Label>
+                        <Label className="font-medium text-text-main">Mô tả</Label>
                         <textarea
                             name="description"
                             value={formData.description}
@@ -298,7 +300,7 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                         <div className="space-y-1.5">
-                            <Label className="font-bold text-text-main">Trạng thái</Label>
+                            <Label className="font-medium text-text-main">Trạng thái</Label>
                             <select
                                 name="status"
                                 value={formData.status}
@@ -317,7 +319,7 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                             )}
                         </div>
                         <div className="space-y-1.5">
-                            <Label className="font-bold text-text-main">Thứ tự hiển thị</Label>
+                            <Label className="font-medium text-text-main">Thứ tự hiển thị</Label>
                             <Input
                                 type="number"
                                 name="sort_order"
@@ -330,7 +332,7 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                             )}
                         </div>
                         <div className="space-y-1.5">
-                            <Label className="font-bold text-text-main">Màu chủ đạo</Label>
+                            <Label className="font-medium text-text-main">Màu chủ đạo</Label>
                             <div className="flex gap-2">
                                 <input
                                     type="color"
@@ -362,14 +364,14 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                                 onChange={handleInputChange}
                                 className="w-4 h-4 text-primary rounded border-border-color focus:ring-primary/20 cursor-pointer"
                             />
-                            <span className="text-sm font-bold text-text-main select-none">Đánh dấu là Game HOT</span>
+                            <span className="text-sm font-medium text-text-main select-none">Đánh dấu là Game HOT</span>
                         </label>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                         {/* Trường Icon */}
                         <div className="space-y-1.5">
-                            <Label className="font-bold text-text-main">Icon</Label>
+                            <Label className="font-medium text-text-main">Icon</Label>
                             <div className="flex flex-col gap-2">
                                 {formData.icon && (
                                     <div className="relative group w-26 h-26">
@@ -415,7 +417,7 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                         </div>
                         {/* Trường Thumbnail */}
                         <div className="space-y-1.5">
-                            <Label className="font-bold text-text-main">Thumbnail</Label>
+                            <Label className="font-medium text-text-main">Thumbnail</Label>
                             <div className="flex flex-col gap-2">
                                 {formData.thumbnail && (
                                     <div className="relative group w-full h-26">
@@ -461,7 +463,7 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
                         </div>
                         {/* Trường Banner */}
                         <div className="space-y-1.5">
-                            <Label className="font-bold text-text-main">Banner</Label>
+                            <Label className="font-medium text-text-main">Banner</Label>
                             <div className="flex flex-col gap-2">
                                 {formData.banner && (
                                     <div className="relative group w-full h-26">
@@ -510,10 +512,10 @@ const GameModal: React.FC<GameModalProps> = ({ isOpen, onClose, onSuccess, game 
 
                 {/* Footer Buttons */}
                 <div className="px-6 py-4 border-t border-border-color flex items-center justify-end gap-3 bg-bg-secondary/50">
-                    <Button type="button" variant="outline" onClick={onClose} className="font-bold px-5">
+                    <Button type="button" variant="outline" onClick={onClose} className="font-medium px-5">
                         Hủy bỏ
                     </Button>
-                    <Button onClick={handleSubmit} disabled={isLoading} className="font-bold px-8">
+                    <Button onClick={handleSubmit} disabled={isLoading} className="font-medium px-8 flex items-center gap-2">
                         {isLoading ? (
                             <Loader2 className="animate-spin" size={18} />
                         ) : (

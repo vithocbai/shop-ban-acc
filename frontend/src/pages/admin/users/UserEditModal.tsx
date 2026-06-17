@@ -6,10 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "react-toastify";
-import type { User } from "../types";
 import { formatPrice, cn } from "@/lib/utils";
-import { userService } from "../services/user.service";
 import api from "@/services/api";
+import type { User } from "@/features/user/types";
+import { userService } from "@/features/user/services/user.service";
 
 interface UserEditModalProps {
     isOpen: boolean;
@@ -234,18 +234,14 @@ const UserEditModal: React.FC<UserEditModalProps> = ({ isOpen, onClose, user, on
                     </div>
 
                     {/* Row 1: ID, Username, Email */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-text-secondary">ID người dùng</Label>
-                            <Input value={`#${user.id}`} disabled className="bg-gray-50" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label className="font-bold text-text-main">Username <span className="text-error">*</span></Label>
+                            <Label className="font-bold text-text-main">Tên đăng nhập <span className="text-error">*</span></Label>
                             <Input 
                                 name="username"
                                 value={formData.username} 
                                 onChange={handleInputChange}
-                                placeholder="Nhập username" 
+                                placeholder="Nhập tên đăng nhập" 
                                 className={cn(fieldErrors.username && "border-error focus-visible:ring-error")}
                             />
                             {fieldErrors.username && (

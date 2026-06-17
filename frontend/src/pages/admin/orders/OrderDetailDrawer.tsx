@@ -1,7 +1,7 @@
 import React from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
-import type { Order } from "../types";
+import type { Order } from "@/features/order/types";
 import { formatPrice } from "@/lib/utils";
 
 interface OrderDetailDrawerProps {
@@ -10,37 +10,39 @@ interface OrderDetailDrawerProps {
     order: Order | null;
 }
 
-const PAYMENT_STATUS_MAP: Record<string, { label: string; color: string }> = {
-    PENDING: { label: "Chờ thanh toán", color: "bg-warning text-white" },
-    PAID: { label: "Đã thanh toán", color: "bg-success text-white" },
-    FAILED: { label: "Thất bại", color: "bg-error text-white" },
-    REFUNDED: { label: "Đã hoàn tiền", color: "bg-gray-500 text-white" },
+type BadgeVariant = "default" | "secondary" | "destructive" | "outline" | "ghost" | "link" | "success";
+
+const PAYMENT_STATUS_MAP: Record<string, { label: string; variant: BadgeVariant }> = {
+    PENDING: { label: "Chờ thanh toán", variant: "secondary" },
+    PAID: { label: "Đã thanh toán", variant: "success" },
+    FAILED: { label: "Thất bại", variant: "destructive" },
+    REFUNDED: { label: "Đã hoàn", variant: "outline" },
 };
 
-const DELIVERY_STATUS_MAP: Record<string, { label: string; color: string }> = {
-    PENDING: { label: "Chờ bàn giao", color: "bg-warning text-white" },
-    DELIVERED: { label: "Đã bàn giao", color: "bg-success text-white" },
-    FAILED: { label: "Lỗi bàn giao", color: "bg-error text-white" },
+const DELIVERY_STATUS_MAP: Record<string, { label: string; variant: BadgeVariant }> = {
+    PENDING: { label: "Chờ bàn giao", variant: "secondary" },
+    DELIVERED: { label: "Đã bàn giao", variant: "success" },
+    FAILED: { label: "Lỗi", variant: "destructive" },
 };
 
 const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({ isOpen, onClose, order }) => {
     if (!order) return null;
 
-    const paymentConfig = PAYMENT_STATUS_MAP[order.payment_status] || { label: order.payment_status, color: "bg-gray-200 text-black" };
-    const deliveryConfig = DELIVERY_STATUS_MAP[order.delivery_status] || { label: order.delivery_status, color: "bg-gray-200 text-black" };
+    const paymentConfig = PAYMENT_STATUS_MAP[order.payment_status] || { label: order.payment_status, variant: "secondary" };
+    const deliveryConfig = DELIVERY_STATUS_MAP[order.delivery_status] || { label: order.delivery_status, variant: "secondary" };
 
     return (
         <Sheet open={isOpen} onOpenChange={onClose}>
-            <SheetContent className="w-full sm:max-w-xl md:max-w-2xl overflow-y-auto p-4 border-none">
+            <SheetContent className="w-full sm:max-w-xl md:max-w-2xl p-4 border-none">
                 <SheetHeader className="border-b px-0 py-4">
                     <SheetTitle className="text-xl font-bold flex flex-col gap-2">
                         <span>Chi tiết Đơn hàng #{order.order_code}</span>
                         <div className="flex gap-2">
-                            <Badge className={paymentConfig.color}>{paymentConfig.label}</Badge>
-                            <Badge className={deliveryConfig.color}>{deliveryConfig.label}</Badge>
+                            <Badge variant={paymentConfig.variant} className="border-0">{paymentConfig.label}</Badge>
+                            <Badge variant={deliveryConfig.variant} className="border-0">{deliveryConfig.label}</Badge>
                         </div>
                     </SheetTitle>
-                    <p className="text-sm text-text-secondary mt-2">
+                    <p className="text-sm text-text-main mt-2">
                         Thời gian tạo: {new Date(order.created_at).toLocaleString("vi-VN")}
                     </p>
                 </SheetHeader>
@@ -50,12 +52,12 @@ const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({ isOpen, onClose, 
                     <section>
                         <h3 className="text-base font-bold text-text-main mb-3">Thông tin Khách hàng</h3>
                         <div className="bg-bg-secondary p-4 rounded-md border border-border-color space-y-2 text-sm">
-                            <div className="flex justify-between">
-                                <span className="text-text-secondary">Tên đăng nhập:</span>
+                            <div className="flex justify-between font-medium">
+                                <span className="text-text-main">Tên đăng nhập:</span>
                                 <span className="font-bold text-text-main">{order.user?.username || "Không có"}</span>
                             </div>
-                            <div className="flex justify-between">
-                                <span className="text-text-secondary">Email:</span>
+                            <div className="flex justify-between font-medium">
+                                <span className="text-text-main">Email:</span>
                                 <span className="font-medium text-text-main">{order.user?.email || "Không có"}</span>
                             </div>
                         </div>
@@ -64,7 +66,7 @@ const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({ isOpen, onClose, 
                     {/* Chi tiết Item (Tài khoản) */}
                     <section>
                         <h3 className="text-base font-bold text-text-main mb-3">Danh sách Tài khoản ({order.items.length})</h3>
-                        <div className="space-y-4">
+                        <div className="space-y-4 overflow-y-auto h-[50vh]">
                             {order.items.map((item) => (
                                 <div key={item.id} className="border border-border-color rounded-md overflow-hidden bg-white">
                                     <div className="p-4 bg-bg-secondary/50 border-b border-border-color flex justify-between items-center">
@@ -78,7 +80,7 @@ const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({ isOpen, onClose, 
                                     {/* Thông tin bàn giao (Username/Pass của Game) */}
                                     {item.delivery_data && Object.keys(item.delivery_data).length > 0 && (
                                         <div className="p-4">
-                                            <p className="text-xs font-bold uppercase text-text-secondary mb-2">Thông tin Bàn giao:</p>
+                                            <p className="text-xs font-bold uppercase text-text-main mb-2">Thông tin Bàn giao:</p>
                                             <div className="bg-orange-50 border border-orange-200 p-3 rounded-md space-y-2 text-sm">
                                                 {Object.entries(item.delivery_data).map(([k, v]) => {
                                                     const keyMap: Record<string, string> = {
@@ -107,8 +109,8 @@ const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({ isOpen, onClose, 
 
                     {/* Tổng kết */}
                     <section className="border-t border-border-color pt-4 flex justify-between items-center">
-                        <span className="font-medium text-text-secondary uppercase">Tổng thanh toán:</span>
-                        <span className="text-2xl font-medium text-error">{formatPrice(Number(order.total_price))}</span>
+                        <span className="font-medium text-text-main text-xl">Tổng thanh toán:</span>
+                        <span className="text-xl font-medium text-error">{formatPrice(Number(order.total_price))}</span>
                     </section>
                 </div>
             </SheetContent>

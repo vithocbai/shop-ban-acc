@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { orderService } from "../services/order.service";
-import type { Order, OrderFilters } from "../types";
+import { orderService } from "@/features/order/services/order.service";
+import type { Order, OrderFilters } from "@/features/order/types";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,24 +15,26 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { formatPrice } from "@/lib/utils";
+import { formatDate, formatPrice } from "@/lib/utils";
 import OrderDetailDrawer from "./OrderDetailDrawer";
 import { Badge } from "@/components/ui/badge";
 
-const PAYMENT_STATUS_MAP: Record<string, { label: string; color: string }> = {
-    PENDING: { label: "Chờ thanh toán", color: "bg-warning text-white" },
-    PAID: { label: "Đã thanh toán", color: "bg-success text-white" },
-    FAILED: { label: "Thất bại", color: "bg-error text-white" },
-    REFUNDED: { label: "Đã hoàn", color: "bg-gray-500 text-white" },
+type BadgeVariant = "default" | "secondary" | "destructive" | "outline" | "ghost" | "link" | "success";
+
+const PAYMENT_STATUS_MAP: Record<string, { label: string; variant: BadgeVariant }> = {
+    PENDING: { label: "Chờ thanh toán", variant: "secondary" },
+    PAID: { label: "Đã thanh toán", variant: "success" },
+    FAILED: { label: "Thất bại", variant: "destructive" },
+    REFUNDED: { label: "Đã hoàn", variant: "outline" },
 };
 
-const DELIVERY_STATUS_MAP: Record<string, { label: string; color: string }> = {
-    PENDING: { label: "Chờ bàn giao", color: "bg-warning text-white" },
-    DELIVERED: { label: "Đã bàn giao", color: "bg-success text-white" },
-    FAILED: { label: "Lỗi", color: "bg-error text-white" },
+const DELIVERY_STATUS_MAP: Record<string, { label: string; variant: BadgeVariant }> = {
+    PENDING: { label: "Chờ bàn giao", variant: "secondary" },
+    DELIVERED: { label: "Đã bàn giao", variant: "success" },
+    FAILED: { label: "Lỗi", variant: "destructive" },
 };
 
-export const OrderList: React.FC = () => {
+const OrderManagement: React.FC = () => {
     const [orders, setOrders] = useState<Order[]>([]);
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -84,9 +86,9 @@ export const OrderList: React.FC = () => {
     };
 
     return (
-        <div className="flex-1 flex flex-col min-h-0 space-y-4">
+        <div className="flex-1 flex flex-col min-h-0 gap-2 space-y-4">
             {/* Toolbar */}
-            <div className="py-2 px-[1px] flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 mb-0">
+            <div className="pb-2 px-[1px] flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 mb-0">
                 <div className="flex flex-1 items-center gap-3">
                     {/* Search */}
                     <div className="relative flex-1 max-w-sm">
@@ -149,12 +151,11 @@ export const OrderList: React.FC = () => {
                     <TableHeader className="sticky top-0 z-10 bg-bg-secondary">
                         <TableRow>
                             <TableHead className="w-[15%]">Mã Đơn</TableHead>
-                            <TableHead className="w-[20%]">Người Mua</TableHead>
+                            <TableHead className="w-[15%]">Người Mua</TableHead>
                             <TableHead className="w-[15%] text-right">Tổng Tiền</TableHead>
-                            <TableHead className="w-[15%] text-center">Thanh Toán</TableHead>
+                            <TableHead className="w-[20%] text-center">Thanh Toán</TableHead>
                             <TableHead className="w-[15%] text-center">Bàn Giao</TableHead>
-                            <TableHead className="w-[10%] text-center">Thời Gian</TableHead>
-                            <TableHead className="w-[10%] text-right">Thao tác</TableHead>
+                            <TableHead className="w-[20%] text-center">Thời Gian</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -175,40 +176,29 @@ export const OrderList: React.FC = () => {
                             </TableRow>
                         ) : (
                             orders.map((order) => {
-                                const payConf = PAYMENT_STATUS_MAP[order.payment_status] || { label: order.payment_status, color: "bg-gray-200 text-black" };
-                                const delConf = DELIVERY_STATUS_MAP[order.delivery_status] || { label: order.delivery_status, color: "bg-gray-200 text-black" };
+                                const payConf = PAYMENT_STATUS_MAP[order.payment_status] || { label: order.payment_status, variant: "secondary" };
+                                const delConf = DELIVERY_STATUS_MAP[order.delivery_status] || { label: order.delivery_status, variant: "secondary" };
 
                                 return (
-                                    <TableRow key={order.id}>
-                                        <TableCell className="font-bold text-text-main " onClick={() => handleViewDetail(order)}>
+                                    <TableRow key={order.id} onClick={() => handleViewDetail(order)}>
+                                        <TableCell className="font-bold text-text-main ">
                                             #{order.order_code}
                                         </TableCell>
                                         <TableCell>
                                             <p className="font-medium text-sm text-text-main">{order.user?.username || "N/A"}</p>
-                                            <p className="text-xs text-text-secondary">{order.user?.email || "N/A"}</p>
+                                            <p className="text-sm text-text-secondary">{order.user?.email || "N/A"}</p>
                                         </TableCell>
                                         <TableCell className="text-right font-bold text-error">
                                             {formatPrice(Number(order.total_price))}
                                         </TableCell>
                                         <TableCell className="text-center">
-                                            <Badge className={payConf.color}>{payConf.label}</Badge>
+                                            <Badge variant={payConf.variant} className="border-0">{payConf.label}</Badge>
                                         </TableCell>
                                         <TableCell className="text-center">
-                                            <Badge className={delConf.color}>{delConf.label}</Badge>
+                                            <Badge variant={delConf.variant} className="border-0">{delConf.label}</Badge>
                                         </TableCell>
-                                        <TableCell className="text-center text-sm text-text-secondary">
-                                            {new Date(order.created_at).toLocaleDateString("vi-VN")}
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <Button 
-                                                variant="outline" 
-                                                size="sm" 
-                                                className="gap-1 h-8 px-2 border-border-color"
-                                                onClick={() => handleViewDetail(order)}
-                                            >
-                                                <Eye size={14} />
-                                                Chi tiết
-                                            </Button>
+                                        <TableCell className="text-center text-sm font-medium text-text-main">
+                                            {formatDate(order.created_at)}
                                         </TableCell>
                                     </TableRow>
                                 );
@@ -239,3 +229,5 @@ export const OrderList: React.FC = () => {
         </div>
     );
 };
+
+export default OrderManagement;

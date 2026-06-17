@@ -22,11 +22,14 @@ import { Label } from "@/components/ui/label";
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import CopyButton from "@/components/ui/copy-button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { formatDate } from "@/lib/utils";
 
-const STATUS_MAP: Record<string, { label: string; color: string; icon: any }> = {
-    ACTIVE: { label: "Hoạt động", color: "bg-green-100 text-green-800", icon: CheckCircle2 },
-    USED: { label: "Đã dùng", color: "bg-gray-100 text-gray-800", icon: CheckCircle2 },
-    LOCKED: { label: "Bị khóa", color: "bg-red-100 text-red-800", icon: Lock },
+type BadgeVariant = "default" | "secondary" | "destructive" | "outline" | "ghost" | "link" | "success";
+
+const STATUS_MAP: Record<string, { label: string; variant: BadgeVariant; icon: any }> = {
+    ACTIVE: { label: "Hoạt động", variant: "success", icon: CheckCircle2 },
+    USED: { label: "Đã dùng", variant: "secondary", icon: CheckCircle2 },
+    LOCKED: { label: "Bị khóa", variant: "destructive", icon: Lock },
 };
 
 export default function CardManagement() {
@@ -186,85 +189,77 @@ export default function CardManagement() {
 
     return (
         <div className="flex-1 flex flex-col min-h-0 space-y-4">
-            <div className="flex justify-between items-center shrink-0">
-                <div>
-                    <h2 className="text-2xl font-bold tracking-tight">Quản lý Thẻ nạp</h2>
-                    <p className="text-muted-foreground">Tạo và quản lý danh sách thẻ cào/voucher.</p>
-                </div>
+            {isCreateOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+                    <div className="bg-white rounded-md shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200 border border-border-color">
+                        <div className="px-6 py-4 border-b border-border-color flex items-center justify-between">
+                            <h3 className="text-lg font-bold text-text-main">Tạo thẻ nạp hàng loạt</h3>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setIsCreateOpen(false)}
+                                className="h-9 w-9 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer"
+                            >
+                                <X size={20} />
+                            </Button>
+                        </div>
 
-                {isCreateOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
-                        <div className="bg-white rounded-md shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200 border border-border-color">
-                            <div className="px-6 py-4 border-b border-border-color flex items-center justify-between">
-                                <h3 className="text-lg font-bold text-text-main">Tạo thẻ nạp hàng loạt</h3>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => setIsCreateOpen(false)}
-                                    className="h-9 w-9 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer"
-                                >
-                                    <X size={20} />
-                                </Button>
+                        <div className="p-6 flex-1 overflow-auto space-y-4">
+                            <p className="text-sm text-text-secondary mb-4">
+                                Hệ thống sẽ sinh mã thẻ và serial ngẫu nhiên, sẵn sàng sử dụng.
+                            </p>
+
+                            <div className="space-y-2">
+                                <Label className="font-bold text-text-main">
+                                    Mệnh giá <span className="text-error">*</span>
+                                </Label>
+                                <Select value={createAmount} onValueChange={setCreateAmount}>
+                                    <SelectTrigger className="w-full bg-bg-secondary border-border-color">
+                                        <SelectValue placeholder="Chọn mệnh giá" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="10000">10,000 đ</SelectItem>
+                                        <SelectItem value="20000">20,000 đ</SelectItem>
+                                        <SelectItem value="50000">50,000 đ</SelectItem>
+                                        <SelectItem value="100000">100,000 đ</SelectItem>
+                                        <SelectItem value="200000">200,000 đ</SelectItem>
+                                        <SelectItem value="500000">500,000 đ</SelectItem>
+                                        <SelectItem value="1000000">1,000,000 đ</SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </div>
 
-                            <div className="p-6 flex-1 overflow-auto space-y-4">
-                                <p className="text-sm text-text-secondary mb-4">
-                                    Hệ thống sẽ sinh mã thẻ và serial ngẫu nhiên, sẵn sàng sử dụng.
-                                </p>
-
-                                <div className="space-y-2">
-                                    <Label className="font-bold text-text-main">
-                                        Mệnh giá <span className="text-error">*</span>
-                                    </Label>
-                                    <Select value={createAmount} onValueChange={setCreateAmount}>
-                                        <SelectTrigger className="w-full bg-bg-secondary border-border-color">
-                                            <SelectValue placeholder="Chọn mệnh giá" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="10000">10,000 đ</SelectItem>
-                                            <SelectItem value="20000">20,000 đ</SelectItem>
-                                            <SelectItem value="50000">50,000 đ</SelectItem>
-                                            <SelectItem value="100000">100,000 đ</SelectItem>
-                                            <SelectItem value="200000">200,000 đ</SelectItem>
-                                            <SelectItem value="500000">500,000 đ</SelectItem>
-                                            <SelectItem value="1000000">1,000,000 đ</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label className="font-bold text-text-main">
-                                        Số lượng <span className="text-error">*</span>
-                                    </Label>
-                                    <Input
-                                        type="number"
-                                        className="w-full bg-bg-secondary border-border-color"
-                                        value={createQuantity}
-                                        onChange={(e) => setCreateQuantity(e.target.value)}
-                                        min="1"
-                                        max="1000"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="px-6 py-4 border-t border-border-color flex items-center justify-end gap-3 bg-bg-secondary/50">
-                                <Button
-                                    variant="outline"
-                                    className="font-bold px-5"
-                                    onClick={() => setIsCreateOpen(false)}
-                                >
-                                    Hủy
-                                </Button>
-                                <Button className="font-bold px-8" onClick={handleCreateBatch} disabled={isCreating}>
-                                    {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Tiến hành tạo
-                                </Button>
+                            <div className="space-y-2">
+                                <Label className="font-bold text-text-main">
+                                    Số lượng <span className="text-error">*</span>
+                                </Label>
+                                <Input
+                                    type="number"
+                                    className="w-full bg-bg-secondary border-border-color"
+                                    value={createQuantity}
+                                    onChange={(e) => setCreateQuantity(e.target.value)}
+                                    min="1"
+                                    max="1000"
+                                />
                             </div>
                         </div>
-                    </div>
-                )}
-            </div>
 
+                        <div className="px-6 py-4 border-t border-border-color flex items-center justify-end gap-3 bg-bg-secondary/50">
+                            <Button
+                                variant="outline"
+                                className="font-bold px-5"
+                                onClick={() => setIsCreateOpen(false)}
+                            >
+                                Hủy
+                            </Button>
+                            <Button className="font-bold px-8" onClick={handleCreateBatch} disabled={isCreating}>
+                                {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Tiến hành tạo
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 shrink-0">
                 <Card>
@@ -340,12 +335,12 @@ export default function CardManagement() {
                 <Table className="bg-white" containerClassName="flex-1 overflow-auto min-h-0">
                     <TableHeader className="sticky top-0 z-10 bg-bg-secondary">
                         <TableRow>
-                            <TableHead className="w-[18%]">Mã thẻ</TableHead>
+                            <TableHead className="w-[15%]">Mã thẻ</TableHead>
                             <TableHead className="w-[15%]">Số Serial</TableHead>
                             <TableHead className="w-[15%] text-right">Mệnh giá</TableHead>
-                            <TableHead className="w-[18%] text-center">Trạng thái</TableHead>
-                            <TableHead className="w-[15%] text-center">Ngày tạo</TableHead>
-                            <TableHead className="w-[15%] text-right">Thao tác</TableHead>
+                            <TableHead className="w-[20%] text-center">Trạng thái</TableHead>
+                            <TableHead className="w-[20%] text-center">Ngày tạo</TableHead>
+                            <TableHead className="w-[15%] text-center">Thao tác</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -381,40 +376,41 @@ export default function CardManagement() {
                                         </TableCell>
                                         <TableCell className="text-center">
                                             <Badge
-                                                variant="outline"
-                                                className={`${statusConfig.color} border-0 inline-flex items-center justify-center gap-1 text-sm`}
+                                                variant={statusConfig.variant}
+                                                className="border-0 inline-flex items-center justify-center gap-1 text-sm"
                                             >
-                                                <StatusIcon className="h-3 w-3" />
+                                               
                                                 {statusConfig.label}
                                             </Badge>
                                         </TableCell>
                                         <TableCell className="text-center">
-                                            {new Date(card.created_at).toLocaleDateString("vi-VN")}
-                                            <span className="ml-2">
-                                                {new Date(card.created_at).toLocaleTimeString("vi-VN")}
+                                            <span className="ml-2 text-text-main font-medium">
+                                                {formatDate(card.created_at)}
                                             </span>
                                         </TableCell>
-                                        <TableCell className="text-right">
+                                        <TableCell className="text-center">
                                             {/* Hiển thị thao tác phù hợp với từng trạng thái thẻ */}
-                                            <div className="flex items-center justify-end gap-1.5">
+                                            <div className="flex items-center justify-center gap-1.5">
                                                 {card.status === "ACTIVE" && (
                                                     <>
                                                         {/* Thẻ đang hoạt động: chỉ cho phép Khóa hoặc Xóa */}
                                                         <Button
                                                             variant="ghost"
-                                                            size="sm"
-                                                            className="cursor-pointer px-2 text-xs font-medium text-amber-600 hover:text-amber-700 hover:bg-amber-50 gap-1"
+                                                            size="icon"
+                                                            className="cursor-pointer h-8 w-8 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
                                                             onClick={() => handleToggleStatus(card)}
+                                                            title="Khóa thẻ"
                                                         >
-                                                            <LockKeyhole size={18} />
+                                                            <LockKeyhole className="w-4 h-4" />
                                                         </Button>
                                                         <Button
                                                             variant="ghost"
-                                                            size="sm"
-                                                            className="cursor-pointer px-2 text-xs font-medium text-error hover:text-error hover:bg-error/10 gap-1"
+                                                            size="icon"
+                                                            className="cursor-pointer h-8 w-8 text-red-600 hover:text-red-800 hover:bg-red-50"
                                                             onClick={() => handleDeleteCardConfirm(card)}
+                                                            title="Xóa thẻ"
                                                         >
-                                                            <Trash2 size={18} />
+                                                            <Trash2 className="w-4 h-4" />
                                                         </Button>
                                                     </>
                                                 )}
@@ -423,19 +419,21 @@ export default function CardManagement() {
                                                         {/* Thẻ bị khóa: chỉ cho phép Kích hoạt hoặc Xóa */}
                                                         <Button
                                                             variant="ghost"
-                                                            size="sm"
-                                                            className="cursor-pointer px-2 text-xs font-medium text-green-600 hover:text-green-700 hover:bg-green-50 gap-1"
+                                                            size="icon"
+                                                            className="cursor-pointer h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50"
                                                             onClick={() => handleToggleStatus(card)}
+                                                            title="Kích hoạt"
                                                         >
-                                                            <CircleCheckBig size={18} />
+                                                            <CircleCheckBig className="w-4 h-4" />
                                                         </Button>
                                                         <Button
                                                             variant="ghost"
-                                                            size="sm"
-                                                            className="cursor-pointer px-2 text-xs font-medium text-error hover:text-error hover:bg-error/10 gap-1"
+                                                            size="icon"
+                                                            className="cursor-pointer h-8 w-8 text-red-600 hover:text-red-800 hover:bg-red-50"
                                                             onClick={() => handleDeleteCardConfirm(card)}
+                                                            title="Xóa thẻ"
                                                         >
-                                                            <Trash2 size={18} />
+                                                            <Trash2 className="w-4 h-4" />
                                                         </Button>
                                                     </>
                                                 )}

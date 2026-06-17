@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Plus, Search, Edit2, Trash2, Star, Eye, EyeOff, Loader2 } from "lucide-react";
-import { gameService } from "../services/game.service";
-import type { Game } from "../types";
+import { Plus, Search, Edit2, Trash2, Star, Eye, EyeOff, Loader2, Edit } from "lucide-react";
+import { gameService } from "@/features/game/services/game.service";
+import type { Game } from "@/features/game/types";
 import GameModal from "./GameModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PaginationControls } from "@/components/shared/PaginationControls";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "react-toastify";
 
-const GameList: React.FC = () => {
+const GameManagement: React.FC = () => {
     // Trạng thái lưu trữ danh sách Game
     const [games, setGames] = useState<Game[]>([]);
     // Trạng thái hiển thị khi đang tải dữ liệu (loading)
@@ -108,9 +109,9 @@ const GameList: React.FC = () => {
     }
 
     return (
-        <div className="flex-1 flex flex-col min-h-0 space-y-4">
+        <div className="flex-1 flex flex-col min-h-0 gap-2 space-y-4">
             {/* Header / Toolbar */}
-            <div className="py-2 px-[1px] flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 mb-0">
+            <div className="pb-2 px-[1px] flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 mb-0">
                 <div className="relative flex-1 max-w-md">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-secondary z-10">
                         <Search size={18} />
@@ -142,7 +143,7 @@ const GameList: React.FC = () => {
                             <TableHead className="w-[25%] text-center">Banner</TableHead>
                             <TableHead className="w-[12%] text-center">Trạng thái</TableHead>
                             <TableHead className="w-[10%] text-center">Game hot</TableHead>
-                            <TableHead className="w-[10%] text-right">Thao tác</TableHead>
+                            <TableHead className="w-[10%] text-center">Thao tác</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -151,7 +152,7 @@ const GameList: React.FC = () => {
                                 <TableRow key={game.id}>
                                     <TableCell className="w-[20%]">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-22 h-22 rounded-md bg-bg-secondary flex items-center justify-center overflow-hidden border border-border-color shrink-0">
+                                            <div className="w-18 h-18 rounded-md bg-bg-secondary flex items-center justify-center overflow-hidden border border-border-color shrink-0">
                                                 {game.icon ? (
                                                     <img src={game.icon} alt={game.name} className="w-full h-full object-cover" />
                                                 ) : (
@@ -169,40 +170,38 @@ const GameList: React.FC = () => {
                                     <TableCell className="w-[25%] text-center">
                                         <div className="flex items-center justify-center">
                                             {game.thumbnail ? (
-                                                <div className="w-36 h-22 rounded-md bg-bg-secondary flex items-center justify-center overflow-hidden border border-border-color shadow-sm">
+                                                <div className="w-28 h-18 rounded-md bg-bg-secondary flex items-center justify-center overflow-hidden border border-border-color shadow-sm">
                                                     <img src={game.thumbnail} alt={`${game.name} thumbnail`} className="w-full h-full object-cover hover:scale-110 transition-transform duration-200" />
                                                 </div>
                                             ) : (
-                                                <span className="text-xs text-text-secondary italic">Chưa có</span>
+                                                <span className="text-xs text-text-secondary italic"></span>
                                             )}
                                         </div>
                                     </TableCell>
                                     <TableCell className="w-[25%] text-center">
                                         <div className="flex items-center justify-center">
                                             {game.banner ? (
-                                                <div className="w-36 h-22 rounded-md bg-bg-secondary flex items-center justify-center overflow-hidden border border-border-color shadow-sm">
+                                                <div className="w-28 h-18 rounded-md bg-bg-secondary flex items-center justify-center overflow-hidden border border-border-color shadow-sm">
                                                     <img src={game.banner} alt={`${game.name} banner`} className="w-full h-full object-cover hover:scale-110 transition-transform duration-200" />
                                                 </div>
                                             ) : (
-                                                <span className="text-xs text-text-secondary italic">Chưa có</span>
+                                                <span className="text-xs text-text-secondary italic"></span>
                                             )}
                                         </div>
                                     </TableCell>
                                     <TableCell className="w-[12%] text-center whitespace-nowrap">
                                         {game.status === "ACTIVE" ? (
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-success/10 text-success text-xs font-bold border border-success/20">
-                                                <Eye size={14} />
+                                            <Badge variant="success" className="border-0">
                                                 Hoạt động
-                                            </span>
+                                            </Badge>
                                         ) : game.status === "HIDDEN" ? (
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-bg-secondary text-text-secondary text-xs font-bold border border-border-color">
-                                                <EyeOff size={14} />
+                                            <Badge variant="secondary" className="border-0">
                                                 Đang ẩn
-                                            </span>
+                                            </Badge>
                                         ) : (
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-warning/10 text-warning text-xs font-bold border border-warning/20">
+                                            <Badge variant="destructive" className="border-0">
                                                 Bảo trì
-                                            </span>
+                                            </Badge>
                                         )}
                                     </TableCell>
                                     <TableCell className="w-[8%] text-center">
@@ -216,16 +215,16 @@ const GameList: React.FC = () => {
                                             </div>
                                         )}
                                     </TableCell>
-                                    <TableCell className="w-[10%] text-right">
-                                        <div className="flex items-center justify-end gap-1">
+                                    <TableCell className="w-[10%] text-center">
+                                        <div className="flex items-center justify-center">
                                             <Button 
                                                 variant="ghost" 
                                                 size="icon" 
                                                 onClick={() => handleEdit(game)}
                                                 title="Chỉnh sửa"
-                                                className="h-8 w-8 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer"
+                                                className="h-8 w-8 text-blue-600 hover:text-blue-800 hover:bg-blue-50 cursor-pointer"
                                             >
-                                                <Edit2 size={16} />
+                                                <Edit className="w-4 h-4" />
                                             </Button>
                                             <Button 
                                                 variant="ghost" 
@@ -233,9 +232,9 @@ const GameList: React.FC = () => {
                                                 onClick={() => handleDelete(game.id)}
                                                 disabled={isDeleting === game.id}
                                                 title="Xóa"
-                                                className="h-8 w-8 text-text-secondary hover:text-error hover:bg-error/10 cursor-pointer disabled:opacity-50"
+                                                className="h-8 w-8 text-red-600 hover:text-red-800 hover:bg-red-50 cursor-pointer disabled:opacity-50"
                                             >
-                                                {isDeleting === game.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                                                {isDeleting === game.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                                             </Button>
                                         </div>
                                     </TableCell>
@@ -276,4 +275,4 @@ const GameList: React.FC = () => {
     );
 };
 
-export default GameList;
+export default GameManagement;

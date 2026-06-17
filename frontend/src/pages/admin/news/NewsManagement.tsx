@@ -107,7 +107,7 @@ export default function NewsManagement() {
     };
 
     return (
-        <div className="flex-1 flex flex-col min-h-0 space-y-4">
+        <div className="flex-1 flex flex-col min-h-0 gap-2 space-y-4">
             {/* Thanh công cụ tìm kiếm và lọc */}
             <div className="pb-2 px-[1px] flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 mb-0">
                 <div className="flex flex-1 items-center gap-3">

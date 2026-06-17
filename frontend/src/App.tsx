@@ -4,7 +4,7 @@ import AuthPage from "./pages/admin/auth";
 import GameManagementPage from "./pages/admin/games/GameManagement";
 import AccountManagementPage from "./pages/admin/accounts/AccountManagement";
 import OrderManagementPage from "./pages/admin/orders/OrderManagement";
-import UserManagementPage from "./pages/admin/UserManagement";
+import UserManagementPage from "./pages/admin/users/UserManagement";
 import ManualDepositPage from "./pages/admin/deposits/ManualDeposit";
 import CardManagementPage from "./pages/admin/deposits/CardManagement";
 import DepositHistoryPage from "./pages/admin/deposits/DepositHistory";

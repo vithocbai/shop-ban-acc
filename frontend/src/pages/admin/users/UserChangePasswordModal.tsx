@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "react-toastify";
-import type { User } from "../types";
 import { cn } from "@/lib/utils";
-import { userService } from "../services/user.service";
+import type { User } from "@/features/user/types";
+import { userService } from "@/features/user/services/user.service";
+
 
 interface UserChangePasswordModalProps {
     isOpen: boolean;

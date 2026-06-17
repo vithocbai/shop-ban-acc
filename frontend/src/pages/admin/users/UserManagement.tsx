@@ -1,15 +1,15 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { userService } from "../services/user.service";
-import type { User, UserFilters } from "../types";
+import { userService } from "@/features/user/services/user.service";
+import type { User, UserFilters } from "@/features/user/types";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Search, Edit, EllipsisVertical, Eye, Lock, Shield, Trash2, Key, Plus } from "lucide-react";
+import { Loader2, Search, Edit, EllipsisVertical, Shield, Trash2, Key, Plus } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import { toast } from "react-toastify";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { formatPrice } from "@/lib/utils";
+import { formatDate, formatPrice } from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";
 import UserEditModal from "./UserEditModal";
@@ -17,28 +17,23 @@ import UserChangePasswordModal from "./UserChangePasswordModal";
 import UserRoleModal from "./UserRoleModal";
 import UserCreateModal from "./UserCreateModal";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
-const ROLE_MAP: Record<string, { label: string; color: string }> = {
-    USER: { label: "Người dùng", color: "bg-gray-200 text-black" },
-    ADMIN: { label: "Admin", color: "bg-primary text-white" },
-    SUPER_ADMIN: { label: "Super Admin", color: "bg-purple-600 text-white" },
-    MODERATOR: { label: "Moderator", color: "bg-blue-500 text-white" },
+type BadgeVariant = "default" | "secondary" | "destructive" | "outline" | "ghost" | "link" | "success";
+
+const ROLE_MAP: Record<string, { label: string; variant: BadgeVariant; className?: string }> = {
+    USER: { label: "Người dùng", variant: "secondary" },
+    ADMIN: { label: "Admin", variant: "default" },
+    SUPER_ADMIN: { label: "Super Admin", variant: "default", className: "bg-purple-600 hover:bg-purple-700 text-white" },
+    MODERATOR: { label: "Moderator", variant: "outline" },
 };
 
-const STATUS_MAP: Record<string, { label: string; color: string }> = {
-    ACTIVE: { label: "Hoạt động", color: "bg-success text-white" },
-    BANNED: { label: "Bị khóa", color: "bg-error text-white" },
-    PENDING: { label: "Chờ xác thực", color: "bg-warning text-white" },
+const STATUS_MAP: Record<string, { label: string; variant: BadgeVariant }> = {
+    ACTIVE: { label: "Hoạt động", variant: "success" },
+    BANNED: { label: "Bị khóa", variant: "destructive" },
+    PENDING: { label: "Chờ xác thực", variant: "secondary" },
 };
 
-const UserList: React.FC = () => {
+const UserManagement: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [total, setTotal] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
@@ -53,7 +48,6 @@ const UserList: React.FC = () => {
 
     // Modal
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
     const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
@@ -127,7 +121,7 @@ const UserList: React.FC = () => {
     };
 
     return (
-        <div className="flex-1 flex flex-col min-h-0 space-y-2">
+        <div className="flex-1 flex flex-col min-h-0 gap-2 space-y-4">
             {/* Thanh công cụ tìm kiếm và lọc */}
             <div className="pb-2 px-[1px] flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 mb-0">
                 <div className="flex flex-1 items-center gap-3">
@@ -150,7 +144,7 @@ const UserList: React.FC = () => {
                             setPage(1);
                         }}
                     >
-                        <SelectTrigger className="w-[180px] bg-bg-secondary border-border-color">
+                        <SelectTrigger className="w-[180px] border-border-color">
                             <SelectValue placeholder="Tất cả quyền" />
                         </SelectTrigger>
                         <SelectContent>
@@ -168,7 +162,7 @@ const UserList: React.FC = () => {
                             setPage(1);
                         }}
                     >
-                        <SelectTrigger className="w-[180px] bg-bg-secondary border-border-color">
+                        <SelectTrigger className="w-[180px] border-border-color">
                             <SelectValue placeholder="Tất cả trạng thái" />
                         </SelectTrigger>
                         <SelectContent>
@@ -193,12 +187,12 @@ const UserList: React.FC = () => {
                         <TableRow>
                             <TableHead className="w-[20%]">Người dùng</TableHead>
                             <TableHead className="w-[15%]">Email</TableHead>
-                            <TableHead className="w-[12%] text-center">Số điện thoại</TableHead>
+                            <TableHead className="w-[10%] text-center">Số điện thoại</TableHead>
                             <TableHead className="w-[10%] text-center">Quyền hạn</TableHead>
                             <TableHead className="w-[12%] text-right">Số dư (VNĐ)</TableHead>
                             <TableHead className="w-[10%] text-center">Trạng thái</TableHead>
                             <TableHead className="w-[13%] text-center">Đăng nhập cuối</TableHead>
-                            <TableHead className="w-[8%] text-right">Thao tác</TableHead>
+                            <TableHead className="w-[10%] text-center">Thao tác</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -206,12 +200,12 @@ const UserList: React.FC = () => {
                             <TableRow>
                                 <TableCell colSpan={7} className="h-32 text-center">
                                     <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" />
-                                    <p className="text-sm text-text-secondary mt-2">Đang tải dữ liệu...</p>
+                                    <p className="text-sm text-text-main font-medium mt-2">Đang tải dữ liệu...</p>
                                 </TableCell>
                             </TableRow>
                         ) : users.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={7} className="h-32 text-center text-text-secondary">
+                                <TableCell colSpan={7} className="h-32 text-center text-text-main font-medium">
                                     Không tìm thấy người dùng nào khớp với bộ lọc.
                                 </TableCell>
                             </TableRow>
@@ -219,11 +213,11 @@ const UserList: React.FC = () => {
                             users.map((user) => {
                                 const roleConf = ROLE_MAP[user.role] || {
                                     label: user.role,
-                                    color: "bg-gray-200 text-black",
+                                    variant: "secondary",
                                 };
                                 const statusConf = STATUS_MAP[user.status] || {
                                     label: user.status,
-                                    color: "bg-gray-200 text-black",
+                                    variant: "secondary",
                                 };
 
                                 return (
@@ -234,71 +228,85 @@ const UserList: React.FC = () => {
                                                     <img
                                                         src={user.avatar}
                                                         alt="avatar"
-                                                        className="w-10 h-10 rounded-full object-cover bg-bg-secondary"
+                                                        className="w-12 h-12 rounded-lg object-cover bg-bg-secondary flex-shrink-0"
                                                     />
                                                 ) : (
-                                                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">
+                                                    <div className="w-12 h-12 rounded-lg flex bg-gray-200 items-center justify-center font-medium text-primary flex-shrink-0">
                                                         {user.username?.charAt(0).toUpperCase() || "?"}
                                                     </div>
                                                 )}
                                                 <div>
-                                                    <p className="font-bold text-sm text-text-main">
+                                                    <p className="font-medium text-sm text-text-main">
                                                         {user.username}
                                                     </p>
-                                                    <p className="text-xs text-text-secondary">{`${user.first_name} ${user.last_name}`.trim()}</p>
+                                                    <p className="text-xs text-text-secondary">
+                                                        {`${user.first_name} ${user.last_name}`.trim()}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            {user.email}
+                                            {<span className="text-sm text-text-main font-medium">{user.email}</span>}
+                                        </TableCell>
+                                        <TableCell className="text-center ">
+                                            {<span className="text-sm text-text-main font-medium">{user.phone}</span>}
                                         </TableCell>
                                         <TableCell className="text-center">
-                                            {user.phone || <span className="text-text-secondary">Chưa cập nhật</span>}
-                                        </TableCell>
-                                        <TableCell className="text-center">
-                                            <Badge className={roleConf.color}>{roleConf.label}</Badge>
+                                            <Badge variant={roleConf.variant} className={`border-0 ${roleConf.className || ""}`}>
+                                                {roleConf.label}
+                                            </Badge>
                                         </TableCell>
                                         <TableCell className="text-right font-bold text-success">
                                             {formatPrice(Number(user.balance))}
                                         </TableCell>
 
                                         <TableCell className="text-center">
-                                            <Badge className={statusConf.color}>{statusConf.label}</Badge>
+                                            <Badge variant={statusConf.variant} className="border-0">
+                                                {statusConf.label}
+                                            </Badge>
                                         </TableCell>
-                                        <TableCell className="text-center text-sm text-text-secondary">
-                                            {user.last_login ? new Date(user.last_login).toLocaleDateString("vi-VN") : "Chưa đăng nhập"}
+                                        <TableCell className="text-center text-sm text-text-main font-medium">
+                                            {user.last_login ? formatDate(user.last_login) : "Chưa đăng nhập"}
                                         </TableCell>
-                                        <TableCell className="text-right">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-8 w-8 border border-border-color bg-white hover:bg-gray-50"
-                                                    >
-                                                        <EllipsisVertical size={16} className="text-text-secondary" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-48 bg-white border border-border-color p-1 rounded-lg shadow-md">
-                                                    <DropdownMenuItem className="cursor-pointer hover:bg-gray-50 rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleEditUser(user)}>
-                                                        <Edit className="mr-3 h-4 w-4 text-text-secondary" />
-                                                        <span className="text-text-main font-medium">Chỉnh sửa</span>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem className="cursor-pointer hover:bg-gray-50 rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleChangePassword(user)}>
-                                                        <Key className="mr-3 h-4 w-4 text-text-secondary" />
-                                                        <span className="text-text-main font-medium">Đổi mật khẩu</span>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem className="cursor-pointer hover:bg-gray-50 rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleAssignRole(user)}>
-                                                        <Shield className="mr-3 h-4 w-4 text-text-secondary" />
-                                                        <span className="text-text-main font-medium">Phân quyền</span>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuSeparator className="my-1 bg-border-color h-[1px]" />
-                                                    <DropdownMenuItem className="cursor-pointer hover:bg-error/10 text-error focus:text-error rounded-md py-2 px-3 flex items-center text-sm" onClick={() => handleDeleteUserConfirm(user)}>
-                                                        <Trash2 className="mr-3 h-4 w-4" />
-                                                        <span className="font-medium">Xóa tài khoản</span>
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                        <TableCell className="text-center">
+                                            <div className="flex items-center justify-center">
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    onClick={() => handleEditUser(user)}
+                                                    title="Chỉnh sửa"
+                                                    className="h-8 w-8 text-blue-600 hover:text-blue-800 hover:bg-blue-50 cursor-pointer"
+                                                >
+                                                    <Edit className="w-4 h-4" />
+                                                </Button>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    onClick={() => handleChangePassword(user)}
+                                                    title="Đổi mật khẩu"
+                                                    className="h-8 w-8 text-orange-600 hover:text-orange-800 hover:bg-orange-50 cursor-pointer"
+                                                >
+                                                    <Key className="w-4 h-4" />
+                                                </Button>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    onClick={() => handleAssignRole(user)}
+                                                    title="Phân quyền"
+                                                    className="h-8 w-8 text-purple-600 hover:text-purple-800 hover:bg-purple-50 cursor-pointer"
+                                                >
+                                                    <Shield className="w-4 h-4" />
+                                                </Button>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    onClick={() => handleDeleteUserConfirm(user)}
+                                                    title="Xóa tài khoản"
+                                                    className="h-8 w-8 text-red-600 hover:text-red-800 hover:bg-red-50 cursor-pointer"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 );
@@ -352,7 +360,9 @@ const UserList: React.FC = () => {
                 title="Xóa tài khoản"
                 description={
                     <>
-                        Bạn có chắc chắn muốn xóa tài khoản <span className="font-bold text-text-main">{selectedUser?.username}</span> không? Hành động này sẽ xóa toàn bộ dữ liệu liên quan và không thể hoàn tác.
+                        Bạn có chắc chắn muốn xóa tài khoản{" "}
+                        <span className="font-bold text-text-main font-medium">{selectedUser?.username}</span> không?
+                        Hành động này sẽ xóa toàn bộ dữ liệu liên quan và không thể hoàn tác.
                     </>
                 }
                 confirmText="Xóa tài khoản"
@@ -369,4 +379,4 @@ const UserList: React.FC = () => {
     );
 };
 
-export default UserList;
+export default UserManagement;

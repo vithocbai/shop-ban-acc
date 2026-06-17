@@ -42,7 +42,7 @@ const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({ isOpen, onClose, 
                             <Badge variant={deliveryConfig.variant} className="border-0">{deliveryConfig.label}</Badge>
                         </div>
                     </SheetTitle>
-                    <p className="text-sm text-text-secondary mt-2">
+                    <p className="text-sm text-text-main mt-2">
                         Thời gian tạo: {new Date(order.created_at).toLocaleString("vi-VN")}
                     </p>
                 </SheetHeader>
@@ -52,21 +52,21 @@ const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({ isOpen, onClose, 
                     <section>
                         <h3 className="text-base font-bold text-text-main mb-3">Thông tin Khách hàng</h3>
                         <div className="bg-bg-secondary p-4 rounded-md border border-border-color space-y-2 text-sm">
-                            <div className="flex justify-between">
-                                <span className="text-text-secondary">Tên đăng nhập:</span>
+                            <div className="flex justify-between font-medium">
+                                <span className="text-text-main">Tên đăng nhập:</span>
                                 <span className="font-bold text-text-main">{order.user?.username || "Không có"}</span>
                             </div>
-                            <div className="flex justify-between">
-                                <span className="text-text-secondary">Email:</span>
+                            <div className="flex justify-between font-medium">
+                                <span className="text-text-main">Email:</span>
                                 <span className="font-medium text-text-main">{order.user?.email || "Không có"}</span>
                             </div>
                         </div>
                     </section>
 
                     {/* Chi tiết Item (Tài khoản) */}
-                    <section className="overflow-y-auto h-[50vh]">
+                    <section>
                         <h3 className="text-base font-bold text-text-main mb-3">Danh sách Tài khoản ({order.items.length})</h3>
-                        <div className="space-y-4">
+                        <div className="space-y-4 overflow-y-auto h-[50vh]">
                             {order.items.map((item) => (
                                 <div key={item.id} className="border border-border-color rounded-md overflow-hidden bg-white">
                                     <div className="p-4 bg-bg-secondary/50 border-b border-border-color flex justify-between items-center">
@@ -80,7 +80,7 @@ const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({ isOpen, onClose, 
                                     {/* Thông tin bàn giao (Username/Pass của Game) */}
                                     {item.delivery_data && Object.keys(item.delivery_data).length > 0 && (
                                         <div className="p-4">
-                                            <p className="text-xs font-bold uppercase text-text-secondary mb-2">Thông tin Bàn giao:</p>
+                                            <p className="text-xs font-bold uppercase text-text-main mb-2">Thông tin Bàn giao:</p>
                                             <div className="bg-orange-50 border border-orange-200 p-3 rounded-md space-y-2 text-sm">
                                                 {Object.entries(item.delivery_data).map(([k, v]) => {
                                                     const keyMap: Record<string, string> = {
@@ -109,8 +109,8 @@ const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({ isOpen, onClose, 
 
                     {/* Tổng kết */}
                     <section className="border-t border-border-color pt-4 flex justify-between items-center">
-                        <span className="font-medium text-text-secondary uppercase">Tổng thanh toán:</span>
-                        <span className="text-2xl font-medium text-error">{formatPrice(Number(order.total_price))}</span>
+                        <span className="font-medium text-text-main text-xl">Tổng thanh toán:</span>
+                        <span className="text-xl font-medium text-error">{formatPrice(Number(order.total_price))}</span>
                     </section>
                 </div>
             </SheetContent>

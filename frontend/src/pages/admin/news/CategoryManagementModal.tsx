@@ -108,7 +108,7 @@ export default function CategoryManagementModal({ isOpen, onClose, onCategoryCha
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
             <div className="bg-white rounded-md shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200 border border-border-color">
                 <div className="px-6 py-4 border-b border-border-color flex items-center justify-between">
-                    <h3 className="text-xl font-medium text-text-main">Quản lý Danh mục Tin tức</h3>
+                    <h3 className="text-xl font-bold text-text-main">Quản lý Danh mục Tin tức</h3>
                     <Button variant="ghost" size="icon" className="h-9 w-9 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer" onClick={onClose}>
                         <X size={20} />
                     </Button>

@@ -167,8 +167,8 @@ export default function NewsModal({ isOpen, onClose, onSuccess, article, categor
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
             <div className="bg-white rounded-md shadow-2xl w-full max-w-[1100px] max-h-[95vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200 border border-border-color">
                 {/* Header */}
-                <div className="px-6 py-4 border-b border-border-color flex items-center justify-between">
-                    <h3 className="text-xl font-medium text-text-main">
+                <div className="px-6 py-3 border-b border-border-color flex items-center justify-between">
+                    <h3 className="text-xl font-bold text-text-main">
                         {article ? "Chỉnh sửa tin tức" : "Thêm tin tức"}
                     </h3>
                     <Button variant="ghost" size="icon" onClick={onClose} className="h-9 w-9 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer">

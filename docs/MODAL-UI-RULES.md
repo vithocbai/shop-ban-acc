@@ -11,9 +11,9 @@ Tài liệu này tổng hợp lại toàn bộ các `className` tiêu chuẩn đ
 
 ## 2. Header
 - **Container của Header:** 
-  `px-6 py-4 border-b border-border-color flex items-center justify-between`
+  `px-6 py-3 border-b border-border-color flex items-center justify-between`
 - **Tiêu đề (Title):** 
-  `text-lg font-medium text-text-main`
+  `text-xl font-bold text-text-main`
 - **Nút Đóng (Close Button):** 
   Dùng component `<Button variant="ghost" size="icon">` và thêm class: 
   `h-9 w-9 text-text-secondary hover:bg-bg-secondary hover:text-text-main cursor-pointer`

@@ -79,9 +79,9 @@ export default function DepositHistory() {
     const [stats, setStats] = useState<DepositStats>({
         total: 0, total_amount: 0, approved: 0, pending: 0, rejected: 0,
     });
-    console.log("🚀 ~ file: DepositHistory.tsx:122 ~ DepositHistory ~ stats:", stats);
+  
 
-    // refreshKey để trigger cả 2 useEffect (list + stats) sau mỗi action
+      // refreshKey để trigger cả 2 useEffect (list + stats) sau mỗi action
     const [refreshKey, setRefreshKey] = useState(0);
 
     const fetchDeposits = async () => {

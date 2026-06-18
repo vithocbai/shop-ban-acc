@@ -34,6 +34,15 @@ class TransactionViewSet(ResponseEnvelopeMixin, viewsets.ReadOnlyModelViewSet):
         if status_param:
             queryset = queryset.filter(status=status_param)
             
+        search_param = self.request.query_params.get('search')
+        if search_param:
+            from django.db.models import Q
+            queryset = queryset.filter(
+                Q(transaction_code__icontains=search_param) |
+                Q(user__username__icontains=search_param) |
+                Q(user__email__icontains=search_param)
+            )
+            
         return queryset
 
     def list(self, request, *args, **kwargs):

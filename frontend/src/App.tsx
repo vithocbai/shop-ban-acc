@@ -10,6 +10,7 @@ import CardManagementPage from "./pages/admin/deposits/CardManagement";
 import DepositHistoryPage from "./pages/admin/deposits/DepositHistory";
 import NewsManagementPage from "./pages/admin/news/NewsManagement";
 import BannerManagementPage from "./pages/admin/banners/BannerManagement";
+import TransactionManagementPage from "./pages/admin/transactions/TransactionManagement";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -80,6 +81,7 @@ function App() {
                         <Route path="deposits/history" element={<DepositHistoryPage />} />
                         <Route path="news" element={<NewsManagementPage />} />
                         <Route path="banners" element={<BannerManagementPage />} />
+                        <Route path="transactions" element={<TransactionManagementPage />} />
                     </Route>
 
                     {/* Home Redirect / Landing Page */}

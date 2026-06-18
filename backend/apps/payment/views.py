@@ -36,6 +36,34 @@ class TransactionViewSet(ResponseEnvelopeMixin, viewsets.ReadOnlyModelViewSet):
             
         return queryset
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        
+        from django.db.models import Sum
+        
+        total = queryset.count()
+        total_in = queryset.filter(type__in=[Transaction.Type.DEPOSIT, Transaction.Type.REFUND]).aggregate(Sum('amount'))['amount__sum'] or 0
+        total_out = queryset.filter(type__in=[Transaction.Type.PURCHASE, Transaction.Type.WITHDRAW]).aggregate(Sum('amount'))['amount__sum'] or 0
+        stats = {
+            "total": total,
+            "total_in": total_in,
+            "total_out": total_out
+        }
+        
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            response = self.get_paginated_response(serializer.data)
+            if isinstance(response.data, dict) and "data" in response.data:
+                response.data["data"]["stats"] = stats
+            return response
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({
+            "items": serializer.data,
+            "stats": stats
+        })
+
 
 class DepositViewSet(ResponseEnvelopeMixin, viewsets.ModelViewSet):
     """

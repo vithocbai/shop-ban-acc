@@ -54,15 +54,15 @@ export default function TransactionManagement() {
             if (typeFilter !== "all") params.type = typeFilter;
             if (search.trim()) params.search = search.trim();
 
-            const [listRes, statsRes] = await Promise.all([
-                api.
-            ])
             const response = await api.get("/transactions/", { params });
             const data = response.data?.data ?? response.data;
 
             const results = data?.results || data?.items || [];
+            const statsData = data.stats
+
             setTransactions(results);
             setTotal(data?.count ?? data?.total ?? results.length);
+            setStats(statsData)
         } catch (error) {
             console.error("Lỗi tải lịch sử giao dịch", error);
             toast.error("Không thể tải lịch sử giao dịch");
@@ -71,38 +71,9 @@ export default function TransactionManagement() {
         }
     };
 
-    const fetchStats = async () => {
-        setLoading(true);
-        try {
-            const response = await api.get("/transactions/", { params: { page_size: 999999 } });
-            const data = response.data?.data ?? response.data;
-            const all: Transaction[] = data?.results || data?.items || [];
-
-            let total_in = 0;
-            let total_out = 0;
-
-            all.forEach(t => {
-                const conf = TYPE_MAP[t.type];
-                if (conf?.isPositive) {
-                    total_in += Number(t.amount);
-                } else {
-                    total_out += Number(t.amount);
-                }
-            });
-
-            setStats({ total: all.length, total_in, total_out });
-        } catch (error) {
-            console.error("Lỗi tải thống kê giao dịch", error);
-        }
-    };
-
     useEffect(() => {
         fetchTransactions();
     }, [page, pageSize, typeFilter, search,]);
-
-    useEffect(() => {
-        fetchStats();
-    }, []);
 
     const formatCurrency = (amount: number | string, isPositive: boolean) => {
         const prefix = isPositive ? "+" : "-";

@@ -267,11 +267,13 @@ class ManualDepositAdminView(APIView):
                 approved_at=timezone.now(),
             )
             
+            transaction_note = f"Nạp thủ công: {note}" if note.strip() else "Nạp tiền thủ công"
+            
             update_user_balance(
                 user=user,
                 amount=amount,
                 transaction_type=Transaction.Type.DEPOSIT,
-                note=f"Nạp thủ công: {note}",
+                note=transaction_note,
                 metadata={"admin_id": request.user.id, "payment_method": payment_method, "deposit_id": deposit.id}
             )
         

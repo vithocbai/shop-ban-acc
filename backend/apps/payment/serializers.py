@@ -5,14 +5,21 @@ class TransactionSerializer(serializers.ModelSerializer):
     """
     Serializer hiển thị lịch sử giao dịch.
     """
+    user = serializers.SerializerMethodField()
+
     class Meta:
         model = Transaction
         fields = [
             'id', 'transaction_code', 'type', 'amount', 
             'balance_before', 'balance_after', 'status', 
-            'note', 'created_at'
+            'note', 'payment_method', 'user','created_at'
         ]
         read_only_fields = ['id', 'transaction_code', 'created_at']
+
+    def get_user(self, obj):
+        if not obj.user:
+            return None
+        return {"id": obj.user.id, "username": obj.user.username, "email": obj.user.email}
 
 class DepositUserSerializer(serializers.Serializer):
     """Serializer nhúng inline để trả thông tin người dùng trong deposit list"""

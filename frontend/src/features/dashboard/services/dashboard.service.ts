@@ -30,7 +30,7 @@ export const dashboardService = {
    */
   exportReport: async (format: "excel" | "pdf", params?: DashboardParams) => {
     const response = await api.get("/admin/dashboard/export/", {
-      params: { format, ...params },
+      params: { file_format: format, ...params },
       responseType: "blob",
     });
 

@@ -287,7 +287,7 @@ class DashboardExportView(APIView):
     permission_classes = [permissions.IsAdminUser]
 
     def get(self, request, *args, **kwargs):
-        fmt = request.query_params.get('format', 'excel')
+        fmt = request.query_params.get('file_format', 'excel')
         start_date, end_date, start_dt, end_dt = _parse_date_range(request)
 
         total_revenue = (

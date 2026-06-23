@@ -94,21 +94,134 @@ class DashboardOverviewView(APIView):
             logger.error(f"[Dashboard/overview] summary_cards error: {e}")
             data["summary_cards"] = None  # Widget sẽ hiện trạng thái lỗi riêng
 
-        # --- Section 2: Revenue Chart ---
+        # --- Section 2: Revenue Chart & Game Breakdown ---
         try:
-            days_diff = min((end_date - start_date).days, 30)
-            revenue_chart = []
-            for i in range(days_diff, -1, -1):
-                day = end_date - timedelta(days=i)
-                revenue_chart.append({
-                    "date": day.strftime("%d/%m"),
-                    "revenue": 0,
-                    "orders": 0,
-                })
+            # Filter orders in date range
+            chart_order_qs = Order.objects.filter(
+                created_at__range=(start_dt, end_dt),
+                payment_status=Order.PaymentStatus.PAID
+            )
+            if game_id:
+                chart_order_qs = chart_order_qs.filter(items__account__game_id=game_id)
+
+            total_days = (end_date - start_date).days
+
+            # Quyết định gom nhóm dựa trên khoảng thời gian lọc
+            if total_days <= 31:
+                # Gom nhóm theo ngày
+                from django.db.models.functions import TruncDate
+                from django.db.models import Count
+                daily_stats = (
+                    chart_order_qs
+                    .annotate(period=TruncDate('created_at'))
+                    .values('period')
+                    .annotate(
+                        revenue=Sum('total_price'),
+                        orders=Count('id')
+                    )
+                    .order_by('period')
+                )
+                daily_map = {item['period']: item for item in daily_stats}
+                
+                revenue_chart = []
+                for i in range(total_days, -1, -1):
+                    day = end_date - timedelta(days=i)
+                    day_data = daily_map.get(day, {"revenue": 0, "orders": 0})
+                    revenue_chart.append({
+                        "date": day.strftime("%d/%m"),
+                        "revenue": float(day_data.get("revenue") or 0),
+                        "orders": int(day_data.get("orders") or 0),
+                    })
+            elif total_days <= 90:
+                # Gom nhóm theo tuần (hiển thị ví dụ: "Tuần 25" hoặc "15/06 - 21/06")
+                from django.db.models.functions import TruncWeek
+                from django.db.models import Count
+                weekly_stats = (
+                    chart_order_qs
+                    .annotate(period=TruncWeek('created_at'))
+                    .values('period')
+                    .annotate(
+                        revenue=Sum('total_price'),
+                        orders=Count('id')
+                    )
+                    .order_by('period')
+                )
+                weekly_map = {item['period'].date(): item for item in weekly_stats}
+                
+                revenue_chart = []
+                # Chạy từ ngày bắt đầu đến ngày kết thúc, nhảy từng tuần
+                current_week_start = start_date - timedelta(days=start_date.weekday()) # Trunc to Monday
+                while current_week_start <= end_date:
+                    week_data = weekly_map.get(current_week_start, {"revenue": 0, "orders": 0})
+                    # Format dạng: "22/06" (ngày bắt đầu của tuần đó)
+                    revenue_chart.append({
+                        "date": f"T.{current_week_start.strftime('%d/%m')}",
+                        "revenue": float(week_data.get("revenue") or 0),
+                        "orders": int(week_data.get("orders") or 0),
+                    })
+                    current_week_start += timedelta(days=7)
+            else:
+                # Gom nhóm theo tháng (Hiển thị ví dụ: "Tháng 06/2026")
+                from django.db.models.functions import TruncMonth
+                from django.db.models import Count
+                monthly_stats = (
+                    chart_order_qs
+                    .annotate(period=TruncMonth('created_at'))
+                    .values('period')
+                    .annotate(
+                        revenue=Sum('total_price'),
+                        orders=Count('id')
+                    )
+                    .order_by('period')
+                )
+                monthly_map = {item['period'].date(): item for item in monthly_stats}
+                
+                revenue_chart = []
+                # Chạy qua từng tháng
+                current_month_start = start_date.replace(day=1)
+                while current_month_start <= end_date:
+                    month_data = monthly_map.get(current_month_start, {"revenue": 0, "orders": 0})
+                    revenue_chart.append({
+                        "date": current_month_start.strftime("%m/%y"),
+                        "revenue": float(month_data.get("revenue") or 0),
+                        "orders": int(month_data.get("orders") or 0),
+                    })
+                    # Nhảy sang tháng tiếp theo
+                    if current_month_start.month == 12:
+                        current_month_start = current_month_start.replace(year=current_month_start.year + 1, month=1)
+                    else:
+                        current_month_start = current_month_start.replace(month=current_month_start.month + 1)
+            
             data["revenue_chart"] = revenue_chart
+
+            # Game breakdown
+            from apps.game.models import Game
+            # Subquery to aggregate revenue by game
+            game_revenue = (
+                Order.objects.filter(
+                    created_at__range=(start_dt, end_dt),
+                    payment_status=Order.PaymentStatus.PAID
+                )
+                .values('items__account__game__name')
+                .annotate(value=Sum('total_price'))
+                .order_by('-value')
+            )
+            
+            game_breakdown = []
+            for item in game_revenue:
+                name = item.get('items__account__game__name') or "Khác"
+                val = float(item.get('value') or 0)
+                game_breakdown.append({
+                    "name": name,
+                    "value": val
+                })
+            
+            data["game_breakdown"] = game_breakdown
+            
         except Exception as e:
-            logger.error(f"[Dashboard/overview] revenue_chart error: {e}")
+            logger.error(f"[Dashboard/overview] revenue_chart/breakdown error: {e}")
             data["revenue_chart"] = None
+            data["game_breakdown"] = None
 
         # --- Section 3: Quick Stats ---
         try:

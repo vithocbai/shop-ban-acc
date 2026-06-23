@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
-    Loader2,
     DollarSign,
     ShoppingCart,
     Gamepad2,
@@ -14,7 +13,7 @@ import {
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { dashboardService } from "@/features/dashboard/services/dashboard.service";
-import { formatDate, formatPrice } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
 import {
     LineChart,
     Line,
@@ -42,6 +41,7 @@ import type { DateRange } from "react-day-picker";
 import { format, subDays } from "date-fns";
 import { vi } from "date-fns/locale";
 import type { LiveData, OverviewData } from "@/features/dashboard/types";
+import Spinner from "@/components/ui/spinner";
 
 // ---- Sub-components ----
 function SectionError({ message = "Không thể tải dữ liệu" }: { message?: string }) {
@@ -95,21 +95,31 @@ export default function Dashboard() {
             toast.info(`Đang tạo báo cáo ${formatType.toUpperCase()}...`);
             await dashboardService.exportReport(formatType, queryParams);
             toast.success("Tải báo cáo thành công!");
-        } catch (error) {
-            toast.error("Lỗi khi tải báo cáo.");
+        } catch (error: any) {
+            let errorMsg = "Lỗi khi xuất báo cáo. Vui lòng thử lại!";
+            if (error?.response?.data instanceof Blob) {
+                try {
+                    const text = await error.response.data.text();
+                    const json = JSON.parse(text);
+                    errorMsg = json.detail || json.message || errorMsg;
+                } catch (e) {
+                    // Ignore parse error
+                }
+            } else {
+                errorMsg = error?.response?.data?.detail || error?.response?.data?.message || errorMsg;
+            }
+            toast.error(errorMsg);
         }
     };
 
-    // Chỉ block toàn trang khi lần đầu load (overview chưa có gì)
+    // Chỉ block toàn trang khi lần đầu load (overview chưa có gì)  
     if (overviewLoading && !overview) {
         return (
-            <div className="flex items-center justify-center h-full min-h-[400px]">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="flex items-center justify-center h-full">
+                <Spinner />
             </div>
         );
     }
-    
-
 
 
     return (

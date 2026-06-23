@@ -11,14 +11,14 @@ import {
   ChevronRight,
   Newspaper,
   Settings,
-  BarChart3,
   CreditCard,
   History,
   ShieldCheck,
   FileText,
   Image as ImageIcon,
   Bell,
-  LogOut
+  LogOut,
+  LayoutDashboard
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -104,7 +104,7 @@ const AdminLayout: React.FC = () => {
   };
 
   const menuItems: MenuItem[] = [
-    { label: 'Báo cáo thống kê', icon: <BarChart3 size={20} />, to: '/admin/dashboard' },
+    { label: 'Tổng quan hệ thống', icon: <LayoutDashboard size={20} />, to: '/admin/dashboard' },
     { 
       label: 'Quản lý tài khoản', 
       icon: <Gamepad2 size={20} />, 

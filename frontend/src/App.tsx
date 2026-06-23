@@ -11,6 +11,7 @@ import DepositHistoryPage from "./pages/admin/deposits/DepositHistory";
 import NewsManagementPage from "./pages/admin/news/NewsManagement";
 import BannerManagementPage from "./pages/admin/banners/BannerManagement";
 import TransactionManagementPage from "./pages/admin/transactions/TransactionManagement";
+import DashboardPage from "./pages/admin/dashboard/Dashboard";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -28,25 +29,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     return <>{children}</>;
 };
 
-// Mock Pages
-const Dashboard = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {[
-            { label: "Tổng doanh thu", value: "150,000,000đ", color: "text-success" },
-            { label: "Đơn hàng mới", value: "25", color: "text-primary" },
-            { label: "Tài khoản đang bán", value: "1,240", color: "text-warning" },
-            { label: "Người dùng mới", value: "12", color: "text-text-main" },
-        ].map((stat, i) => (
-            <div key={i} className="card p-6">
-                <p className="text-sm text-text-secondary mb-1">{stat.label}</p>
-                <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-            </div>
-        ))}
-    </div>
-);
-
-
-
+// Removed mock Dashboard
 function App() {
     return (
         <AuthProvider>
@@ -70,7 +53,7 @@ function App() {
                         }
                     >
                         <Route index element={<Navigate to="/admin/dashboard" replace />} />
-                        <Route path="dashboard" element={<Dashboard />} />
+                        <Route path="dashboard" element={<DashboardPage />} />
                         <Route path="games" element={<GameManagementPage />} />
                         <Route path="accounts" element={<AccountManagementPage />} />
                         <Route path="orders" element={<OrderManagementPage />} />

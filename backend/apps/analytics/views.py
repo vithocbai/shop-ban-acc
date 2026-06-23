@@ -295,7 +295,30 @@ class DashboardExportView(APIView):
             .aggregate(Sum('total_price'))['total_price__sum'] or 0
         )
         total_orders = Order.objects.filter(created_at__range=(start_dt, end_dt)).count()
+        sold_accounts = Order.objects.filter(created_at__range=(start_dt, end_dt), payment_status=Order.PaymentStatus.PAID).count()
         new_users = User.objects.filter(created_at__range=(start_dt, end_dt)).count()
+        
+        total_deposits = (
+            Transaction.objects.filter(
+                created_at__range=(start_dt, end_dt), 
+                type=Transaction.Type.DEPOSIT, 
+                status=Transaction.Status.SUCCESS
+            ).aggregate(Sum('amount'))['amount__sum'] or 0
+        )
+
+        game_revenue = (
+            Order.objects.filter(
+                created_at__range=(start_dt, end_dt),
+                payment_status=Order.PaymentStatus.PAID
+            )
+            .values('items__account__game__name')
+            .annotate(value=Sum('total_price'))
+            .order_by('-value')
+        )
+
+        recent_orders = Order.objects.select_related('user').filter(
+            created_at__range=(start_dt, end_dt)
+        ).order_by('-created_at')[:50]
 
         period_label = f"{start_date.strftime('%d/%m/%Y')} - {end_date.strftime('%d/%m/%Y')}"
 
@@ -303,16 +326,41 @@ class DashboardExportView(APIView):
             wb = openpyxl.Workbook()
             ws = wb.active
             ws.title = "BaoCao"
-            ws.column_dimensions['A'].width = 30
-            ws.column_dimensions['B'].width = 20
+            ws.column_dimensions['A'].width = 25
+            ws.column_dimensions['B'].width = 25
+            ws.column_dimensions['C'].width = 15
+            ws.column_dimensions['D'].width = 15
+            ws.column_dimensions['E'].width = 20
 
             ws.append(["BÁO CÁO TỔNG QUAN HỆ THỐNG"])
             ws.append([f"Thời gian: {period_label}"])
             ws.append([])
             ws.append(["Chỉ số", "Giá trị"])
             ws.append(["Tổng doanh thu (VND)", float(total_revenue)])
+            ws.append(["Tổng tiền nạp (VND)", float(total_deposits)])
             ws.append(["Tổng đơn hàng", total_orders])
+            ws.append(["Tài khoản đã bán", sold_accounts])
             ws.append(["Người dùng mới", new_users])
+            ws.append([])
+
+            ws.append(["DOANH THU THEO GAME"])
+            ws.append(["Tên Game", "Doanh thu (VND)"])
+            for g in game_revenue:
+                name = g.get('items__account__game__name') or "Khác"
+                val = float(g.get('value') or 0)
+                ws.append([name, val])
+            ws.append([])
+
+            ws.append(["DANH SÁCH ĐƠN HÀNG (Tối đa 50)"])
+            ws.append(["Mã ĐH", "Khách hàng", "Số tiền (VND)", "Trạng thái", "Ngày tạo"])
+            for o in recent_orders:
+                ws.append([
+                    o.order_code,
+                    o.user.username,
+                    float(o.total_price),
+                    o.payment_status,
+                    o.created_at.strftime("%d/%m/%Y %H:%M")
+                ])
 
             output = io.BytesIO()
             wb.save(output)
@@ -333,8 +381,21 @@ class DashboardExportView(APIView):
             p.drawString(72, 778, f"Thoi gian: {period_label}")
             p.line(72, 768, 520, 768)
             p.drawString(72, 750, f"Tong doanh thu: {float(total_revenue):,.0f} VND")
-            p.drawString(72, 732, f"Tong don hang:  {total_orders}")
-            p.drawString(72, 714, f"Nguoi dung moi: {new_users}")
+            p.drawString(72, 732, f"Tong tien nap:  {float(total_deposits):,.0f} VND")
+            p.drawString(72, 714, f"Tong don hang:  {total_orders}")
+            p.drawString(72, 696, f"TK da ban:      {sold_accounts}")
+            p.drawString(72, 678, f"Nguoi dung moi: {new_users}")
+
+            p.setFont("Helvetica-Bold", 12)
+            p.drawString(72, 640, "DOANH THU THEO GAME")
+            p.setFont("Helvetica", 11)
+            y = 620
+            for g in game_revenue:
+                name = g.get('items__account__game__name') or "Khac"
+                val = float(g.get('value') or 0)
+                p.drawString(72, y, f"- {name}: {val:,.0f} VND")
+                y -= 18
+            
             p.showPage()
             p.save()
             output.seek(0)

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, Outlet } from 'react-router-dom';
 import { 
   Gamepad2, 
@@ -7,8 +7,6 @@ import {
   Users, 
   CircleDollarSign,
   UserCircle,
-  ChevronDown,
-  ChevronRight,
   Newspaper,
   Settings,
   CreditCard,
@@ -18,9 +16,12 @@ import {
   Image as ImageIcon,
   Bell,
   LogOut,
-  LayoutDashboard
+  LayoutDashboard,
+  Menu,
+  ChevronRight
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 
 interface MenuItem {
   label: string;
@@ -29,79 +30,35 @@ interface MenuItem {
   children?: { label: string; to: string; icon: React.ReactNode }[];
 }
 
-const NavItem: React.FC<{ item: MenuItem; isActive: boolean; isOpen: boolean; onToggle: () => void }> = ({ 
-  item, isActive, isOpen, onToggle 
-}) => {
-  const location = useLocation();
-  const hasChildren = !!item.children;
-  if (!hasChildren) {
-    return (
-      <Link 
-        to={item.to!} 
-        className={`flex items-center px-4 py-3 mb-1 rounded-md transition-all duration-200 ${
-          isActive 
-            ? 'bg-primary text-white font-medium shadow-sm' 
-            : 'text-text-secondary font-medium hover:bg-bg-secondary hover:text-primary'
-        }`}
-      >
-        <span className="mr-3">{item.icon}</span>
-        <span className="text-sm">{item.label}</span>
-      </Link>
-    );
-  }
-
-  return (
-    <div className="mb-1">
-      <button 
-        onClick={onToggle}
-        className={`w-full flex items-center justify-between px-4 py-3 rounded-md transition-all duration-200 ${
-          isActive ? 'text-primary font-bold' : 'text-text-secondary font-medium hover:bg-bg-secondary hover:text-primary'
-        }`}
-      >
-        <div className="flex items-center">
-          <span className="mr-3">{item.icon}</span>
-          <span className="text-sm">{item.label}</span>
-        </div>
-        {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-      </button>
-      
-      {isOpen && (
-        <div className="ml-9 mt-1 space-y-1">
-          {item.children?.map((child) => (
-            <Link
-              key={child.to}
-              to={child.to}
-              className={`flex items-center px-4 py-2 text-sm rounded-md transition-all ${
-                location.pathname === child.to 
-                  ? 'text-white bg-primary font-medium shadow-sm' 
-                  : 'text-text-secondary font-medium hover:text-primary hover:bg-bg-secondary'
-              }`}
-            >
-              <span className="mr-2 opacity-70">{child.icon}</span>
-              {child.label}
-            </Link>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
 const AdminLayout: React.FC = () => {
   const location = useLocation();
   const { logout } = useAuth();
-  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
-    'Tài khoản': true,
-    'Đơn hàng': false,
-    'Người dùng': false,
-    'Nạp tiền': false,
-    'Nội dung': false,
-    'Cấu hình': false,
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    const saved = localStorage.getItem('adminSidebarOpen');
+    return saved !== null ? JSON.parse(saved) : true;
   });
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  const toggleMenu = (label: string) => {
-    setOpenMenus(prev => ({ ...prev, [label]: !prev[label] }));
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prev: boolean) => {
+      const newState = !prev;
+      localStorage.setItem('adminSidebarOpen', JSON.stringify(newState));
+      return newState;
+    });
   };
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [location.pathname]);
+
+  const expanded = isMobile ? true : isSidebarOpen;
 
   const menuItems: MenuItem[] = [
     { label: 'Tổng quan hệ thống', icon: <LayoutDashboard size={20} />, to: '/admin/dashboard' },
@@ -109,85 +66,191 @@ const AdminLayout: React.FC = () => {
       label: 'Quản lý tài khoản', 
       icon: <Gamepad2 size={20} />, 
       children: [
-        { label: 'Tài khoản game', to: '/admin/accounts', icon: <ClipboardList size={14} /> },
-        { label: 'Danh mục game', to: '/admin/games', icon: <Gamepad2 size={14} /> },
+        { label: 'Tài khoản game', to: '/admin/accounts', icon: <ClipboardList size={16} /> },
+        { label: 'Danh mục game', to: '/admin/games', icon: <Gamepad2 size={16} /> },
       ]
     },
     { 
       label: 'Quản lý đơn hàng', 
       icon: <Zap size={20} />, 
       children: [
-        { label: 'Danh sách đơn hàng', to: '/admin/orders', icon: <FileText size={14} /> },
-        { label: 'Lịch sử giao dịch', to: '/admin/transactions', icon: <History size={14} /> },
+        { label: 'Danh sách đơn hàng', to: '/admin/orders', icon: <FileText size={16} /> },
+        { label: 'Lịch sử giao dịch', to: '/admin/transactions', icon: <History size={16} /> },
       ]
     },
     { 
       label: 'Quản lý người dùng', 
       icon: <Users size={20} />, 
       children: [
-        { label: 'Danh sách người dùng', to: '/admin/users', icon: <Users size={14} /> },
-        { label: 'Phân quyền', to: '/admin/roles', icon: <ShieldCheck size={14} /> },
-        { label: 'Nhóm người dùng', to: '/admin/user-groups', icon: <Users size={14} /> },
+        { label: 'Danh sách người dùng', to: '/admin/users', icon: <Users size={16} /> },
+        { label: 'Phân quyền', to: '/admin/roles', icon: <ShieldCheck size={16} /> },
+        { label: 'Nhóm người dùng', to: '/admin/user-groups', icon: <Users size={16} /> },
       ]
     },
     { 
       label: 'Quản lý nạp tiền', 
       icon: <CircleDollarSign size={20} />, 
       children: [
-        { label: 'Nạp tiền thủ công', to: '/admin/deposits/manual', icon: <CircleDollarSign size={14} /> },
-        { label: 'Thẻ nạp', to: '/admin/deposits/cards', icon: <CreditCard size={14} /> },
-        { label: 'Lịch sử nạp tiền', to: '/admin/deposits/history', icon: <History size={14} /> },
+        { label: 'Nạp tiền thủ công', to: '/admin/deposits/manual', icon: <CircleDollarSign size={16} /> },
+        { label: 'Thẻ nạp', to: '/admin/deposits/cards', icon: <CreditCard size={16} /> },
+        { label: 'Lịch sử nạp tiền', to: '/admin/deposits/history', icon: <History size={16} /> },
       ]
     },
     { 
       label: 'Quản lý nội dung', 
       icon: <Newspaper size={20} />, 
       children: [
-        { label: 'Tin tức', to: '/admin/news', icon: <Newspaper size={14} /> },
-        { label: 'Banner', to: '/admin/banners', icon: <ImageIcon size={14} /> },
-        { label: 'Thông báo hệ thống', to: '/admin/notifications', icon: <Bell size={14} /> },
+        { label: 'Tin tức', to: '/admin/news', icon: <Newspaper size={16} /> },
+        { label: 'Banner', to: '/admin/banners', icon: <ImageIcon size={16} /> },
+        { label: 'Thông báo hệ thống', to: '/admin/notifications', icon: <Bell size={16} /> },
       ]
     },
     { 
       label: 'Cấu hình hệ thống', 
       icon: <Settings size={20} />, 
       children: [
-        { label: 'Cài đặt chung', to: '/admin/settings/general', icon: <Settings size={14} /> },
-        { label: 'Cài đặt thanh toán', to: '/admin/settings/payment', icon: <CreditCard size={14} /> },
-        { label: 'Cài đặt bảo mật', to: '/admin/settings/security', icon: <ShieldCheck size={14} /> },
-        { label: 'Nhật ký hệ thống', to: '/admin/settings/logs', icon: <FileText size={14} /> },
+        { label: 'Cài đặt chung', to: '/admin/settings/general', icon: <Settings size={16} /> },
+        { label: 'Cài đặt thanh toán', to: '/admin/settings/payment', icon: <CreditCard size={16} /> },
+        { label: 'Cài đặt bảo mật', to: '/admin/settings/security', icon: <ShieldCheck size={16} /> },
+        { label: 'Nhật ký hệ thống', to: '/admin/settings/logs', icon: <FileText size={16} /> },
       ]
     },
   ];
 
+  const activeParentItem = menuItems.find(
+    (item) => item.children?.some((child) => location.pathname === child.to)
+  );
+
   return (
     <div className="flex h-screen bg-bg-secondary font-roboto overflow-hidden">
+      {/* Mobile Overlay */}
+      {isMobile && isMobileOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 transition-opacity" 
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-border-color sticky top-0 h-screen flex flex-col overflow-y-auto py-6 scrollbar-hide">
-        <div className="px-6 mb-8">
-          <h2 className="text-2xl font-bold text-primary tracking-tight">SHOP GAME</h2>
-          <p className="text-[14px] text-text-secondary mt-1 font-medium">Hệ thống quản trị</p>
+      <aside 
+        className={`bg-white border-r border-border-color h-screen flex flex-col pt-2 pb-6 transition-all duration-300 ${
+          isMobile ? 'fixed inset-y-0 left-0 z-50' : 'sticky top-0'
+        } ${expanded ? 'w-68' : 'w-20'} ${
+          isMobile && !isMobileOpen ? '-translate-x-full' : 'translate-x-0'
+        }`}
+      > 
+        <div className={`mb-4 flex ${expanded ? 'justify-center px-2' : 'justify-center px-0'} items-center`}>
+          {expanded ? (
+            <Link to="/admin/dashboard" className="block w-84 px-2">
+              <img className="w-full h-14 object-cover" src="/logoshop.svg" alt="Logo Shop" />
+            </Link>
+          ) : (
+            <Link to="/admin/dashboard" className="block">
+              <h2 className="text-2xl font-bold text-primary tracking-tight"><img className="w-44 h-14 object-cover" src="/logoshop.svg" alt="Logo Shop" /></h2>
+            </Link>
+          )}
         </div>
         
-        <nav className="flex-1 px-3">
-          {menuItems.map((item) => (
-            <NavItem 
-              key={item.label}
-              item={item}
-              isActive={item.to ? location.pathname === item.to : item.children?.some(c => location.pathname === c.to) || false}
-              isOpen={openMenus[item.label]}
-              onToggle={() => toggleMenu(item.label)}
-            />
-          ))}
+        <nav className="flex-1 px-1 overflow-y-auto scrollbar-hide">
+          <Accordion 
+            type="multiple" 
+            defaultValue={menuItems.map(item => item.label)}
+            className="w-full space-y-2"
+          >
+            {menuItems.map((item) => {
+              const hasChildren = !!item.children;
+              const isParentActive = item.to ? location.pathname === item.to : item.children?.some(c => location.pathname === c.to) || false;
+
+              if (!hasChildren) {
+                return (
+                  <Link 
+                    key={item.label}
+                    to={item.to!} 
+                    title={!expanded ? item.label : undefined}
+                    className={`flex items-center rounded-md transition-all duration-200 ${
+                      expanded ? 'px-4 py-3' : 'justify-center p-3'
+                    } ${
+                      isParentActive 
+                        ? 'bg-primary text-white font-medium shadow-sm' 
+                        : 'text-text-secondary font-medium hover:bg-bg-secondary hover:text-primary'
+                    }`}
+                  >
+                    <span className={`${expanded ? 'mr-3' : ''}`}>{item.icon}</span>
+                    {expanded && <span className="text-[16px] text-nowrap">{item.label}</span>}
+                  </Link>
+                );
+              }
+
+              return (
+                <AccordionItem 
+                  key={item.label} 
+                  value={item.label}
+                  className="border-none"
+                >
+                  <AccordionTrigger 
+                    onClick={(e) => {
+                      if (!expanded) {
+                        e.preventDefault();
+                        toggleSidebar();
+                      }
+                    }}
+                    title={!expanded ? item.label : undefined}
+                    className={`w-full flex items-center rounded-md transition-all duration-200 no-underline hover:no-underline ${
+                      !expanded ? 'justify-center [&>svg]:hidden p-3' : 'justify-between px-4 py-3'
+                    } ${
+                      isParentActive 
+                        ? 'bg-primary text-white font-medium shadow-sm' 
+                        : 'text-text-secondary font-medium hover:bg-bg-secondary hover:text-primary'
+                    }`}
+                  >
+                    <div className={`flex items-center ${!expanded ? 'justify-center w-full' : ''}`}>
+                      <span className={`${expanded ? 'mr-3' : ''}`}>{item.icon}</span>
+                      {expanded && <span className="text-[16px] text-nowrap">{item.label}</span>}
+                    </div>
+                  </AccordionTrigger>
+                  
+                  <AccordionContent className={`pb-1 pt-1 ${expanded ? 'pl-4' : 'hidden'}`}>
+                    <div className={`space-y-1 mt-1 ${expanded ? 'ml-2 border-l border-gray-100' : ''}`}>
+                      {item.children?.map((child) => {
+                        const isChildActive = location.pathname === child.to;
+                        return (
+                          <Link
+                            key={child.to}
+                            to={child.to}
+                            title={!expanded ? child.label : undefined}
+                            className={`flex items-center rounded-md transition-all ${
+                              expanded ? 'px-4 py-2' : 'justify-center py-2 px-0'
+                            } ${
+                              isChildActive 
+                                ? 'text-primary bg-primary/10 font-semibold' 
+                                : 'text-text-secondary  hover:text-primary hover:bg-bg-secondary font-medium'
+                            }`}
+                          >
+                            <span className={`${expanded ? 'mr-3' : ''} opacity-70`}>
+                              {expanded ? child.icon : <ChevronRight size={16} />}
+                            </span>
+                            {expanded && <span className="text-[15px]">{child.label}</span>}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
+          </Accordion>
         </nav>
         
-        <div className="px-4 mt-10">
+        <div className={`mt-6 ${expanded ? 'px-4' : 'px-2'}`}>
           <button 
             onClick={() => logout()}
-            className="w-full flex items-center px-4 py-3 text-error hover:bg-error/10 cursor-pointer rounded-md transition-colors text-sm font-medium"
+            title={!expanded ? "Đăng xuất" : undefined}
+            className={`w-full flex items-center border border-t-2 text-error hover:bg-error/10 cursor-pointer rounded-md transition-colors font-medium ${
+              expanded ? 'px-4 py-3 text-sm' : 'justify-center p-3'
+            }`}
           >
-            <span className="mr-3 font-bold"><LogOut size={18} /></span>
-            <span>Đăng xuất</span>
+            <span className={`${expanded ? 'mr-3' : ''} font-bold`}><LogOut size={20} /></span>
+            {expanded && <span>Đăng xuất</span>}
           </button>
         </div>
       </aside>
@@ -195,8 +258,14 @@ const AdminLayout: React.FC = () => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <header className="h-16 bg-white border-b border-border-color flex items-center justify-between px-8 sticky top-0 z-20 flex-shrink-0">
-          <div className="flex items-center">
-            <h1 className="text-lg font-bold text-text-main">
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => isMobile ? setIsMobileOpen(!isMobileOpen) : toggleSidebar()} 
+              className="p-2 -ml-2 rounded-md hover:bg-bg-secondary text-text-secondary transition-colors"
+            >
+              <Menu size={20} />
+            </button>
+            <h1 className="text-lg font-bold text-text-main hidden sm:block">
               {/* Tên trang hiện tại */}
               Admin Panel 
             </h1>
@@ -204,10 +273,10 @@ const AdminLayout: React.FC = () => {
           
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-bold text-text-main">Quản trị viên</p>
-              <p className="text-[11px] text-text-secondary">admin@gamemarket.com</p>
+              <p className="font-bold text-text-main">Quản trị viên</p>
+              <p className="text-[14px] text-text-secondary">admin@gamemarket.com</p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-bg-secondary flex items-center justify-center text-text-main border border-border-color">
+            <div className="w-10 h-10 rounded-full bg-bg-secondary flex items-center justify-center text-text-main border border-border-color cursor-pointer hover:bg-gray-100 transition-colors">
               <UserCircle size={24} />
             </div>
           </div>

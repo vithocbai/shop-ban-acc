@@ -114,9 +114,9 @@ export default function Dashboard() {
 
     return (
         <div className="flex-1 flex flex-col min-h-0 space-y-4 overflow-y-auto pr-2">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 max-lg:gap-0 shrink-0">
                 <div>
-                    <h1 className="text-xl font-bold text-text-main leading-tight">Tổng quan hệ thống</h1>
+                    <h1 className="text-xl font-bold text-text-main leading-tight max-lg:hidden">Tổng quan hệ thống</h1>
                 </div>
                 {/* Filters & Export Actions */}
                 <div className="flex flex-wrap items-center gap-4 ml-auto">
@@ -198,7 +198,7 @@ export default function Dashboard() {
             </div>
 
             {/* Top Stat Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 <Card className="border-l-4 border-l-blue-500 shadow-sm">
                     <CardHeader className="p-4 pb-2">
                         <CardTitle className="text-sm font-medium text-gray-500">Tổng doanh thu</CardTitle>

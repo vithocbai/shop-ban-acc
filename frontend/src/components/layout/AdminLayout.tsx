@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import PersonalInfoModal from "./PersonalInfoModal";
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -51,6 +52,7 @@ const AdminLayout: React.FC = () => {
     });
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const [isPersonalInfoModalOpen, setIsPersonalInfoModalOpen] = useState(false);
 
     const toggleSidebar = () => {
         setIsSidebarOpen((prev: boolean) => {
@@ -356,7 +358,7 @@ const AdminLayout: React.FC = () => {
                                 
                                 <DropdownMenuSeparator className="bg-gray-100" />
                                 
-                                <DropdownMenuItem className="cursor-pointer py-2.5 px-3 flex items-center gap-3 hover:bg-gray-50 text-text-secondary font-medium rounded-md">
+                                <DropdownMenuItem onClick={() => setIsPersonalInfoModalOpen(true)} className="cursor-pointer py-2.5 px-3 flex items-center gap-3 hover:bg-gray-50 text-text-secondary font-medium rounded-md">
                                     <User size={18} className="text-gray-500" />
                                     <span>Thông tin cá nhân</span>
                                 </DropdownMenuItem>
@@ -399,6 +401,11 @@ const AdminLayout: React.FC = () => {
                     <Outlet />
                 </div>
             </main>
+
+            <PersonalInfoModal 
+                isOpen={isPersonalInfoModalOpen} 
+                onClose={() => setIsPersonalInfoModalOpen(false)} 
+            />
         </div>
     );
 };

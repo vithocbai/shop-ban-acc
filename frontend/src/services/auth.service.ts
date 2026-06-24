@@ -35,5 +35,13 @@ export const authService = {
   getMe: async () => {
     const response = await api.get('/auth/me/');
     return response.data;
+  },
+
+  /**
+   * Cập nhật thông tin cá nhân
+   */
+  updateMe: async (data: any) => {
+    const response = await api.patch('/auth/me/', data);
+    return response.data;
   }
 };

@@ -110,6 +110,16 @@ class DepositViewSet(ResponseEnvelopeMixin, viewsets.ModelViewSet):
             
         return queryset
 
+    def perform_create(self, serializer):
+        deposit = serializer.save(user=self.request.user)
+        from apps.notification.services.notifier import notify_admins
+        from apps.notification.models import Notification
+        notify_admins(
+            title="Có yêu cầu nạp tiền mới",
+            content=f"User {deposit.user.username} vừa tạo yêu cầu nạp {deposit.amount:,.0f}đ qua {deposit.method}.",
+            n_type=Notification.Type.PAYMENT
+        )
+
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def approve(self, request, pk=None):
         """
@@ -159,6 +169,14 @@ class DepositViewSet(ResponseEnvelopeMixin, viewsets.ModelViewSet):
         deposit.approved_by = request.user
         deposit.admin_note = request.data.get('admin_note', 'Thông tin không hợp lệ.')
         deposit.save()
+        
+        # Gửi thông báo từ chối nạp tiền
+        notify_user(
+            user=deposit.user,
+            title="Nạp tiền thất bại",
+            content=f"Yêu cầu nạp {deposit.amount:,.0f}đ của bạn đã bị từ chối. Lý do: {deposit.admin_note}",
+            n_type=Notification.Type.PAYMENT
+        )
         
         return Response({"message": "Đã từ chối yêu cầu nạp tiền."})
 

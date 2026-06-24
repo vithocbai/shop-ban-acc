@@ -75,10 +75,11 @@ Chuẩn phân trang áp dụng cho mọi danh sách dữ liệu (Accounts, Order
 - `POST /auth/logout/` - Đăng xuất.
 
 ## 3.2. Users (Người dùng)
-- `GET /users/profile/` - Lấy thông tin cá nhân hiện tại.
-- `PUT /users/profile/` - Cập nhật thông tin (Tên, Số điện thoại...).
-- `POST /users/change-password/` - Đổi mật khẩu.
+- `GET /auth/me/` - Lấy thông tin cá nhân hiện tại.
+- `PATCH /auth/me/` - Cập nhật thông tin cá nhân (Họ tên, Số điện thoại, Avatar).
+- `POST /auth/password/change/` - Đổi mật khẩu cá nhân.
 
+---
 ---
 
 # 4. NHÓM API GAME & ACCOUNT

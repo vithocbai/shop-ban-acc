@@ -35,5 +35,21 @@ export const authService = {
   getMe: async () => {
     const response = await api.get('/auth/me/');
     return response.data;
+  },
+
+  /**
+   * Cập nhật thông tin cá nhân
+   */
+  updateMe: async (data: any) => {
+    const response = await api.patch('/auth/me/', data);
+    return response.data;
+  },
+
+  /**
+   * Đổi mật khẩu
+   */
+  changePassword: async (data: any) => {
+    const response = await api.post('/auth/password/change/', data);
+    return response.data;
   }
 };

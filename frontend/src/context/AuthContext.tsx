@@ -8,6 +8,8 @@ interface User {
   role: string;
   balance: string;
   avatar?: string;
+  first_name?: string;
+  last_name?: string;
 }
 
 interface AuthContextType {

@@ -22,8 +22,8 @@ type BadgeVariant = "default" | "secondary" | "destructive" | "outline" | "ghost
 
 const ROLE_MAP: Record<string, { label: string; variant: BadgeVariant; className?: string }> = {
     USER: { label: "Người dùng", variant: "secondary" },
-    ADMIN: { label: "Admin", variant: "default" },
-    SUPER_ADMIN: { label: "Super Admin", variant: "default", className: "bg-purple-600 hover:bg-purple-700 text-white" },
+    ADMIN: { label: "Quản trị viên", variant: "secondary" },
+    SUPER_ADMIN: { label: "Super Admin", variant: "secondary", className: "bg-purple-600 hover:bg-purple-700 text-white" },
     MODERATOR: { label: "Moderator", variant: "outline" },
 };
 

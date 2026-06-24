@@ -30,6 +30,40 @@ const NotificationDropdown: React.FC = () => {
         fetchNotifications();
     }, []);
 
+    // Kết nối WebSocket để nhận thông báo real-time
+    useEffect(() => {
+        const token = localStorage.getItem('access_token');
+        if (!token) return;
+
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsBase = import.meta.env.VITE_API_URL 
+            ? import.meta.env.VITE_API_URL.replace('http', 'ws').replace('/api', '') 
+            : `${protocol}//localhost:8000`;
+            
+        const wsUrl = `${wsBase}/ws/notifications/?token=${token}`;
+        const ws = new WebSocket(wsUrl);
+
+        ws.onopen = () => {
+            console.log('Connected to WebSocket for notifications');
+        };
+
+        ws.onmessage = (event) => {
+            try {
+                const payload = JSON.parse(event.data);
+                if (payload.type === 'new_notification') {
+                    const newNotif = payload.data as Notification;
+                    setNotifications(prev => [newNotif, ...prev]);
+                }
+            } catch (err) {
+                console.error("Error parsing WS message", err);
+            }
+        };
+
+        return () => {
+            ws.close();
+        };
+    }, []);
+
     // Đánh dấu 1 thông báo là đã đọc
     const handleMarkAsRead = async (id: number) => {
         try {

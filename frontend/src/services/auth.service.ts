@@ -43,5 +43,13 @@ export const authService = {
   updateMe: async (data: any) => {
     const response = await api.patch('/auth/me/', data);
     return response.data;
+  },
+
+  /**
+   * Đổi mật khẩu
+   */
+  changePassword: async (data: any) => {
+    const response = await api.post('/auth/password/change/', data);
+    return response.data;
   }
 };

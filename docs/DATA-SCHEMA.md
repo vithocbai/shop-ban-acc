@@ -41,7 +41,7 @@ user_user
 ## 👤 HỆ THỐNG NGƯỜI DÙNG
 
 ### `user_user`
-Quản lý thông tin tài khoản người dùng và admin.
+Quản lý thông tin tài khoản người dùng và admin. (Đã tích hợp hiển thị đầy đủ trên Header / Profile Modal).
 - `id` (integer) [PK]
 - `username`, `email`, `password` (varchar/text)
 - `first_name`, `last_name` (varchar)

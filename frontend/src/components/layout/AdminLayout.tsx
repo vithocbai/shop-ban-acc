@@ -29,6 +29,7 @@ import { useAuth } from "../../context/AuthContext";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import PersonalInfoModal from "./PersonalInfoModal";
 import ChangePasswordModal from "./ChangePasswordModal";
+import NotificationDropdown from "../shared/NotificationDropdown";
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -294,14 +295,7 @@ const AdminLayout: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1 sm:gap-2 mr-2">
-                            <button className="relative p-2 rounded-full hover:bg-gray-100 text-text-secondary transition-colors">
-                                <Bell size={24} />
-                                <span className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
-                                    3
-                                </span>
-                            </button>
-                        </div>
+                        <NotificationDropdown />
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -390,8 +384,8 @@ const AdminLayout: React.FC = () => {
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator className="bg-gray-100" />
                                 
-                                <DropdownMenuItem onClick={() => logout()} className="cursor-pointer py-2.5 px-3 flex items-center gap-3 hover:bg-red-50 text-error font-medium rounded-md">
-                                    <LogOut size={18} className="text-error" />
+                                <DropdownMenuItem onClick={() => logout()} className="cursor-pointer py-2.5 px-3 flex items-center gap-3 hover:bg-error/10 text-error font-medium rounded-md mt-1">
+                                    <LogOut size={18} />
                                     <span>Đăng xuất</span>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>

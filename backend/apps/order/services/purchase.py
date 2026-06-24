@@ -77,4 +77,12 @@ def purchase_account(user, account_id: int, note: str = ""):
         n_type=Notification.Type.ORDER
     )
 
+    # 8. Gửi thông báo cho Admin
+    from apps.notification.services.notifier import notify_admins
+    notify_admins(
+        title="Tài khoản vừa được bán",
+        content=f"User {user.username} vừa mua tài khoản {account.account_code} với giá {account.price:,.0f}đ.",
+        n_type=Notification.Type.ORDER
+    )
+
     return order

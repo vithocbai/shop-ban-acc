@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { X, Save, Loader2, Upload, CalendarIcon } from "lucide-react";
+import { X, Save, Loader2, Upload, CalendarIcon, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "react-toastify";
 import { formatPrice, cn } from "@/lib/utils";
 import api from "@/services/api";
@@ -298,33 +297,45 @@ const UserEditModal: React.FC<UserEditModalProps> = ({ isOpen, onClose, user, on
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label className="font-bold text-text-main">Vai trò <span className="text-error">*</span></Label>
-                            <Select value={formData.role} onValueChange={(val) => handleSelectChange("role", val)}>
-                                <SelectTrigger className={cn("w-full", fieldErrors.role && "border-error focus-visible:ring-error")}>
-                                    <SelectValue placeholder="Chọn vai trò" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="USER">Người dùng</SelectItem>
-                                    <SelectItem value="ADMIN">Admin</SelectItem>
-                                    <SelectItem value="MODERATOR">Moderator</SelectItem>
-                                    <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <div className="relative w-full">
+                                <select
+                                    value={formData.role}
+                                    onChange={(e) => handleSelectChange("role", e.target.value)}
+                                    className={cn(
+                                        "appearance-none flex h-10 w-full items-center justify-between rounded-md border bg-white pl-3 pr-10 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary",
+                                        fieldErrors.role ? "border-error focus:ring-error" : "border-border-color"
+                                    )}
+                                >
+                                    <option value="" disabled hidden>Chọn vai trò</option>
+                                    <option value="USER">Người dùng</option>
+                                    <option value="ADMIN">Admin</option>
+                                    <option value="MODERATOR">Moderator</option>
+                                    <option value="SUPER_ADMIN">Super Admin</option>
+                                </select>
+                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50 pointer-events-none text-text-main" />
+                            </div>
                             {fieldErrors.role && (
                                 <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.role}</p>
                             )}
                         </div>
                         <div className="space-y-2">
                             <Label className="font-bold text-text-main">Trạng thái <span className="text-error">*</span></Label>
-                            <Select value={formData.status} onValueChange={(val) => handleSelectChange("status", val)}>
-                                <SelectTrigger className={cn("w-full", fieldErrors.status && "border-error focus-visible:ring-error")}>
-                                    <SelectValue placeholder="Chọn trạng thái" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="ACTIVE">Hoạt động</SelectItem>
-                                    <SelectItem value="BANNED">Đã khóa</SelectItem>
-                                    <SelectItem value="PENDING">Chờ xác thực</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <div className="relative w-full">
+                                <select
+                                    value={formData.status}
+                                    onChange={(e) => handleSelectChange("status", e.target.value)}
+                                    className={cn(
+                                        "appearance-none flex h-10 w-full items-center justify-between rounded-md border bg-white pl-3 pr-10 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary",
+                                        fieldErrors.status ? "border-error focus:ring-error" : "border-border-color"
+                                    )}
+                                >
+                                    <option value="" disabled hidden>Chọn trạng thái</option>
+                                    <option value="ACTIVE">Hoạt động</option>
+                                    <option value="BANNED">Đã khóa</option>
+                                    <option value="PENDING">Chờ xác thực</option>
+                                </select>
+                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50 pointer-events-none text-text-main" />
+                            </div>
                             {fieldErrors.status && (
                                 <p className="text-[12px] text-error mt-0.5 italic">{fieldErrors.status}</p>
                             )}

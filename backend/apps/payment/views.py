@@ -116,7 +116,7 @@ class DepositViewSet(ResponseEnvelopeMixin, viewsets.ModelViewSet):
         from apps.notification.models import Notification
         notify_admins(
             title="Có yêu cầu nạp tiền mới",
-            content=f"User {deposit.user.username} vừa tạo yêu cầu nạp {deposit.amount:,.0f}đ qua {deposit.method}.",
+            content=f"Người dùng {deposit.user.username} vừa tạo yêu cầu nạp {deposit.amount:,.0f}đ qua {deposit.method}.",
             n_type=Notification.Type.PAYMENT
         )
 

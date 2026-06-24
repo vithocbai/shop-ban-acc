@@ -4,12 +4,12 @@ import type { User, UserFilters } from "@/features/user/types";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Search, Edit, EllipsisVertical, Shield, Trash2, Key, Plus } from "lucide-react";
+import { Loader2, Search, Edit, Trash2, Plus, KeyRound, ShieldAlert } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import { toast } from "react-toastify";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { formatDate, formatPrice } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";
 import UserEditModal from "./UserEditModal";
@@ -130,7 +130,7 @@ const UserManagement: React.FC = () => {
                             <Search size={18} />
                         </div>
                         <Input
-                            placeholder="Email hoặc username..."
+                            placeholder="Tìm kiếm tên đăng nhập hoặc email..."
                             className="pl-10"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
@@ -187,9 +187,8 @@ const UserManagement: React.FC = () => {
                         <TableRow>
                             <TableHead className="w-[20%]">Người dùng</TableHead>
                             <TableHead className="w-[15%]">Email</TableHead>
-                            <TableHead className="w-[10%] text-center">Số điện thoại</TableHead>
+                            <TableHead className="w-[10%] text-center">Điện thoại</TableHead>
                             <TableHead className="w-[10%] text-center">Quyền hạn</TableHead>
-                            <TableHead className="w-[12%] text-right">Số dư (VNĐ)</TableHead>
                             <TableHead className="w-[10%] text-center">Trạng thái</TableHead>
                             <TableHead className="w-[13%] text-center">Đăng nhập cuối</TableHead>
                             <TableHead className="w-[10%] text-center">Thao tác</TableHead>
@@ -256,9 +255,6 @@ const UserManagement: React.FC = () => {
                                                 {roleConf.label}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell className="text-right font-bold text-success">
-                                            {formatPrice(Number(user.balance))}
-                                        </TableCell>
 
                                         <TableCell className="text-center">
                                             <Badge variant={statusConf.variant} className="border-0">
@@ -266,7 +262,7 @@ const UserManagement: React.FC = () => {
                                             </Badge>
                                         </TableCell>
                                         <TableCell className="text-center text-sm text-text-main font-medium">
-                                            {user.last_login ? formatDate(user.last_login) : "Chưa đăng nhập"}
+                                            {user.last_login ? formatDate(user.last_login) : ""}
                                         </TableCell>
                                         <TableCell className="text-center">
                                             <div className="flex items-center justify-center">
@@ -286,7 +282,7 @@ const UserManagement: React.FC = () => {
                                                     title="Đổi mật khẩu"
                                                     className="h-8 w-8 text-orange-600 hover:text-orange-800 hover:bg-orange-50 cursor-pointer"
                                                 >
-                                                    <Key className="w-4 h-4" />
+                                                    <KeyRound className="w-4 h-4" />
                                                 </Button>
                                                 <Button 
                                                     variant="ghost" 
@@ -295,7 +291,7 @@ const UserManagement: React.FC = () => {
                                                     title="Phân quyền"
                                                     className="h-8 w-8 text-purple-600 hover:text-purple-800 hover:bg-purple-50 cursor-pointer"
                                                 >
-                                                    <Shield className="w-4 h-4" />
+                                                    <ShieldAlert className="w-4 h-4" />
                                                 </Button>
                                                 <Button 
                                                     variant="ghost" 

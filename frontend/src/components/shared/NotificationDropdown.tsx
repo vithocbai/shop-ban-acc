@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bell } from 'lucide-react';
+import { Bell, Wallet, ShoppingCart, Info, CheckCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -108,7 +108,7 @@ const NotificationDropdown: React.FC = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80 bg-white p-0 border border-border-color shadow-lg rounded-xl overflow-hidden">
                 <div className="p-3 border-b border-border-color flex justify-between items-center bg-gray-50/80">
-                    <h3 className="font-semibold text-text-main text-sm">Thông báo</h3>
+                    <h3 className="font-medium text-text-main text-sm">Thông báo</h3>
                     {unreadCount > 0 && (
                         <button 
                             onClick={handleMarkAllAsRead}
@@ -118,36 +118,57 @@ const NotificationDropdown: React.FC = () => {
                         </button>
                     )}
                 </div>
-                <div className="max-h-[350px] overflow-y-auto custom-scrollbar">
+                <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
                     {notifications.length === 0 ? (
-                        <div className="p-4 text-center text-text-secondary text-sm">
-                            Không có thông báo nào.
+                        <div className="p-8 text-center flex flex-col items-center justify-center text-text-secondary">
+                            <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-3">
+                                <Bell size={20} className="text-gray-300" />
+                            </div>
+                            <p className="text-sm font-medium">Không có thông báo nào</p>
+                            <p className="text-[12px] text-gray-400 mt-1">Khi có thông báo mới, chúng sẽ xuất hiện ở đây.</p>
                         </div>
                     ) : (
-                        notifications.map((notif) => (
-                            <div 
-                                key={notif.id} 
-                                className={`p-3 border-b border-border-color hover:bg-gray-50 transition-colors cursor-pointer ${!notif.is_read ? 'bg-blue-50/30' : ''}`}
-                                onClick={() => {
-                                    if (!notif.is_read) handleMarkAsRead(notif.id);
-                                }}
-                            >
-                                <div className="flex gap-3">
-                                    <div className={`mt-1.5 h-2 w-2 rounded-full flex-shrink-0 ${!notif.is_read ? 'bg-primary' : 'bg-transparent'}`} />
-                                    <div className="flex-1">
-                                        <p className={`text-sm ${!notif.is_read ? 'font-semibold text-text-main' : 'text-text-secondary'}`}>
-                                            {notif.title}
-                                        </p>
-                                        <p className="text-[12px] text-text-secondary mt-0.5 line-clamp-2">
-                                            {notif.content}
-                                        </p>
-                                        <p className="text-[10px] text-gray-400 mt-1">
-                                            {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true, locale: vi })}
-                                        </p>
+                        notifications.map((notif) => {
+                            // Map type sang icon và màu sắc tương ứng
+                            const getIcon = (type: string) => {
+                                switch (type) {
+                                    case 'PAYMENT': return <Wallet size={18} className="text-emerald-500" />;
+                                    case 'ORDER': return <ShoppingCart size={18} className="text-blue-500" />;
+                                    case 'SYSTEM': return <Info size={18} className="text-purple-500" />;
+                                    default: return <Bell size={18} className="text-gray-500" />;
+                                }
+                            };
+
+                            return (
+                                <div 
+                                    key={notif.id} 
+                                    className={`p-4 border-b border-border-color hover:bg-gray-50/80 transition-all cursor-pointer relative group ${!notif.is_read ? 'bg-blue-50/40' : ''}`}
+                                    onClick={() => {
+                                        if (!notif.is_read) handleMarkAsRead(notif.id);
+                                    }}
+                                >
+                                    {!notif.is_read && (
+                                        <div className="absolute top-4 right-4 h-2 w-2 rounded-full bg-primary shadow-[0_0_4px_rgba(var(--primary),0.5)]" />
+                                    )}
+                                    <div className="flex gap-3.5">
+                                        <div className="mt-0.5 flex-shrink-0 w-9 h-9 bg-white rounded-full flex items-center justify-center border border-gray-100 shadow-sm group-hover:scale-105 transition-transform">
+                                            {getIcon(notif.type)}
+                                        </div>
+                                        <div className="flex-1 pr-3">
+                                            <p className={`text-sm tracking-tight ${!notif.is_read ? 'font-medium text-gray-900' : 'font-medium text-gray-600'}`}>
+                                                {notif.title}
+                                            </p>
+                                            <p className="text-[13px] text-gray-500 mt-1 leading-relaxed line-clamp-2">
+                                                {notif.content}
+                                            </p>
+                                            <p className="text-[11px] text-gray-400 mt-2 font-medium flex items-center gap-1.5">
+                                                {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true, locale: vi })}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))
+                            );
+                        })
                     )}
                 </div>
                 <div className="p-2 border-t border-border-color text-center bg-gray-50/80 hover:bg-gray-100 cursor-pointer transition-colors">
